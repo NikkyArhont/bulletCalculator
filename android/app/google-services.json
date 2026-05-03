@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "111658630134",
+    "project_id": "bullet-calculator-g2nezy",
+    "storage_bucket": "bullet-calculator-g2nezy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:111658630134:android:d32eb47202cc63b1fae5d7",
+        "android_client_info": {
+          "package_name": "com.mycompany.bulletcalculator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCs06d5MI5YOUlgpPMbkM44qgZhoyO065g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
