@@ -8,6 +8,8 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import '/flutter_flow/units_util.dart';
+import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,6 +49,87 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isMetric = UnitsManager.instance.distanceUnit == DistanceUnit.m;
+
+    double? parseVal(String? text) {
+      if (text == null || text.trim().isEmpty) return null;
+      return double.tryParse(text.trim().replaceAll(',', '.'));
+    }
+
+    // Name
+    final name = _model.textFieldModel1.inputTextController?.text.trim() ?? '';
+    final nameValid = name.isNotEmpty;
+
+    // Sight Height (20-120 mm)
+    final sHText = _model.textFieldModel2.inputTextController?.text ?? '';
+    final sH = parseVal(sHText);
+    final sHValid = sH != null &&
+        (isMetric
+            ? (sH >= 20 && sH <= 120)
+            : (sH * 25.4 >= 20 && sH * 25.4 <= 120));
+    final sHErr = sHText.trim().isNotEmpty && !sHValid;
+
+    // Zero Distance (10-1000 m)
+    final zDText = _model.textFieldModel3.inputTextController?.text ?? '';
+    final zD = parseVal(zDText);
+    final zDValid = zD != null &&
+        (isMetric
+            ? (zD >= 10 && zD <= 1000)
+            : (zD * 0.9144 >= 10 && zD * 0.9144 <= 1000));
+    final zDErr = zDText.trim().isNotEmpty && !zDValid;
+
+    // Twist (100-600 mm)
+    final twText = _model.textFieldModel4.inputTextController?.text ?? '';
+    final tw = parseVal(twText);
+    final twValid = tw != null &&
+        (isMetric
+            ? (tw >= 100 && tw <= 600)
+            : (tw * 25.4 >= 100 && tw * 25.4 <= 600));
+    final twErr = twText.trim().isNotEmpty && !twValid;
+
+    // Click Value (> 0)
+    final cVText = _model.textFieldModel5.inputTextController?.text ?? '';
+    final cV = parseVal(cVText);
+    final cVValid = cV != null && cV > 0 && cV <= 5.0;
+    final cVErr = cVText.trim().isNotEmpty && !cVValid;
+
+    // Bullet Weight (10-1000 grain)
+    final bWText = _model.textFieldModel6.inputTextController?.text ?? '';
+    final bW = parseVal(bWText);
+    final bWValid = bW != null && bW >= 10 && bW <= 1000;
+    final bWErr = bWText.trim().isNotEmpty && !bWValid;
+
+    // Bullet Length (3-80 mm)
+    final bLText = _model.textFieldModel7.inputTextController?.text ?? '';
+    final bL = parseVal(bLText);
+    final bLValid = bL != null && bL >= 3 && bL <= 80;
+    final bLErr = bLText.trim().isNotEmpty && !bLValid;
+
+    // Muzzle Velocity (100-1500 m/s)
+    final mVText = _model.textFieldModel8.inputTextController?.text ?? '';
+    final mV = parseVal(mVText);
+    final mVValid = mV != null &&
+        (isMetric
+            ? (mV >= 100 && mV <= 1500)
+            : (mV * 0.3048 >= 100 && mV * 0.3048 <= 1500));
+    final mVErr = mVText.trim().isNotEmpty && !mVValid;
+
+    // BC Value (0.05-1.5)
+    final bcVText = _model.textFieldModel9.inputTextController?.text ?? '';
+    final bcV = parseVal(bcVText);
+    final bcVValid = bcV != null && bcV >= 0.05 && bcV <= 1.5;
+    final bcVErr = bcVText.trim().isNotEmpty && !bcVValid;
+
+    final isFormValid = nameValid &&
+        sHValid &&
+        zDValid &&
+        twValid &&
+        cVValid &&
+        bWValid &&
+        bLValid &&
+        mVValid &&
+        bcVValid;
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -172,8 +255,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                     model: _model.textFieldModel1,
                                     updateCallback: () => safeSetState(() {}),
                                     child: TextFieldWidget(
-                                      label: false,
-                                      helper: false,
+                                      label: 'Название профиля',
+                                      helper: null,
                                       hint: 'Напр. TIKKA T3X .308',
                                       value: '',
                                       leading_icon: Icon(
@@ -200,8 +283,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: false,
-                                            helper: false,
+                                            label: 'Высота прицела',
+                                            helper: sHErr ? (isMetric ? '20–120 мм' : '0.8–4.7 дюйм') : (isMetric ? 'мм' : 'дюймов'),
                                             hint: '5.0',
                                             value: '',
                                             leading_icon_present: false,
@@ -212,7 +295,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                             border: Color(0x00000000),
                                             hint_color: 'hint',
                                             variant: 'outlined',
-                                            error: false,
+                                            error: sHErr,
+                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
                                           ),
                                         ),
                                       ),
@@ -223,8 +308,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: false,
-                                            helper: false,
+                                            label: 'Дист. пристрелки',
+                                            helper: zDErr ? (isMetric ? '10–1000 м' : '10–1100 ярд') : UnitsManager.instance.distanceLabel,
                                             hint: '100',
                                             value: '',
                                             leading_icon_present: false,
@@ -235,7 +320,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                             border: Color(0x00000000),
                                             hint_color: 'hint',
                                             variant: 'outlined',
-                                            error: false,
+                                            error: zDErr,
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                           ),
                                         ),
                                       ),
@@ -292,8 +379,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: false,
-                                            helper: false,
+                                            label: 'Твист (шаг)',
+                                            helper: twErr ? (isMetric ? '100–600 мм' : '4–24 дюйма') : (isMetric ? 'мм' : 'дюймов'),
                                             hint: '10',
                                             value: '',
                                             leading_icon: Icon(
@@ -304,7 +391,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                             border: Color(0x00000000),
                                             hint_color: 'hint',
                                             variant: 'outlined',
-                                            error: false,
+                                            error: twErr,
+                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
                                           ),
                                         ),
                                       ),
@@ -315,8 +404,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: false,
-                                            helper: false,
+                                            label: 'Цена клика',
+                                            helper: cVErr ? '0.001–5.0' : 'MRAD / MOA',
                                             hint: '0.1',
                                             value: '',
                                             leading_icon: Icon(
@@ -327,172 +416,356 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                             border: Color(0x00000000),
                                             hint_color: 'hint',
                                             variant: 'outlined',
-                                            error: false,
+                                            error: cVErr,
+                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
                                           ),
                                         ),
                                       ),
                                     ].divide(SizedBox(width: 16.0)),
                                   ),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        'Направление нарезов',
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelSmall
-                                            .override(
-                                              font: GoogleFonts.spaceGrotesk(
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelSmall
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelSmall
-                                                        .fontStyle,
+                                      Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Тип клика',
+                                              style: FlutterFlowTheme.of(
+                                                      context)
+                                                  .labelSmall
+                                                  .override(
+                                                    font: GoogleFonts.spaceGrotesk(
+                                                      fontWeight:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelSmall
+                                                              .fontWeight,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelSmall
+                                                              .fontStyle,
+                                                    ),
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .labelSmall
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .labelSmall
+                                                            .fontStyle,
+                                                    lineHeight: 1.1,
+                                                  ),
+                                            ),
+                                            FlutterFlowDropDown<String>(
+                                              controller: _model
+                                                      .clickTypeController ??=
+                                                  FormFieldController<String>(
+                                                _model.clickTypeValue ??=
+                                                    'MRAD',
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
+                                              options: ['MRAD', 'MOA'],
+                                              onChanged: (val) => safeSetState(
+                                                  () => _model.clickTypeValue =
+                                                      val),
+                                              width: double.infinity,
+                                              height: 40.0,
+                                              textStyle: FlutterFlowTheme.of(
+                                                      context)
+                                                  .bodyMedium
+                                                  .override(
+                                                    font: GoogleFonts.inter(
+                                                      fontWeight:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontWeight,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    ),
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primaryText,
+                                                    letterSpacing: 0.0,
+                                                  ),
+                                              hintText: 'MRAD',
+                                              icon: Icon(
+                                                Icons
+                                                    .keyboard_arrow_down_rounded,
+                                                color: FlutterFlowTheme.of(
+                                                        context)
+                                                    .secondaryText,
+                                                size: 24.0,
+                                              ),
+                                              fillColor: FlutterFlowTheme.of(
+                                                      context)
+                                                  .secondaryBackground,
+                                              elevation: 2.0,
+                                              borderColor: FlutterFlowTheme.of(
+                                                      context)
+                                                  .alternate,
+                                              borderWidth: 1.0,
+                                              borderRadius: 8.0,
+                                              margin: EdgeInsetsDirectional
+                                                  .fromSTEB(
+                                                      16.0, 0.0, 16.0, 0.0),
+                                              hidesUnderline: true,
+                                              isOverButton: false,
+                                              isSearchable: false,
+                                              isMultiSelect: false,
+                                            ),
+                                          ].divide(SizedBox(height: 8.0)),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Направление нарезов',
+                                              style:
                                                   FlutterFlowTheme.of(context)
                                                       .labelSmall
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontStyle,
-                                              lineHeight: 1.1,
-                                            ),
-                                      ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => safeSetState(
-                                                () => _model.isRightTwist = true),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: _model.isRightTwist
-                                                    ? FlutterFlowTheme.of(context).primary
-                                                    : Colors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(4.0),
-                                                shape: BoxShape.rectangle,
-                                                border: Border.all(
-                                                  color: _model.isRightTwist
-                                                      ? FlutterFlowTheme.of(context).primary
-                                                      : FlutterFlowTheme.of(context).alternate,
-                                                  width: 1.0,
-                                                ),
-                                              ),
-                                              child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        12.0, 10.0, 12.0, 10.0),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    if (_model.isRightTwist)
-                                                      Padding(
-                                                        padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 6.0, 0.0),
-                                                        child: Icon(
-                                                          Icons.check_rounded,
-                                                          color: FlutterFlowTheme.of(context).onPrimary,
-                                                          size: 14.0,
+                                                      .override(
+                                                        font: GoogleFonts.spaceGrotesk(
+                                                          fontWeight:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .labelSmall
+                                                                  .fontWeight,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .labelSmall
+                                                                  .fontStyle,
                                                         ),
+                                                        color: FlutterFlowTheme.of(
+                                                                context)
+                                                            .primary,
+                                                        letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .labelSmall
+                                                                .fontWeight,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .labelSmall
+                                                                .fontStyle,
+                                                        lineHeight: 1.1,
                                                       ),
-                                                    Text(
-                                                      'Правое',
-                                                      style: FlutterFlowTheme.of(context)
-                                                          .labelMedium
-                                                          .override(
-                                                            font: GoogleFonts.spaceGrotesk(
-                                                              fontWeight: FlutterFlowTheme.of(context).labelMedium.fontWeight,
-                                                              fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
-                                                            ),
-                                                            color: _model.isRightTwist
-                                                                ? FlutterFlowTheme.of(context).onPrimary
-                                                                : FlutterFlowTheme.of(context).secondaryText,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight: FlutterFlowTheme.of(context).labelMedium.fontWeight,
-                                                            fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
-                                                            lineHeight: 1.1,
-                                                          ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
                                             ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () => safeSetState(
-                                                () => _model.isRightTwist = false),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: !_model.isRightTwist
-                                                    ? FlutterFlowTheme.of(context).primary
-                                                    : Colors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(4.0),
-                                                shape: BoxShape.rectangle,
-                                                border: Border.all(
-                                                  color: !_model.isRightTwist
-                                                      ? FlutterFlowTheme.of(context).primary
-                                                      : FlutterFlowTheme.of(context).alternate,
-                                                  width: 1.0,
-                                                ),
-                                              ),
-                                              child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        12.0, 10.0, 12.0, 10.0),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    if (!_model.isRightTwist)
-                                                      Padding(
-                                                        padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 6.0, 0.0),
-                                                        child: Icon(
-                                                          Icons.check_rounded,
-                                                          color: FlutterFlowTheme.of(context).onPrimary,
-                                                          size: 14.0,
-                                                        ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () => safeSetState(() =>
+                                                      _model.isRightTwist =
+                                                          true),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: _model.isRightTwist
+                                                          ? FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primary
+                                                          : Colors.transparent,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4.0),
+                                                      shape: BoxShape.rectangle,
+                                                      border: Border.all(
+                                                        color: _model
+                                                                .isRightTwist
+                                                            ? FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primary
+                                                            : FlutterFlowTheme.of(
+                                                                    context)
+                                                                .alternate,
+                                                        width: 1.0,
                                                       ),
-                                                    Text(
-                                                      'Левое',
-                                                      style: FlutterFlowTheme.of(context)
-                                                          .labelMedium
-                                                          .override(
-                                                            font: GoogleFonts.spaceGrotesk(
-                                                              fontWeight: FlutterFlowTheme.of(context).labelMedium.fontWeight,
-                                                              fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
-                                                            ),
-                                                            color: !_model.isRightTwist
-                                                                ? FlutterFlowTheme.of(context).onPrimary
-                                                                : FlutterFlowTheme.of(context).secondaryText,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight: FlutterFlowTheme.of(context).labelMedium.fontWeight,
-                                                            fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
-                                                            lineHeight: 1.1,
-                                                          ),
                                                     ),
-                                                  ],
+                                                    child: Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(12.0,
+                                                                  10.0, 12.0, 10.0),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          if (_model
+                                                              .isRightTwist)
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0.0,
+                                                                          0.0,
+                                                                          6.0,
+                                                                          0.0),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .check_rounded,
+                                                                color:
+                                                                    FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .onPrimary,
+                                                                size: 14.0,
+                                                              ),
+                                                            ),
+                                                          Text(
+                                                            'Правое',
+                                                            style: FlutterFlowTheme.of(
+                                                                    context)
+                                                                .labelMedium
+                                                                .override(
+                                                                  font: GoogleFonts.spaceGrotesk(
+                                                                    fontWeight:
+                                                                        FlutterFlowTheme.of(context).labelMedium.fontWeight,
+                                                                    fontStyle:
+                                                                        FlutterFlowTheme.of(context).labelMedium.fontStyle,
+                                                                  ),
+                                                                  color: _model
+                                                                          .isRightTwist
+                                                                      ? FlutterFlowTheme.of(context).onPrimary
+                                                                      : FlutterFlowTheme.of(context).secondaryText,
+                                                                  letterSpacing:
+                                                                      0.0,
+                                                                  fontWeight:
+                                                                      FlutterFlowTheme.of(context).labelMedium.fontWeight,
+                                                                  fontStyle:
+                                                                      FlutterFlowTheme.of(context).labelMedium.fontStyle,
+                                                                  lineHeight:
+                                                                      1.1,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
+                                                GestureDetector(
+                                                  onTap: () => safeSetState(() =>
+                                                      _model.isRightTwist =
+                                                          false),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: !_model
+                                                              .isRightTwist
+                                                          ? FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primary
+                                                          : Colors.transparent,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4.0),
+                                                      shape: BoxShape.rectangle,
+                                                      border: Border.all(
+                                                        color: !_model
+                                                                .isRightTwist
+                                                            ? FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primary
+                                                            : FlutterFlowTheme.of(
+                                                                    context)
+                                                                .alternate,
+                                                        width: 1.0,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(12.0,
+                                                                  10.0, 12.0, 10.0),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          if (!_model
+                                                              .isRightTwist)
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0.0,
+                                                                          0.0,
+                                                                          6.0,
+                                                                          0.0),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .check_rounded,
+                                                                color:
+                                                                    FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .onPrimary,
+                                                                size: 14.0,
+                                                              ),
+                                                            ),
+                                                          Text(
+                                                            'Левое',
+                                                            style: FlutterFlowTheme.of(
+                                                                    context)
+                                                                .labelMedium
+                                                                .override(
+                                                                  font: GoogleFonts.spaceGrotesk(
+                                                                    fontWeight:
+                                                                        FlutterFlowTheme.of(context).labelMedium.fontWeight,
+                                                                    fontStyle:
+                                                                        FlutterFlowTheme.of(context).labelMedium.fontStyle,
+                                                                  ),
+                                                                  color: !_model
+                                                                          .isRightTwist
+                                                                      ? FlutterFlowTheme.of(context).onPrimary
+                                                                      : FlutterFlowTheme.of(context).secondaryText,
+                                                                  letterSpacing:
+                                                                      0.0,
+                                                                  fontWeight:
+                                                                      FlutterFlowTheme.of(context).labelMedium.fontWeight,
+                                                                  fontStyle:
+                                                                      FlutterFlowTheme.of(context).labelMedium.fontStyle,
+                                                                  lineHeight:
+                                                                      1.1,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ].divide(SizedBox(width: 8.0)),
                                             ),
-                                          ),
-                                        ].divide(SizedBox(width: 8.0)),
+                                          ].divide(SizedBox(height: 8.0)),
+                                        ),
                                       ),
-                                    ].divide(SizedBox(height: 8.0)),
+                                    ].divide(SizedBox(width: 16.0)),
                                   ),
                                 ].divide(SizedBox(height: 16.0)),
                               ),
@@ -545,8 +818,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: false,
-                                            helper: false,
+                                            label: 'Вес пули',
+                                            helper: bWErr ? '10–1000 grain' : 'grain',
                                             hint: '175',
                                             value: '',
                                             leading_icon: Icon(
@@ -557,7 +830,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                             border: Color(0x00000000),
                                             hint_color: 'hint',
                                             variant: 'outlined',
-                                            error: false,
+                                            error: bWErr,
+                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
                                           ),
                                         ),
                                       ),
@@ -568,8 +843,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: false,
-                                            helper: false,
+                                            label: 'Длина пули',
+                                            helper: bLErr ? '3–80 мм' : 'мм',
                                             hint: '32.5',
                                             value: '',
                                             leading_icon: Icon(
@@ -580,7 +855,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                             border: Color(0x00000000),
                                             hint_color: 'hint',
                                             variant: 'outlined',
-                                            error: false,
+                                            error: bLErr,
+                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
                                           ),
                                         ),
                                       ),
@@ -590,8 +867,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                     model: _model.textFieldModel8,
                                     updateCallback: () => safeSetState(() {}),
                                     child: TextFieldWidget(
-                                      label: false,
-                                      helper: false,
+                                      label: 'Начальная скорость',
+                                      helper: mVErr ? (isMetric ? '100–1500 м/с' : '330–4900 fps') : (isMetric ? 'м/с' : 'fps'),
                                       hint: '820',
                                       value: '',
                                       leading_icon: Icon(
@@ -602,7 +879,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                       border: Color(0x00000000),
                                       hint_color: 'hint',
                                       variant: 'outlined',
-                                      error: false,
+                                      error: mVErr,
+                                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
                                     ),
                                   ),
                                   Divider(
@@ -740,7 +1019,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                                       size: 24.0,
                                                     ),
                                                     fillColor:
-                                                        Colors.transparent,
+                                                        FlutterFlowTheme.of(context).secondaryBackground,
                                                     elevation: 2.0,
                                                     borderColor:
                                                         FlutterFlowTheme.of(
@@ -762,17 +1041,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                                                 context)
                                                             .labelMedium
                                                             .override(
-                                                              font: GoogleFonts
-                                                                  .spaceGrotesk(
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .labelMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .labelMedium
-                                                                    .fontStyle,
-                                                              ),
+                                                              font: GoogleFonts.spaceGrotesk(),
                                                               letterSpacing:
                                                                   0.0,
                                                               fontWeight:
@@ -799,16 +1068,18 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                               updateCallback: () =>
                                                   safeSetState(() {}),
                                               child: TextFieldWidget(
-                                                label: false,
-                                                helper: false,
-                                                hint: '0.243',
-                                                value: '',
-                                                leading_icon_present: false,
-                                                trailing_icon_present: false,
-                                                border: Color(0x00000000),
-                                                hint_color: 'hint',
-                                                variant: 'outlined',
-                                                error: false,
+                                            label: 'Значение BC',
+                                            helper: bcVErr ? '0.05–1.5' : null,
+                                            hint: '0.243',
+                                            value: '',
+                                            leading_icon_present: false,
+                                            trailing_icon_present: false,
+                                            border: Color(0x00000000),
+                                            hint_color: 'hint',
+                                            variant: 'outlined',
+                                            error: bcVErr,
+                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
                                               ),
                                             ),
                                           ),
@@ -902,7 +1173,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                           size: 'large',
                           full_width: true,
                           loading: _model.isLoading,
-                          disabled: _model.isLoading,
+                          disabled: _model.isLoading || !isFormValid,
                           onPressed: () async {
                             safeSetState(() => _model.isLoading = true);
                             try {
@@ -912,54 +1183,126 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                       .inputTextController?.text.trim() ??
                                   '';
                               if (name.isEmpty) {
-                                safeSetState(
-                                    () => _model.isLoading = false);
+                                safeSetState(() => _model.isLoading = false);
                                 return;
                               }
+
+                              final isMetric =
+                                  UnitsManager.instance.distanceUnit ==
+                                      DistanceUnit.m;
+
+                              double? parseValue(String? text) {
+                                if (text == null || text.trim().isEmpty)
+                                  return null;
+                                return double.tryParse(
+                                    text.trim().replaceAll(',', '.'));
+                              }
+
+                              void showError(String msg) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(msg)));
+                                safeSetState(() => _model.isLoading = false);
+                              }
+
+                              double? sH = parseValue(_model.textFieldModel2
+                                  .inputTextController?.text);
+                              if (sH == null) {
+                                showError('Введите высоту прицела');
+                                return;
+                              }
+                              if (!isMetric) sH *= 25.4;
+                              if (sH < 20 || sH > 120) {
+                                showError('Высота прицела: 20–120 мм');
+                                return;
+                              }
+
+                              double? zD = parseValue(_model.textFieldModel3
+                                  .inputTextController?.text);
+                              if (zD == null) {
+                                showError('Введите дистанцию пристрелки');
+                                return;
+                              }
+                              if (!isMetric) zD *= 0.9144;
+                              if (zD < 10 || zD > 1000) {
+                                showError('Дистанция пристрелки: 10–1000 м');
+                                return;
+                              }
+
+                              double? tw = parseValue(_model.textFieldModel4
+                                  .inputTextController?.text);
+                              if (tw == null) {
+                                showError('Введите твист');
+                                return;
+                              }
+                              if (!isMetric) tw *= 25.4;
+                              if (tw < 100 || tw > 600) {
+                                showError('Твист: 100–600 мм');
+                                return;
+                              }
+
+                              double? cV = parseValue(_model.textFieldModel5
+                                  .inputTextController?.text);
+                              if (cV == null || cV <= 0) {
+                                showError('Цена клика должна быть > 0');
+                                return;
+                              }
+                              if (_model.clickTypeValue == null) {
+                                showError('Выберите тип клика');
+                                return;
+                              }
+
+                              double? bW = parseValue(_model.textFieldModel6
+                                  .inputTextController?.text);
+                              if (bW == null || bW < 10 || bW > 1000) {
+                                showError('Вес пули: 10–1000 grain');
+                                return;
+                              }
+
+                              double? bL = parseValue(_model.textFieldModel7
+                                  .inputTextController?.text);
+                              if (bL == null || bL < 3 || bL > 80) {
+                                showError('Длина пули: 3–80 мм');
+                                return;
+                              }
+
+                              double? mV = parseValue(_model.textFieldModel8
+                                  .inputTextController?.text);
+                              if (mV == null) {
+                                showError('Введите скорость');
+                                return;
+                              }
+                              if (!isMetric) mV *= 0.3048;
+                              if (mV < 100 || mV > 1500) {
+                                showError('Скорость: 100–1500 м/с');
+                                return;
+                              }
+
+                              double? bcV = parseValue(_model.textFieldModel9
+                                  .inputTextController?.text);
+                              if (bcV == null || bcV < 0.05 || bcV > 1.5) {
+                                showError('БК: 0.05–1.5');
+                                return;
+                              }
+
                               await FirebaseFirestore.instance
                                   .collection('users')
                                   .doc(uid)
                                   .collection('weapons')
                                   .add({
                                 'name': name,
-                                'sight_height': _model.textFieldModel2
-                                        .inputTextController?.text
-                                        .trim() ??
-                                    '',
-                                'zero_distance': _model.textFieldModel3
-                                        .inputTextController?.text
-                                        .trim() ??
-                                    '',
-                                'twist': _model.textFieldModel4
-                                        .inputTextController?.text
-                                        .trim() ??
-                                    '',
-                                'click_value': _model.textFieldModel5
-                                        .inputTextController?.text
-                                        .trim() ??
-                                    '',
+                                'sight_height': sH.toString(),
+                                'zero_distance': zD.toString(),
+                                'twist': tw.toString(),
+                                'click_value': cV.toString(),
+                                'click_type': _model.clickTypeValue,
                                 'twist_direction':
                                     _model.isRightTwist ? 'right' : 'left',
-                                'bullet_weight': _model.textFieldModel6
-                                        .inputTextController?.text
-                                        .trim() ??
-                                    '',
-                                'bullet_length': _model.textFieldModel7
-                                        .inputTextController?.text
-                                        .trim() ??
-                                    '',
-                                'muzzle_velocity': _model.textFieldModel8
-                                        .inputTextController?.text
-                                        .trim() ??
-                                    '',
-                                'bc_model':
-                                    _model.dropdownValue ?? 'G7',
-                                'bc_value': _model.textFieldModel9
-                                        .inputTextController?.text
-                                        .trim() ??
-                                    '',
-                                'created_at':
-                                    FieldValue.serverTimestamp(),
+                                'bullet_weight': bW.toString(),
+                                'bullet_length': bL.toString(),
+                                'muzzle_velocity': mV.toString(),
+                                'bc_model': _model.dropdownValue ?? 'G7',
+                                'bc_value': bcV.toString(),
+                                'created_at': FieldValue.serverTimestamp(),
                               });
                               if (context.mounted) context.safePop();
                             } finally {

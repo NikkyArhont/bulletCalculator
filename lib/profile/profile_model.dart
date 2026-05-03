@@ -32,8 +32,6 @@ class ProfileModel extends FlutterFlowModel<ProfileWidget> {
   late HistoryCardModel historyCardModel4;
   // Model for Button.
   late ButtonModel buttonModel2;
-  // Model for Button.
-  late ButtonModel buttonModel3;
 
   @override
   void initState(BuildContext context) {
@@ -46,7 +44,6 @@ class ProfileModel extends FlutterFlowModel<ProfileWidget> {
     historyCardModel3 = createModel(context, () => HistoryCardModel());
     historyCardModel4 = createModel(context, () => HistoryCardModel());
     buttonModel2 = createModel(context, () => ButtonModel());
-    buttonModel3 = createModel(context, () => ButtonModel());
   }
 
   @override
@@ -60,6 +57,5 @@ class ProfileModel extends FlutterFlowModel<ProfileWidget> {
     historyCardModel3.dispose();
     historyCardModel4.dispose();
     buttonModel2.dispose();
-    buttonModel3.dispose();
   }
 }

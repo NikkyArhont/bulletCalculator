@@ -198,8 +198,8 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                             updateCallback: () =>
                                                 safeSetState(() {}),
                                             child: TextFieldWidget(
-                                              label: false,
-                                              helper: false,
+                                              label: null,
+                                              helper: null,
                                               hint: 'SEARCH INVENTORY...',
                                               value: '',
                                               leading_icon_present: false,

@@ -12,9 +12,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_settings_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import '/flutter_flow/units_util.dart';
 import '/components/choose_spec_widget.dart';
 import '/components/delete_account_widget.dart';
 import '/components/logout_widget.dart';
+import '/main.dart';
 export 'profile_settings_model.dart';
 
 class ProfileSettingsWidget extends StatefulWidget {
@@ -213,6 +215,13 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                     final tUnit = userData['temp_unit'] as String? ?? 'c';
                     final pUnit = userData['pressure_unit'] as String? ?? 'mm';
 
+                    if (!_model.isInitialized && snapshot.hasData) {
+                      _model.distanceUnit = distUnit;
+                      _model.temperatureUnit = tUnit;
+                      _model.pressureUnit = pUnit;
+                      _model.isInitialized = true;
+                    }
+
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -330,8 +339,8 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                   model: _model.textFieldModel1,
                                   updateCallback: () => safeSetState(() {}),
                                   child: TextFieldWidget(
-                                    label: false,
-                                    helper: false,
+                                    label: null,
+                                    helper: null,
                                     hint: 'Имя',
                                     value: currentUserDisplayName.split(' ').first,
                                     leading_icon_present: false,
@@ -346,8 +355,8 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                   model: _model.textFieldModel2,
                                   updateCallback: () => safeSetState(() {}),
                                   child: TextFieldWidget(
-                                    label: false,
-                                    helper: false,
+                                    label: null,
+                                    helper: null,
                                     hint: 'Фамилия',
                                     value: currentUserDisplayName.split(' ').length > 1
                                         ? currentUserDisplayName
@@ -504,8 +513,8 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                   model: _model.textFieldModel3,
                                   updateCallback: () => safeSetState(() {}),
                                   child: TextFieldWidget(
-                                    label: false,
-                                    helper: false,
+                                    label: null,
+                                    helper: null,
                                     hint: 'Email',
                                     value: currentUserEmail,
                                     leading_icon_present: false,
@@ -523,6 +532,41 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
+                                wrapWithModel(
+                                  model: _model.themeButtonModel,
+                                  updateCallback: () => safeSetState(() {}),
+                                  child: ButtonWidget(
+                                    content: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? 'Светлая тема'
+                                        : 'Темная тема',
+                                    icon: Icon(
+                                      Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Icons.light_mode_rounded
+                                          : Icons.dark_mode_rounded,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? FlutterFlowTheme.of(context).primary
+                                          : FlutterFlowTheme.of(context)
+                                              .primaryText,
+                                      size: 20.0,
+                                    ),
+                                    icon_present: true,
+                                    variant: 'ghost',
+                                    size: 'medium',
+                                    onPressed: () async {
+                                      if (Theme.of(context).brightness ==
+                                          Brightness.dark) {
+                                        MyApp.of(context)
+                                            .setThemeMode(ThemeMode.light);
+                                      } else {
+                                        MyApp.of(context)
+                                            .setThemeMode(ThemeMode.dark);
+                                      }
+                                    },
+                                  ),
+                                ),
                                 Text(
                                   'Единицы измерения',
                                   style: FlutterFlowTheme.of(context)
@@ -595,19 +639,21 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
+                                              _model.distanceUnit = 'm';
+                                              await UnitsManager.instance.updateDistanceUnit('m');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'distance_unit': 'm',
                                               }, SetOptions(merge: true));
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: distUnit == 'm'
+                                                color: _model.distanceUnit == 'm'
                                                     ? FlutterFlowTheme.of(context).primary
                                                     : FlutterFlowTheme.of(context).secondaryBackground,
                                                 borderRadius:
                                                     BorderRadius.circular(4.0),
                                                 shape: BoxShape.rectangle,
-                                                border: distUnit == 'm'
+                                                border: _model.distanceUnit == 'm'
                                                     ? null
                                                     : Border.all(
                                                         color: FlutterFlowTheme.of(context).alternate,
@@ -639,7 +685,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                                     .labelMedium
                                                                     .fontStyle,
                                                           ),
-                                                          color: distUnit == 'm'
+                                                          color: _model.distanceUnit == 'm'
                                                               ? FlutterFlowTheme.of(context).onPrimary
                                                               : FlutterFlowTheme.of(context).secondaryText,
                                                           letterSpacing: 0.0,
@@ -665,19 +711,21 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
+                                              _model.distanceUnit = 'yd';
+                                              await UnitsManager.instance.updateDistanceUnit('yd');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'distance_unit': 'yd',
                                               }, SetOptions(merge: true));
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: distUnit == 'yd'
+                                                color: _model.distanceUnit == 'yd'
                                                     ? FlutterFlowTheme.of(context).primary
                                                     : FlutterFlowTheme.of(context).secondaryBackground,
                                                 borderRadius:
                                                     BorderRadius.circular(4.0),
                                                 shape: BoxShape.rectangle,
-                                                border: distUnit == 'yd'
+                                                border: _model.distanceUnit == 'yd'
                                                     ? null
                                                     : Border.all(
                                                         color: FlutterFlowTheme.of(context).alternate,
@@ -709,7 +757,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                                     .labelMedium
                                                                     .fontStyle,
                                                           ),
-                                                          color: distUnit == 'yd'
+                                                          color: _model.distanceUnit == 'yd'
                                                               ? FlutterFlowTheme.of(context).onPrimary
                                                               : FlutterFlowTheme.of(context).secondaryText,
                                                           letterSpacing: 0.0,
@@ -781,19 +829,21 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
+                                              _model.temperatureUnit = 'c';
+                                              await UnitsManager.instance.updateTemperatureUnit('c');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'temp_unit': 'c',
                                               }, SetOptions(merge: true));
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: tUnit == 'c'
+                                                color: _model.temperatureUnit == 'c'
                                                     ? FlutterFlowTheme.of(context).primary
                                                     : FlutterFlowTheme.of(context).secondaryBackground,
                                                 borderRadius:
                                                     BorderRadius.circular(4.0),
                                                 shape: BoxShape.rectangle,
-                                                border: tUnit == 'c'
+                                                border: _model.temperatureUnit == 'c'
                                                     ? null
                                                     : Border.all(
                                                         color: FlutterFlowTheme.of(context).alternate,
@@ -825,7 +875,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                                     .labelMedium
                                                                     .fontStyle,
                                                           ),
-                                                          color: tUnit == 'c'
+                                                          color: _model.temperatureUnit == 'c'
                                                               ? FlutterFlowTheme.of(context).onPrimary
                                                               : FlutterFlowTheme.of(context).secondaryText,
                                                           letterSpacing: 0.0,
@@ -851,19 +901,21 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
+                                              _model.temperatureUnit = 'f';
+                                              await UnitsManager.instance.updateTemperatureUnit('f');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'temp_unit': 'f',
                                               }, SetOptions(merge: true));
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: tUnit == 'f'
+                                                color: _model.temperatureUnit == 'f'
                                                     ? FlutterFlowTheme.of(context).primary
                                                     : FlutterFlowTheme.of(context).secondaryBackground,
                                                 borderRadius:
                                                     BorderRadius.circular(4.0),
                                                 shape: BoxShape.rectangle,
-                                                border: tUnit == 'f'
+                                                border: _model.temperatureUnit == 'f'
                                                     ? null
                                                     : Border.all(
                                                         color: FlutterFlowTheme.of(context).alternate,
@@ -895,7 +947,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                                     .labelMedium
                                                                     .fontStyle,
                                                           ),
-                                                          color: tUnit == 'f'
+                                                          color: _model.temperatureUnit == 'f'
                                                               ? FlutterFlowTheme.of(context).onPrimary
                                                               : FlutterFlowTheme.of(context).secondaryText,
                                                           letterSpacing: 0.0,
@@ -967,19 +1019,21 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
+                                              _model.pressureUnit = 'hpa';
+                                              await UnitsManager.instance.updatePressureUnit('hpa');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'pressure_unit': 'hpa',
                                               }, SetOptions(merge: true));
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: pUnit == 'hpa'
+                                                color: _model.pressureUnit == 'hpa'
                                                     ? FlutterFlowTheme.of(context).primary
                                                     : FlutterFlowTheme.of(context).secondaryBackground,
                                                 borderRadius:
                                                     BorderRadius.circular(4.0),
                                                 shape: BoxShape.rectangle,
-                                                border: pUnit == 'hpa'
+                                                border: _model.pressureUnit == 'hpa'
                                                     ? null
                                                     : Border.all(
                                                         color: FlutterFlowTheme.of(context).alternate,
@@ -1011,7 +1065,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                                     .labelMedium
                                                                     .fontStyle,
                                                           ),
-                                                          color: pUnit == 'hpa'
+                                                          color: _model.pressureUnit == 'hpa'
                                                               ? FlutterFlowTheme.of(context).onPrimary
                                                               : FlutterFlowTheme.of(context).secondaryText,
                                                           letterSpacing: 0.0,
@@ -1037,19 +1091,21 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
+                                              _model.pressureUnit = 'inhg';
+                                              await UnitsManager.instance.updatePressureUnit('inhg');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'pressure_unit': 'inhg',
                                               }, SetOptions(merge: true));
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: pUnit == 'inhg'
+                                                color: _model.pressureUnit == 'inhg'
                                                     ? FlutterFlowTheme.of(context).primary
                                                     : FlutterFlowTheme.of(context).secondaryBackground,
                                                 borderRadius:
                                                     BorderRadius.circular(4.0),
                                                 shape: BoxShape.rectangle,
-                                                border: pUnit == 'inhg'
+                                                border: _model.pressureUnit == 'inhg'
                                                     ? null
                                                     : Border.all(
                                                         color: FlutterFlowTheme.of(context).alternate,
@@ -1081,7 +1137,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                                     .labelMedium
                                                                     .fontStyle,
                                                           ),
-                                                          color: pUnit == 'inhg'
+                                                          color: _model.pressureUnit == 'inhg'
                                                               ? FlutterFlowTheme.of(context).onPrimary
                                                               : FlutterFlowTheme.of(context).secondaryText,
                                                           letterSpacing: 0.0,
@@ -1107,19 +1163,21 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
+                                              _model.pressureUnit = 'mm';
+                                              await UnitsManager.instance.updatePressureUnit('mm');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'pressure_unit': 'mm',
                                               }, SetOptions(merge: true));
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: pUnit == 'mm'
+                                                color: _model.pressureUnit == 'mm'
                                                     ? FlutterFlowTheme.of(context).primary
                                                     : FlutterFlowTheme.of(context).secondaryBackground,
                                                 borderRadius:
                                                     BorderRadius.circular(4.0),
                                                 shape: BoxShape.rectangle,
-                                                border: pUnit == 'mm'
+                                                border: _model.pressureUnit == 'mm'
                                                     ? null
                                                     : Border.all(
                                                         color: FlutterFlowTheme.of(context).alternate,
@@ -1151,7 +1209,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                                     .labelMedium
                                                                     .fontStyle,
                                                           ),
-                                                          color: pUnit == 'mm'
+                                                          color: _model.pressureUnit == 'mm'
                                                               ? FlutterFlowTheme.of(context).onPrimary
                                                               : FlutterFlowTheme.of(context).secondaryText,
                                                           letterSpacing: 0.0,
@@ -1225,42 +1283,6 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                   Colors.transparent,
                                               alignment: Alignment(0.0, 0.0),
                                               child: DeleteAccountWidget(),
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  wrapWithModel(
-                                    model: _model.buttonModel4,
-                                    updateCallback: () => safeSetState(() {}),
-                                    child: ButtonWidget(
-                                      content: 'Выйти из аккаунта',
-                                      icon: Icon(
-                                        Icons.logout_rounded,
-                                        color: FlutterFlowTheme.of(context)
-                                            .success,
-                                        size: 16.0,
-                                      ),
-                                      icon_present: true,
-                                      icon_end_present: false,
-                                      color: FlutterFlowTheme.of(context).success,
-                                      variant: 'ghost',
-                                      size: 'medium',
-                                      full_width: true,
-                                      loading: false,
-                                      disabled: false,
-                                      onPressed: () async {
-                                        await showDialog(
-                                          context: context,
-                                          builder: (dialogContext) {
-                                            return Dialog(
-                                              elevation: 0,
-                                              insetPadding: EdgeInsets.zero,
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              alignment: Alignment(0.0, 0.0),
-                                              child: LogoutWidget(),
                                             );
                                           },
                                         );

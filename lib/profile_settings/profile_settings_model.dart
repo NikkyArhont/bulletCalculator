@@ -16,6 +16,7 @@ class ProfileSettingsModel extends FlutterFlowModel<ProfileSettingsWidget> {
   String distanceUnit = 'm';
   String temperatureUnit = 'c';
   String pressureUnit = 'mm';
+  bool isInitialized = false;
 
   // Model for Button.
   late ButtonModel buttonModel1;
@@ -31,6 +32,8 @@ class ProfileSettingsModel extends FlutterFlowModel<ProfileSettingsWidget> {
   late ButtonModel buttonModel3;
   // Model for Button.
   late ButtonModel buttonModel4;
+  // Model for theme button.
+  late ButtonModel themeButtonModel;
 
 
   @override
@@ -42,6 +45,7 @@ class ProfileSettingsModel extends FlutterFlowModel<ProfileSettingsWidget> {
     textFieldModel3 = createModel(context, () => TextFieldModel());
     buttonModel3 = createModel(context, () => ButtonModel());
     buttonModel4 = createModel(context, () => ButtonModel());
+    themeButtonModel = createModel(context, () => ButtonModel());
   }
 
   @override
@@ -53,5 +57,6 @@ class ProfileSettingsModel extends FlutterFlowModel<ProfileSettingsWidget> {
     textFieldModel3.dispose();
     buttonModel3.dispose();
     buttonModel4.dispose();
+    themeButtonModel.dispose();
   }
 }

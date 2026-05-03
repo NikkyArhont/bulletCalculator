@@ -592,30 +592,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               },
                             ),
                           ),
-                          wrapWithModel(
-                            model: _model.buttonModel3,
-                            updateCallback: () => safeSetState(() {}),
-                            child: ButtonWidget(
-                              content: 'Выйти из аккаунта',
-                              icon: Icon(
-                                Icons.logout_rounded,
-                                color: FlutterFlowTheme.of(context).primary,
-                                size: 16.0,
-                              ),
-                              icon_present: true,
-                              icon_end_present: false,
-                              color: FlutterFlowTheme.of(context).error,
-                              variant: 'ghost',
-                              size: 'medium',
-                              full_width: true,
-                              loading: false,
-                              disabled: false,
-                              onPressed: () async {
-                                await authManager.signOut();
-                                context.goNamedAuth('Login', context.mounted);
-                              },
-                            ),
-                          ),
                         ].divide(SizedBox(height: 8.0)),
                       ),
                       Container(

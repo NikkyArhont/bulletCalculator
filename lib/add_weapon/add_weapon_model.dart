@@ -47,6 +47,9 @@ class AddWeaponModel extends FlutterFlowModel<AddWeaponWidget> {
   // State field(s) for Dropdown widget.
   String? dropdownValue;
   FormFieldController<String>? dropdownValueController;
+  // State field(s) for clickType Dropdown.
+  String? clickTypeValue;
+  FormFieldController<String>? clickTypeController;
   // Model for TextField.
   late TextFieldModel textFieldModel9;
   // Model for Button.

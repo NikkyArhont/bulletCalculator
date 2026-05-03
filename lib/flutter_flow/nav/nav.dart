@@ -14,6 +14,7 @@ import '/flutter_flow/lat_lng.dart';
 import '/flutter_flow/place.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
+import '/flutter_flow/units_util.dart';
 
 import '/index.dart';
 
@@ -41,6 +42,7 @@ class AppStateNotifier extends ChangeNotifier {
   Future initializeFirstTime() async {
     final prefs = await SharedPreferences.getInstance();
     _isFirstTime = prefs.getBool('kIsFirstTime') ?? true;
+    await UnitsManager.instance.initialize();
     notifyListeners();
   }
 

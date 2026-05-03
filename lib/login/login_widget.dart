@@ -245,8 +245,8 @@ class _LoginWidgetState extends State<LoginWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: false,
-                                            helper: false,
+                                            label: null,
+                                            helper: null,
                                             hint: '900 000-00-00',
                                             value: '',
                                             leading_icon: Icon(

@@ -12,8 +12,8 @@ export 'text_field_model.dart';
 class TextFieldWidget extends StatefulWidget {
   const TextFieldWidget({
     super.key,
-    bool? label,
-    bool? helper,
+    String? label,
+    String? helper,
     String? hint,
     String? value,
     this.leading_icon,
@@ -27,8 +27,8 @@ class TextFieldWidget extends StatefulWidget {
     this.height,
     this.inputFormatters,
     this.keyboardType,
-  })  : this.label = label ?? false,
-        this.helper = helper ?? false,
+  })  : this.label = label,
+        this.helper = helper,
         this.hint = hint ?? '900 000-00-00',
         this.value = value ?? '',
         this.leading_icon_present = leading_icon_present ?? true,
@@ -38,8 +38,8 @@ class TextFieldWidget extends StatefulWidget {
         this.variant = variant ?? 'outlined',
         this.error = error ?? false;
 
-  final bool label;
-  final bool helper;
+  final String? label;
+  final String? helper;
   final String hint;
   final String value;
   final Widget? leading_icon;
@@ -91,9 +91,9 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (widget!.label ? true : false)
+          if (widget!.label != null)
             Text(
-              widget!.label.toString(),
+              widget!.label!,
               style: FlutterFlowTheme.of(context).labelMedium.override(
                     font: GoogleFonts.spaceGrotesk(
                       fontWeight:
@@ -295,6 +295,7 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
                                 .fontStyle,
                             lineHeight: 1.0,
                           ),
+                      onChanged: (_) => setState(() {}),
                       validator: _model.inputTextControllerValidator
                           .asValidator(context),
                     ),
@@ -308,9 +309,9 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
               ),
             ),
           ),
-          if (widget!.helper ? true : false)
+          if (widget!.helper != null)
             Text(
-              widget!.helper.toString(),
+              widget!.helper!,
               style: FlutterFlowTheme.of(context).bodySmall.override(
                     font: GoogleFonts.inter(
                       fontWeight:

@@ -104,8 +104,8 @@ class _DataInputFieldWidgetState extends State<DataInputFieldWidget> {
                       model: _model.textFieldModel,
                       updateCallback: () => safeSetState(() {}),
                       child: TextFieldWidget(
-                        label: false,
-                        helper: false,
+                        label: null,
+                        helper: null,
                         hint: valueOrDefault<String>(
                           widget!.hint,
                           '0',
