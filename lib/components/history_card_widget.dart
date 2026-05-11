@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'history_card_model.dart';
 export 'history_card_model.dart';
 
@@ -16,6 +17,8 @@ class HistoryCardWidget extends StatefulWidget {
     String? elevation,
     String? weapon,
     String? wind,
+    this.resultId,
+    this.isHit = false,
   })  : this.date = date ?? 'Сегодня, 14:20',
         this.distance = distance ?? '850',
         this.elevation = elevation ?? '7.4',
@@ -27,6 +30,8 @@ class HistoryCardWidget extends StatefulWidget {
   final String elevation;
   final String weapon;
   final String wind;
+  final String? resultId;
+  final bool isHit;
 
   @override
   State<HistoryCardWidget> createState() => _HistoryCardWidgetState();
@@ -87,10 +92,38 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.help,
-                            color: FlutterFlowTheme.of(context).primary,
-                            size: 18.0,
+                          GestureDetector(
+                            onTap: () async {
+                              if (widget.resultId == null) return;
+                              await FirebaseFirestore.instance
+                                  .collection('shootResults')
+                                  .doc(widget.resultId)
+                                  .update({'isHit': !widget.isHit});
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  widget.isHit
+                                      ? Icons.check_box_rounded
+                                      : Icons.check_box_outline_blank_rounded,
+                                  color: widget.isHit
+                                      ? FlutterFlowTheme.of(context).success
+                                      : FlutterFlowTheme.of(context).secondaryText,
+                                  size: 18.0,
+                                ),
+                                SizedBox(width: 4.0),
+                                Text(
+                                  'Попадание',
+                                  style: FlutterFlowTheme.of(context).labelSmall.override(
+                                    font: GoogleFonts.inter(),
+                                    color: widget.isHit
+                                        ? FlutterFlowTheme.of(context).success
+                                        : FlutterFlowTheme.of(context).secondaryText,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           Text(
                             valueOrDefault<String>(

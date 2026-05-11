@@ -12,7 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ProfileModel extends FlutterFlowModel<ProfileWidget> {
-  ///  State fields for stateful widgets in this page.
+  // State for loading devices screen
+  bool isLoadingDevices = false;
 
   // Model for ProfileStat.
   late ProfileStatModel profileStatModel1;

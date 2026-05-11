@@ -8,6 +8,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/flutter_flow/units_util.dart';
+import '/components/delete_weapon_widget.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,6 +39,7 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
   late EditWeaponModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -49,35 +51,44 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
       final wd = widget.weaponData!;
       final isMetric = UnitsManager.instance.distanceUnit == DistanceUnit.m;
 
+      _model.textFieldModel1.inputTextController ??= TextEditingController();
       _model.textFieldModel1.inputTextController?.text = wd['name'] ?? '';
 
       // Conversions for display if not metric
       double rawSH = double.tryParse(wd['sight_height']?.toString() ?? '0') ?? 0;
       final sH = isMetric ? rawSH : rawSH / 25.4;
+      _model.textFieldModel2.inputTextController ??= TextEditingController();
       _model.textFieldModel2.inputTextController?.text = sH.toStringAsFixed(1);
 
       double rawZD = double.tryParse(wd['zero_distance']?.toString() ?? '0') ?? 0;
       final zD = isMetric ? rawZD : rawZD / 0.9144;
+      _model.textFieldModel3.inputTextController ??= TextEditingController();
       _model.textFieldModel3.inputTextController?.text = zD.toStringAsFixed(0);
 
       double rawTwist = double.tryParse(wd['twist']?.toString() ?? '0') ?? 0;
       final tw = isMetric ? rawTwist : rawTwist / 25.4;
+      _model.textFieldModel4.inputTextController ??= TextEditingController();
       _model.textFieldModel4.inputTextController?.text = tw.toStringAsFixed(1);
 
+      _model.textFieldModel5.inputTextController ??= TextEditingController();
       _model.textFieldModel5.inputTextController?.text =
           wd['click_value']?.toString() ?? '';
       _model.clickTypeValue = wd['click_type'] ?? 'MRAD';
 
+      _model.textFieldModel6.inputTextController ??= TextEditingController();
       _model.textFieldModel6.inputTextController?.text =
           wd['bullet_weight']?.toString() ?? '';
+      _model.textFieldModel7.inputTextController ??= TextEditingController();
       _model.textFieldModel7.inputTextController?.text =
           wd['bullet_length']?.toString() ?? '';
 
       double rawMV = double.tryParse(wd['muzzle_velocity']?.toString() ?? '0') ?? 0;
       final mV = isMetric ? rawMV : rawMV / 0.3048;
+      _model.textFieldModel8.inputTextController ??= TextEditingController();
       _model.textFieldModel8.inputTextController?.text = mV.toStringAsFixed(0);
 
       _model.dropdownValue = wd['bc_model'] ?? 'G7';
+      _model.textFieldModel9.inputTextController ??= TextEditingController();
       _model.textFieldModel9.inputTextController?.text =
           wd['bc_value']?.toString() ?? '';
       _model.twistDir = wd['twist_direction'] == 'left' ? 'Левое' : 'Правое';
@@ -220,7 +231,7 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                                   size: 24.0,
                                 ),
                                 onPressed: () {
-                                  print('IconButton pressed ...');
+                                  context.safePop();
                                 },
                               ),
                               Container(
@@ -1105,33 +1116,46 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                         icon_present: true,
                         icon_end_present: false,
                         color: FlutterFlowTheme.of(context).secondaryText,
-                        disabled: !isFormValid,
+                        loading: _isSaving,
+                        disabled: !isFormValid || _isSaving,
                         onPressed: () async {
                           if (widget.weaponRef == null) return;
 
-                          // Final conversion before persistence
-                          final finalSH = isMetric ? sH! : sH! * 25.4; // inches to mm
-                          final finalZD = isMetric ? zD! : zD! * 0.9144; // yards to m
-                          final finalTwist = isMetric ? tw! : tw! * 25.4; // inches to mm
-                          final finalMV = isMetric ? mV! : mV! * 0.3048; // fps to m/s
+                          safeSetState(() => _isSaving = true);
+                          try {
+                            // Final conversion before persistence
+                            final finalSH =
+                                isMetric ? sH! : sH! * 25.4; // inches to mm
+                            final finalZD =
+                                isMetric ? zD! : zD! * 0.9144; // yards to m
+                            final finalTwist =
+                                isMetric ? tw! : tw! * 25.4; // inches to mm
+                            final finalMV =
+                                isMetric ? mV! : mV! * 0.3048; // fps to m/s
 
-                          await widget.weaponRef!.update({
-                            'name': name,
-                            'sight_height': finalSH.toString(),
-                            'zero_distance': finalZD.toString(),
-                            'twist': finalTwist.toString(),
-                            'twist_direction': _model.twistDir == 'Левое' ? 'left' : 'right',
-                            'click_value': cV.toString(),
-                            'click_type': _model.clickTypeValue,
-                            'bullet_weight': bW.toString(),
-                            'bullet_length': bL.toString(),
-                            'muzzle_velocity': finalMV.toString(),
-                            'bc_model': _model.dropdownValue,
-                            'bc_value': bcV.toString(),
-                            'updated_at': FieldValue.serverTimestamp(),
-                          });
+                            await widget.weaponRef!.update({
+                              'name': name,
+                              'sight_height': finalSH.toString(),
+                              'zero_distance': finalZD.toString(),
+                              'twist': finalTwist.toString(),
+                              'twist_direction':
+                                  _model.twistDir == 'Левое' ? 'left' : 'right',
+                              'click_value': cV.toString(),
+                              'click_type': _model.clickTypeValue,
+                              'bullet_weight': bW.toString(),
+                              'bullet_length': bL.toString(),
+                              'muzzle_velocity': finalMV.toString(),
+                              'bc_model': _model.dropdownValue,
+                              'bc_value': bcV.toString(),
+                              'updated_at': FieldValue.serverTimestamp(),
+                            });
 
-                          context.safePop();
+                            context.safePop();
+                          } finally {
+                            if (mounted) {
+                              safeSetState(() => _isSaving = false);
+                            }
+                          }
                         },
                       ),
                     ),
@@ -1153,6 +1177,27 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                         full_width: true,
                         loading: false,
                         disabled: false,
+                        onPressed: () async {
+                          await showDialog(
+                            context: context,
+                            builder: (dialogContext) {
+                              return Dialog(
+                                elevation: 0,
+                                insetPadding: EdgeInsets.zero,
+                                backgroundColor: Colors.transparent,
+                                alignment: AlignmentDirectional(0.0, 0.0),
+                                child: DeleteWeaponWidget(
+                                  onConfirm: () async {
+                                    if (widget.weaponRef != null) {
+                                      await widget.weaponRef!.delete();
+                                      context.safePop();
+                                    }
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
                     Container(

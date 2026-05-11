@@ -20,13 +20,27 @@ class TacticalWeaponCardWidget extends StatefulWidget {
     String? twist,
     String? v0,
     String? weight,
+    String? sight_height,
+    String? zero_distance,
+    String? click_value,
+    String? click_type,
+    String? twist_dir,
+    String? bullet_length,
+    this.onSelect,
+    this.onEdit,
   })  : this.bc_type = bc_type ?? 'G7',
         this.bc_value = bc_value ?? '0.315',
         this.caliber = caliber ?? '6.5 CREEDMOOR',
         this.name = name ?? 'ACCURACY INTERNATIONAL AT-X',
         this.twist = twist ?? '1:8\"',
         this.v0 = v0 ?? '820',
-        this.weight = weight ?? '9.1';
+        this.weight = weight ?? '9.1',
+        this.sight_height = sight_height ?? '5.0',
+        this.zero_distance = zero_distance ?? '100',
+        this.click_value = click_value ?? '0.1',
+        this.click_type = click_type ?? 'MRAD',
+        this.twist_dir = twist_dir ?? 'R',
+        this.bullet_length = bullet_length ?? '30.0';
 
   final String bc_type;
   final String bc_value;
@@ -35,6 +49,14 @@ class TacticalWeaponCardWidget extends StatefulWidget {
   final String twist;
   final String v0;
   final String weight;
+  final String sight_height;
+  final String zero_distance;
+  final String click_value;
+  final String click_type;
+  final String twist_dir;
+  final String bullet_length;
+  final Future Function()? onSelect;
+  final Future Function()? onEdit;
 
   @override
   State<TacticalWeaponCardWidget> createState() =>
@@ -43,6 +65,47 @@ class TacticalWeaponCardWidget extends StatefulWidget {
 
 class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
   late TacticalWeaponCardModel _model;
+  bool _isSelecting = false;
+
+  Widget _buildGridItem(BuildContext context, String label, String value) {
+    if (label.isEmpty && value.isEmpty) {
+      return Expanded(flex: 1, child: Container());
+    }
+    return Expanded(
+      flex: 1,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: FlutterFlowTheme.of(context).labelSmall.override(
+                  font: GoogleFonts.spaceGrotesk(
+                    fontWeight: FlutterFlowTheme.of(context).labelSmall.fontWeight,
+                    fontStyle: FlutterFlowTheme.of(context).labelSmall.fontStyle,
+                  ),
+                  color: FlutterFlowTheme.of(context).secondaryText,
+                  letterSpacing: 0.0,
+                  lineHeight: 1.1,
+                  fontSize: 10,
+                ),
+          ),
+          Text(
+            valueOrDefault<String>(value, '-'),
+            style: FlutterFlowTheme.of(context).bodySmall.override(
+                  font: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  color: FlutterFlowTheme.of(context).primary,
+                  letterSpacing: 0.0,
+                  lineHeight: 1.3,
+                ),
+          ),
+        ].divide(SizedBox(height: 4.0)),
+      ),
+    );
+  }
 
   @override
   void setState(VoidCallback callback) {
@@ -173,262 +236,37 @@ class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            // Row 1: Twist, Dir, V0, Weight
                             Row(
                               mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'TWIST',
-                                      style: FlutterFlowTheme.of(context)
-                                          .labelSmall
-                                          .override(
-                                            font: GoogleFonts.spaceGrotesk(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelSmall
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelSmall
-                                                    .fontStyle,
-                                            lineHeight: 1.1,
-                                          ),
-                                    ),
-                                    Text(
-                                      valueOrDefault<String>(
-                                        widget!.twist,
-                                        '1:8\"',
-                                      ),
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodySmall
-                                          .override(
-                                            font: GoogleFonts.inter(
-                                              fontWeight: FontWeight.bold,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmall
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.bold,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodySmall
-                                                    .fontStyle,
-                                            lineHeight: 1.3,
-                                          ),
-                                    ),
-                                  ].divide(SizedBox(height: 4.0)),
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'V0 (M/S)',
-                                      style: FlutterFlowTheme.of(context)
-                                          .labelSmall
-                                          .override(
-                                            font: GoogleFonts.spaceGrotesk(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelSmall
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelSmall
-                                                    .fontStyle,
-                                            lineHeight: 1.1,
-                                          ),
-                                    ),
-                                    Text(
-                                      valueOrDefault<String>(
-                                        widget!.v0,
-                                        '820',
-                                      ),
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodySmall
-                                          .override(
-                                            font: GoogleFonts.inter(
-                                              fontWeight: FontWeight.bold,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmall
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.bold,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodySmall
-                                                    .fontStyle,
-                                            lineHeight: 1.3,
-                                          ),
-                                    ),
-                                  ].divide(SizedBox(height: 4.0)),
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'WEIGHT (G)',
-                                      style: FlutterFlowTheme.of(context)
-                                          .labelSmall
-                                          .override(
-                                            font: GoogleFonts.spaceGrotesk(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelSmall
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelSmall
-                                                    .fontStyle,
-                                            lineHeight: 1.1,
-                                          ),
-                                    ),
-                                    Text(
-                                      valueOrDefault<String>(
-                                        widget!.weight,
-                                        '9.1',
-                                      ),
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodySmall
-                                          .override(
-                                            font: GoogleFonts.inter(
-                                              fontWeight: FontWeight.bold,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmall
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.bold,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodySmall
-                                                    .fontStyle,
-                                            lineHeight: 1.3,
-                                          ),
-                                    ),
-                                  ].divide(SizedBox(height: 4.0)),
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'BC (${widget!.bc_type})',
-                                      style: FlutterFlowTheme.of(context)
-                                          .labelSmall
-                                          .override(
-                                            font: GoogleFonts.spaceGrotesk(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelSmall
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelSmall
-                                                    .fontStyle,
-                                            lineHeight: 1.1,
-                                          ),
-                                    ),
-                                    Text(
-                                      valueOrDefault<String>(
-                                        widget!.bc_value,
-                                        '0.315',
-                                      ),
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodySmall
-                                          .override(
-                                            font: GoogleFonts.inter(
-                                              fontWeight: FontWeight.bold,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmall
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.bold,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodySmall
-                                                    .fontStyle,
-                                            lineHeight: 1.3,
-                                          ),
-                                    ),
-                                  ].divide(SizedBox(height: 4.0)),
-                                ),
+                                _buildGridItem(context, 'ТВИСТ', widget!.twist),
+                                _buildGridItem(context, 'НАПР.', widget!.twist_dir),
+                                _buildGridItem(context, 'V0 (М/С)', widget!.v0),
+                                _buildGridItem(context, 'ВЕС (Г)', widget!.weight),
                               ],
                             ),
-                          ].divide(SizedBox(height: 8.0)),
+                            // Row 2: Length, BC Model, BC Value, Sight Height
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                _buildGridItem(context, 'ДЛИНА (ММ)', widget!.bullet_length),
+                                _buildGridItem(context, 'БК МОДЕЛЬ', widget!.bc_type),
+                                _buildGridItem(context, 'БК ЗНАЧ.', widget!.bc_value),
+                                _buildGridItem(context, 'ПРИЦЕЛ (ММ)', widget!.sight_height),
+                              ],
+                            ),
+                            // Row 3: Zero Dist, Click, Click Type, Empty
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                _buildGridItem(context, 'ПРИСТР. (М)', widget!.zero_distance),
+                                _buildGridItem(context, 'КЛИК', widget!.click_value),
+                                _buildGridItem(context, 'ТИП КЛИКА', widget!.click_type),
+                                _buildGridItem(context, '', ''),
+                              ],
+                            ),
+                          ].divide(SizedBox(height: 12.0)),
                         ),
                       ),
                     ),
@@ -444,15 +282,27 @@ class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
                           model: _model.buttonModel,
                           updateCallback: () => safeSetState(() {}),
                           child: ButtonWidget(
-                            content: 'SELECT WEAPON',
+                            content: 'ВЫБРАТЬ ОРУЖИЕ',
                             icon_present: false,
                             icon_end_present: false,
                             color: FlutterFlowTheme.of(context).secondaryText,
                             variant: 'primary',
                             size: 'small',
                             full_width: true,
-                            loading: false,
-                            disabled: false,
+                            loading: _isSelecting,
+                            disabled: _isSelecting,
+                            onPressed: () async {
+                              if (widget.onSelect != null) {
+                                safeSetState(() => _isSelecting = true);
+                                try {
+                                  await widget.onSelect!();
+                                } finally {
+                                  if (mounted) {
+                                    safeSetState(() => _isSelecting = false);
+                                  }
+                                }
+                              }
+                            },
                           ),
                         ),
                       ),
@@ -466,8 +316,10 @@ class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
                           color: FlutterFlowTheme.of(context).primary,
                           size: 20.0,
                         ),
-                        onPressed: () {
-                          print('IconButton pressed ...');
+                        onPressed: () async {
+                          if (widget.onEdit != null) {
+                            await widget.onEdit!();
+                          }
                         },
                       ),
                     ].divide(SizedBox(width: 16.0)),

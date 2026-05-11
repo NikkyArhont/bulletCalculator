@@ -11,16 +11,16 @@ export 'switch_component_model.dart';
 class SwitchComponentWidget extends StatefulWidget {
   const SwitchComponentWidget({
     super.key,
-    bool? label,
-    String? variant,
-    bool? active,
-  })  : this.label = label ?? false,
-        this.variant = variant ?? 'iOS',
-        this.active = active ?? false;
+    this.label = false,
+    this.variant = 'iOS',
+    this.active = false,
+    this.onChanged,
+  });
 
   final bool label;
   final String variant;
   final bool active;
+  final Future Function(bool)? onChanged;
 
   @override
   State<SwitchComponentWidget> createState() => _SwitchComponentWidgetState();
@@ -70,6 +70,9 @@ class _SwitchComponentWidgetState extends State<SwitchComponentWidget> {
             value: _model.switchValue!,
             onChanged: (newValue) async {
               safeSetState(() => _model.switchValue = newValue!);
+              if (widget!.onChanged != null) {
+                await widget!.onChanged!(newValue!);
+              }
             },
             activeTrackColor: FlutterFlowTheme.of(context).primary,
             inactiveTrackColor: FlutterFlowTheme.of(context).alternate,

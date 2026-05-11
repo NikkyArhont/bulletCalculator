@@ -5,7 +5,7 @@
 
 
     <application
-        android:label="bulletCalculator"
+        android:label="Баллистический калькулятор"
         tools:replace="android:label"
         android:icon="@mipmap/launcher_icon"
         android:requestLegacyExternalStorage="true">

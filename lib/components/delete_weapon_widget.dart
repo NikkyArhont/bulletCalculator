@@ -10,7 +10,12 @@ import 'delete_weapon_model.dart';
 export 'delete_weapon_model.dart';
 
 class DeleteWeaponWidget extends StatefulWidget {
-  const DeleteWeaponWidget({super.key});
+  const DeleteWeaponWidget({
+    super.key,
+    this.onConfirm,
+  });
+
+  final Future Function()? onConfirm;
 
   @override
   State<DeleteWeaponWidget> createState() => _DeleteWeaponWidgetState();
@@ -141,8 +146,12 @@ class _DeleteWeaponWidgetState extends State<DeleteWeaponWidget> {
                       variant: 'destructive',
                       size: 'large',
                       full_width: true,
-                      loading: false,
-                      disabled: false,
+                      onPressed: () async {
+                        if (widget.onConfirm != null) {
+                          await widget.onConfirm!();
+                        }
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
                   wrapWithModel(
@@ -158,6 +167,9 @@ class _DeleteWeaponWidgetState extends State<DeleteWeaponWidget> {
                       full_width: true,
                       loading: false,
                       disabled: false,
+                      onPressed: () async {
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
                 ].divide(SizedBox(height: 16.0)),

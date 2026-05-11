@@ -329,7 +329,7 @@ class _SmsWidgetState extends State<SmsWidget> {
                           'created_time': FieldValue.serverTimestamp(),
                         }, SetOptions(merge: true));
 
-                        context.goNamedAuth('shootPage', context.mounted);
+                        context.goNamedAuth('Subscribe', context.mounted);
                       }
                     } finally {
                       safeSetState(() {

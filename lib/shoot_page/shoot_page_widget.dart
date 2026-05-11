@@ -12,11 +12,31 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '/ballistic_engine.dart';
 import 'shoot_page_model.dart';
 export 'shoot_page_model.dart';
 
 class ShootPageWidget extends StatefulWidget {
-  const ShootPageWidget({super.key});
+  const ShootPageWidget({
+    super.key,
+    this.selectedWeaponId,
+    this.selectedWeaponName,
+    this.selectedWeaponCaliber,
+    this.muzzleVelocity,
+    this.bcValue,
+    this.bcModel,
+    this.bulletWeight,
+    this.twist,
+  });
+
+  final String? selectedWeaponId;
+  final String? selectedWeaponName;
+  final String? selectedWeaponCaliber;
+  final String? muzzleVelocity;
+  final String? bcValue;
+  final String? bcModel;
+  final String? bulletWeight;
+  final String? twist;
 
   static String routeName = 'shootPage';
   static String routePath = '/shootPage';
@@ -34,6 +54,32 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => ShootPageModel());
+    _handleParameters();
+  }
+
+  @override
+  void didUpdateWidget(ShootPageWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedWeaponId != oldWidget.selectedWeaponId) {
+      _handleParameters();
+    }
+  }
+
+  void _handleParameters() {
+    if (widget.selectedWeaponId != null) {
+      _model.selectedWeaponId = widget.selectedWeaponId;
+      _model.selectedWeaponName = widget.selectedWeaponName ?? 'Оружие';
+      _model.selectedWeaponCaliber = widget.selectedWeaponCaliber ?? '';
+
+      if (widget.muzzleVelocity != null) {
+        _model.dataInputFieldModel1.textFieldModel.inputTextController?.text =
+            widget.muzzleVelocity!;
+      }
+      if (widget.bcValue != null) {
+        _model.dataInputFieldModel2.textFieldModel.inputTextController?.text =
+            widget.bcValue!;
+      }
+    }
   }
 
   @override
@@ -45,6 +91,23 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final distanceText =
+        _model.dataInputFieldModelDistance.textFieldModel.inputTextController?.text ??
+            '';
+    final angleText =
+        _model.dataInputFieldModel1.textFieldModel.inputTextController?.text ?? '';
+    final speedText =
+        _model.dataInputFieldModel2.textFieldModel.inputTextController?.text ?? '';
+    final tempText =
+        _model.dataInputFieldModel3.textFieldModel.inputTextController?.text ?? '';
+    final pressureText =
+        _model.dataInputFieldModel4.textFieldModel.inputTextController?.text ?? '';
+    final humidityText =
+        _model.dataInputFieldModel5.textFieldModel.inputTextController?.text ?? '';
+    final gustText =
+        _model.dataInputFieldModelGust.textFieldModel.inputTextController?.text ??
+            '';
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -126,7 +189,6 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                     ),
                                   ],
                                 ),
-                                // Weapon dropdown
                                 StreamBuilder<QuerySnapshot>(
                                   stream: FirebaseFirestore.instance
                                       .collection('users')
@@ -139,7 +201,6 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                        // Header row (always visible)
                                         GestureDetector(
                                           onTap: () {
                                             safeSetState(() {
@@ -222,7 +283,6 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                             ),
                                           ),
                                         ),
-                                        // Animated dropdown list
                                         AnimatedCrossFade(
                                           duration: Duration(milliseconds: 200),
                                           firstCurve: Curves.easeInOut,
@@ -424,185 +484,24 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Дистанция',
-                                      style: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .override(
-                                            font: GoogleFonts.spaceGrotesk(
-                                              fontWeight: FontWeight.normal,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleMedium
-                                                      .fontStyle,
-                                            ),
-                                            fontSize: 12.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .titleMedium
-                                                    .fontStyle,
-                                            lineHeight: 1.2,
-                                          ),
-                                    ),
-                                    Container(
-                                      width: 188.0,
-                                      height: 80.0,
-                                      decoration: BoxDecoration(
+                                Expanded(
+                                  flex: 2,
+                                  child: wrapWithModel(
+                                    model: _model.dataInputFieldModelDistance,
+                                    updateCallback: () => safeSetState(() {}),
+                                    child: DataInputFieldWidget(
+                                      hint: '0',
+                                      icon: Icon(
+                                        Icons.straighten_rounded,
                                         color: FlutterFlowTheme.of(context)
-                                            .surface80,
-                                        borderRadius:
-                                            BorderRadius.circular(4.0),
-                                        shape: BoxShape.rectangle,
-                                        border: Border.all(
-                                          color: FlutterFlowTheme.of(context)
-                                              .tertiary,
-                                          width: 1.0,
-                                        ),
+                                            .primary,
+                                        size: 18.0,
                                       ),
-                                      child: Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            8.0, 16.0, 8.0, 16.0),
-                                        child: Container(
-                                          child: Container(
-                                            height: 48.0,
-                                            alignment:
-                                                AlignmentDirectional(0.0, 0.0),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.straighten_rounded,
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .tertiary,
-                                                  size: 18.0,
-                                                ),
-                                                Expanded(
-                                                  flex: 1,
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Text(
-                                                        '850',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyLarge
-                                                                .override(
-                                                                  font:
-                                                                      GoogleFonts
-                                                                          .inter(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyLarge
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primaryText,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyLarge
-                                                                      .fontStyle,
-                                                                  lineHeight:
-                                                                      1.4,
-                                                                ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    2.0,
-                                                                    0.0,
-                                                                    0.0),
-                                                        child: Container(
-                                                          child: Container(
-                                                            width: 2.0,
-                                                            height: 20.0,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .tertiary,
-                                                              shape: BoxShape
-                                                                  .rectangle,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ].divide(
-                                                        SizedBox(width: 0.0)),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'м',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodySmall
-                                                      .override(
-                                                        font: GoogleFonts.inter(
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodySmall
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodySmall
-                                                                  .fontStyle,
-                                                        ),
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryText,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodySmall
-                                                                .fontWeight,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodySmall
-                                                                .fontStyle,
-                                                        lineHeight: 1.3,
-                                                      ),
-                                                ),
-                                              ].divide(SizedBox(width: 8.0)),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                      label: 'Дистанция',
+                                      unit: 'м',
+                                      value: '850',
                                     ),
-                                  ],
+                                  ),
                                 ),
                                 Expanded(
                                   flex: 1,
@@ -710,118 +609,156 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                               'Направление',
                                               style:
                                                   FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .override(
-                                                        font: GoogleFonts
-                                                            .spaceGrotesk(
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .labelSmall
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .labelSmall
-                                                                  .fontStyle,
-                                                        ),
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryText,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelSmall
-                                                                .fontWeight,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelSmall
-                                                                .fontStyle,
-                                                        lineHeight: 1.1,
-                                                      ),
+                                                      .labelSmall,
                                             ),
-                                            AspectRatio(
-                                              aspectRatio: 1.0,
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primaryBackground,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          9999.0),
-                                                  shape: BoxShape.rectangle,
-                                                  border: Border.all(
+                                            Text(
+                                              '${_model.windDirectionHours} ч',
+                                              style: FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .override(
+                                                    font: GoogleFonts.inter(
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
                                                     color: FlutterFlowTheme.of(
                                                             context)
-                                                        .alternate,
-                                                    width: 2.0,
+                                                        .primary,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                ),
-                                                alignment: AlignmentDirectional(
-                                                    0.0, 0.0),
-                                                child: Stack(
-                                                  alignment:
-                                                      AlignmentDirectional(
-                                                          0.0, 0.0),
-                                                  children: [
-                                                    Transform.rotate(
-                                                      angle: 45.0 *
-                                                          (math.pi / 180),
-                                                      alignment:
-                                                          AlignmentDirectional(
-                                                              0.0, 0.0),
-                                                      child: Icon(
-                                                        Icons
-                                                            .navigation_rounded,
+                                            ),
+                                            LayoutBuilder(builder: (context, constraints) {
+                                              return GestureDetector(
+                                                onPanUpdate: (details) {
+                                                  final center =
+                                                      constraints.maxWidth / 2;
+                                                  final dx = details
+                                                          .localPosition.dx -
+                                                      center;
+                                                  final dy = details
+                                                          .localPosition.dy -
+                                                      center;
+                                                  double angle =
+                                                      math.atan2(dx, -dy) *
+                                                          (180 / math.pi);
+                                                  if (angle < 0) angle += 360;
+                                                  int hour =
+                                                      ((angle + 15) / 30)
+                                                          .floor();
+                                                  if (hour <= 0) hour = 12;
+                                                  if (hour > 12) hour -= 12;
+                                                  safeSetState(() {
+                                                    _model.windDirectionHours =
+                                                        hour;
+                                                  });
+                                                },
+                                                onTapDown: (details) {
+                                                  final center =
+                                                      constraints.maxWidth / 2;
+                                                  final dx = details
+                                                          .localPosition.dx -
+                                                      center;
+                                                  final dy = details
+                                                          .localPosition.dy -
+                                                      center;
+                                                  double angle =
+                                                      math.atan2(dx, -dy) *
+                                                          (180 / math.pi);
+                                                  if (angle < 0) angle += 360;
+                                                  int hour =
+                                                      ((angle + 15) / 30)
+                                                          .floor();
+                                                  if (hour <= 0) hour = 12;
+                                                  if (hour > 12) hour -= 12;
+                                                  safeSetState(() {
+                                                    _model.windDirectionHours =
+                                                        hour;
+                                                  });
+                                                },
+                                                child: AspectRatio(
+                                                  aspectRatio: 1.0,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryBackground,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              9999.0),
+                                                      shape: BoxShape.rectangle,
+                                                      border: Border.all(
                                                         color:
                                                             FlutterFlowTheme.of(
                                                                     context)
-                                                                .primary,
-                                                        size: 32.0,
+                                                                .alternate,
+                                                        width: 2.0,
                                                       ),
                                                     ),
-                                                    Align(
+                                                    alignment:
+                                                        AlignmentDirectional(
+                                                            0.0, 0.0),
+                                                    child: Stack(
                                                       alignment:
                                                           AlignmentDirectional(
                                                               0.0, 0.0),
-                                                      child: Text(
-                                                        '2 ч',
-                                                        style: FlutterFlowTheme
-                                                                .of(context)
-                                                            .labelSmall
-                                                            .override(
-                                                              font: GoogleFonts
-                                                                  .spaceGrotesk(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .labelSmall
-                                                                    .fontStyle,
+                                                      children: [
+                                                        // Notches
+                                                        for (int i = 1;
+                                                            i <= 12;
+                                                            i++)
+                                                          Transform.rotate(
+                                                            angle: i *
+                                                                30 *
+                                                                (math.pi / 180),
+                                                            child: Align(
+                                                              alignment:
+                                                                  Alignment(
+                                                                      0, -1),
+                                                              child: Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(4.0),
+                                                                child:
+                                                                    Container(
+                                                                  width: 1.5,
+                                                                  height: 6,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .alternate,
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(
+                                                                                1),
+                                                                  ),
+                                                                ),
                                                               ),
-                                                              letterSpacing:
-                                                                  0.0,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontStyle:
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .labelSmall
-                                                                      .fontStyle,
-                                                              lineHeight: 1.1,
                                                             ),
-                                                      ),
+                                                          ),
+                                                        Transform.rotate(
+                                                          angle: (_model
+                                                                  .windDirectionHours *
+                                                              30.0) *
+                                                              (math.pi / 180),
+                                                          alignment:
+                                                              AlignmentDirectional(
+                                                                  0.0, 0.0),
+                                                          child: Icon(
+                                                            Icons
+                                                                .navigation_rounded,
+                                                            color:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .primary,
+                                                            size: 32.0,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
+                                              );
+                                            }),
                                           ].divide(SizedBox(height: 8.0)),
                                         ),
                                       ),
@@ -905,11 +842,36 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                   child: SwitchComponentWidget(
                                                     label: false,
                                                     variant: 'Android',
-                                                    active: true,
+                                                    active: _model.isGustActive,
+                                                    onChanged: (val) async {
+                                                      safeSetState(() =>
+                                                          _model.isGustActive =
+                                                              val);
+                                                    },
                                                   ),
                                                 ),
                                               ].divide(SizedBox(height: 4.0)),
                                             ),
+                                            if (_model.isGustActive)
+                                              wrapWithModel(
+                                                model: _model
+                                                    .dataInputFieldModelGust,
+                                                updateCallback: () =>
+                                                    safeSetState(() {}),
+                                                child: DataInputFieldWidget(
+                                                  hint: '0',
+                                                  icon: Icon(
+                                                    Icons.air_rounded,
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                    size: 18.0,
+                                                  ),
+                                                  label: 'Порыв',
+                                                  unit: 'м/с',
+                                                  value: '6.0',
+                                                ),
+                                              ),
                                           ].divide(SizedBox(height: 16.0)),
                                         ),
                                       ),
@@ -1098,13 +1060,26 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         MainAxisAlignment.spaceBetween,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Зона точности (Confidence)',
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelLarge
-                                            .override(
-                                              font: GoogleFonts.spaceGrotesk(
+                                      children: [
+                                        Text(
+                                          'Ожидаемый разброс',
+                                          style: FlutterFlowTheme.of(context)
+                                              .labelLarge
+                                              .override(
+                                                font: GoogleFonts.spaceGrotesk(
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(context)
+                                                          .labelLarge
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(context)
+                                                          .labelLarge
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryText,
+                                                letterSpacing: 0.0,
                                                 fontWeight:
                                                     FlutterFlowTheme.of(context)
                                                         .labelLarge
@@ -1113,47 +1088,34 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .labelLarge
                                                         .fontStyle,
+                                                lineHeight: 1.1,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryText,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelLarge
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelLarge
-                                                      .fontStyle,
-                                              lineHeight: 1.1,
-                                            ),
-                                      ),
-                                      Text(
-                                        '92%',
-                                        style: FlutterFlowTheme.of(context)
-                                            .titleMedium
-                                            .override(
-                                              font: GoogleFonts.spaceGrotesk(
+                                        ),
+                                        Text(
+                                          '${((double.tryParse(distanceText) ?? 0.0) / 100 * 2.91 * (1.0 + (_model.isGustActive ? 0.2 : 0.0))).toStringAsFixed(1)} см',
+                                          style: FlutterFlowTheme.of(context)
+                                              .titleMedium
+                                              .override(
+                                                font: GoogleFonts.spaceGrotesk(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(context)
+                                                          .titleMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .success,
+                                                letterSpacing: 0.0,
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .titleMedium
                                                         .fontStyle,
+                                                lineHeight: 1.2,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .success,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.bold,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleMedium
-                                                      .fontStyle,
-                                              lineHeight: 1.2,
-                                            ),
-                                      ),
-                                    ],
+                                        ),
+                                      ],
                                   ),
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(9999.0),
@@ -1211,7 +1173,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                     ),
                                   ),
                                   Text(
-                                    'Высокая вероятность попадания в гонг 30см',
+                                    'Ожидаемый диаметр группы на дистанции ${distanceText}м',
                                     style: FlutterFlowTheme.of(context)
                                         .bodySmall
                                         .override(
@@ -1281,13 +1243,190 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                 ),
                                 icon_present: true,
                                 icon_end_present: false,
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
+                                color: FlutterFlowTheme.of(context).primary,
                                 variant: 'primary',
                                 size: 'large',
                                 full_width: true,
-                                loading: false,
-                                disabled: false,
+                                loading: _model.isLoading,
+                                disabled: _model.isLoading,
+                                onPressed: () async {
+                                  // Validate fields
+                                  if (_model.selectedWeaponId == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content:
+                                              Text('Пожалуйста, выберите оружие')),
+                                    );
+                                    return;
+                                  }
+                                  if (distanceText.isEmpty ||
+                                      angleText.isEmpty ||
+                                      speedText.isEmpty ||
+                                      tempText.isNotEmpty == false ||
+                                      pressureText.isEmpty ||
+                                      humidityText.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'Пожалуйста, заполните все основные поля')),
+                                    );
+                                    return;
+                                  }
+                                  if (_model.isGustActive && gustText.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'Пожалуйста, укажите скорость порыва')),
+                                    );
+                                    return;
+                                  }
+
+                                    safeSetState(() => _model.isLoading = true);
+                                    try {
+                                      // Fetch weapon data for the calculation
+                                      final weaponDoc = await FirebaseFirestore
+                                          .instance
+                                          .collection('users')
+                                          .doc(currentUserUid)
+                                          .collection('weapons')
+                                          .doc(_model.selectedWeaponId)
+                                          .get();
+
+                                      if (!weaponDoc.exists) {
+                                        throw Exception(
+                                            'Данные об оружии не найдены');
+                                      }
+
+                                      final weaponData = weaponDoc.data()!;
+                                      final muzzleVelocity = double.tryParse(
+                                              weaponData['muzzle_velocity']
+                                                      ?.toString() ??
+                                                  '0') ??
+                                          800.0;
+                                      final bcValue = double.tryParse(
+                                              weaponData['bc_value']
+                                                      ?.toString() ??
+                                                  '0') ??
+                                          0.3;
+                                      final bulletWeight = double.tryParse(
+                                              weaponData['bullet_weight']
+                                                      ?.toString() ??
+                                                  '0') ??
+                                          9.0;
+                                      final sightHeight = double.tryParse(
+                                              weaponData['sight_height']
+                                                      ?.toString() ??
+                                                  '0') ??
+                                          50.0;
+                                      final clickValue = double.tryParse(
+                                              weaponData['click_value']
+                                                      ?.toString() ??
+                                                  '0') ??
+                                          0.1;
+
+                                      // Calculate results to save them in history
+                                      final ballisticResult =
+                                          BallisticEngine.calculate(
+                                        v0: muzzleVelocity,
+                                        bc: bcValue,
+                                        weightGrams: bulletWeight,
+                                        distance: double.tryParse(distanceText) ?? 0.0,
+                                        windSpeed: double.tryParse(speedText) ?? 0.0,
+                                        windDirectionHours: _model.windDirectionHours.toDouble(),
+                                        temperatureC: double.tryParse(tempText) ?? 0.0,
+                                        pressureHpa: double.tryParse(pressureText) ?? 0.0,
+                                        sightHeightMm: sightHeight,
+                                        clickValue: clickValue,
+                                      );
+
+                                      final resultData = {
+                                        'weaponId': _model.selectedWeaponId,
+                                        'weaponName': _model.selectedWeaponName,
+                                        'distance':
+                                            double.tryParse(distanceText) ?? 0.0,
+                                        'angle':
+                                            double.tryParse(angleText) ?? 0.0,
+                                        'windSpeed':
+                                            double.tryParse(speedText) ?? 0.0,
+                                        'windDirection':
+                                            _model.windDirectionHours,
+                                        'isGustActive': _model.isGustActive,
+                                        'gustSpeed': _model.isGustActive
+                                            ? (double.tryParse(gustText) ?? 0.0)
+                                            : 0.0,
+                                        'temperature':
+                                            double.tryParse(tempText) ?? 0.0,
+                                        'pressure':
+                                            double.tryParse(pressureText) ?? 0.0,
+                                        'humidity':
+                                            double.tryParse(humidityText) ?? 0.0,
+                                        'windDirection': _model.windDirectionHours,
+                                        'muzzleVelocity': muzzleVelocity,
+                                        'bcValue': bcValue,
+                                        'bulletWeight': bulletWeight,
+                                        'sightHeight': sightHeight,
+                                        'clickValue': clickValue,
+                                        'vertical_correction': ballisticResult.verticalMrad.toStringAsFixed(1),
+                                        'horizontal_correction': ballisticResult.horizontalMrad.toStringAsFixed(1),
+                                        'timestamp': FieldValue.serverTimestamp(),
+                                        'userId': currentUserUid,
+                                      };
+
+                                      final docRef = await FirebaseFirestore.instance
+                                          .collection('shootResults')
+                                          .add(resultData)
+                                          .timeout(Duration(seconds: 5));
+
+                                      if (context.mounted) {
+                                        safeSetState(
+                                            () => _model.isLoading = false);
+
+                                        final clearNeeded =
+                                            await context.pushNamed<bool>(
+                                          'shootResult',
+                                          queryParameters: {
+                                            'resultId': docRef.id,
+                                            'distance': distanceText,
+                                            'windSpeed': speedText,
+                                            'windDirection': _model
+                                                .windDirectionHours
+                                                .toString(),
+                                            'muzzleVelocity':
+                                                muzzleVelocity.toString(),
+                                            'bcValue': bcValue.toString(),
+                                            'bulletWeight':
+                                                bulletWeight.toString(),
+                                            'temperature': tempText,
+                                            'pressure': pressureText,
+                                            'angle': angleText,
+                                            'sightHeight':
+                                                sightHeight.toString(),
+                                            'clickValue':
+                                                clickValue.toString(),
+                                          }.withoutNulls,
+                                        );
+
+                                      if (clearNeeded == true) {
+                                        safeSetState(() {
+                                          _model.clearFields();
+                                        });
+                                      }
+                                    }
+                                  } catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Ошибка при сохранении: $e')),
+                                      );
+                                    }
+                                    if (mounted) {
+                                      safeSetState(
+                                          () => _model.isLoading = false);
+                                    }
+                                  }
+                                },
                               ),
                             ),
                           ),

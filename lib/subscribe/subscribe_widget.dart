@@ -438,6 +438,9 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                         full_width: true,
                         loading: false,
                         disabled: false,
+                        onPressed: () async {
+                          context.goNamed('succsedEnter');
+                        },
                       ),
                     ),
                     wrapWithModel(

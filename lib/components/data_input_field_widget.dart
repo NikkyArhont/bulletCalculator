@@ -34,6 +34,7 @@ class DataInputFieldWidget extends StatefulWidget {
 
 class _DataInputFieldWidgetState extends State<DataInputFieldWidget> {
   late DataInputFieldModel _model;
+  FocusNode? _focusNode;
 
   @override
   void setState(VoidCallback callback) {
@@ -45,11 +46,16 @@ class _DataInputFieldWidgetState extends State<DataInputFieldWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => DataInputFieldModel());
+    _focusNode = FocusNode();
+    _focusNode!.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _model.maybeDispose();
+    _focusNode?.dispose();
 
     super.dispose();
   }
@@ -85,7 +91,9 @@ class _DataInputFieldWidgetState extends State<DataInputFieldWidget> {
             borderRadius: BorderRadius.circular(4.0),
             shape: BoxShape.rectangle,
             border: Border.all(
-              color: FlutterFlowTheme.of(context).alternate,
+              color: _focusNode?.hasFocus ?? false
+                  ? FlutterFlowTheme.of(context).tertiary
+                  : FlutterFlowTheme.of(context).alternate,
               width: 1.0,
             ),
           ),
@@ -120,6 +128,7 @@ class _DataInputFieldWidgetState extends State<DataInputFieldWidget> {
                         hint_color: 'hint',
                         variant: 'ghost',
                         error: false,
+                        focusNode: _focusNode,
                       ),
                     ),
                   ),

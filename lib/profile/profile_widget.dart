@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '/components/logout_widget.dart';
 import 'profile_model.dart';
 import '/auth/firebase_auth/auth_util.dart';
 export 'profile_model.dart';
@@ -268,14 +269,28 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                       MainAxisAlignment.spaceAround,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    wrapWithModel(
-                                      model: _model.profileStatModel1,
-                                      updateCallback: () => safeSetState(() {}),
-                                      child: ProfileStatWidget(
-                                        label: 'Расчетов',
-                                        value: '142',
+                                      StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('shootResults')
+                                            .where('userId', isEqualTo: currentUserUid)
+                                            .snapshots(),
+                                        builder: (context, snapshot) {
+                                          final count = snapshot.data?.docs.length ?? 0;
+                                          return InkWell(
+                                            onTap: () async {
+                                              context.pushNamed('history');
+                                            },
+                                            child: wrapWithModel(
+                                              model: _model.profileStatModel1,
+                                              updateCallback: () => safeSetState(() {}),
+                                              child: ProfileStatWidget(
+                                                label: 'Расчетов',
+                                                value: count.toString(),
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
-                                    ),
                                     Container(
                                       width: 1.0,
                                       height: 30.0,
@@ -285,14 +300,29 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                         shape: BoxShape.rectangle,
                                       ),
                                     ),
-                                    wrapWithModel(
-                                      model: _model.profileStatModel2,
-                                      updateCallback: () => safeSetState(() {}),
-                                      child: ProfileStatWidget(
-                                        label: 'Винтовок',
-                                        value: '3',
+                                      StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc(currentUserUid)
+                                            .collection('weapons')
+                                            .snapshots(),
+                                        builder: (context, snapshot) {
+                                          final count = snapshot.data?.docs.length ?? 0;
+                                          return InkWell(
+                                            onTap: () async {
+                                              context.pushNamed('weaponList');
+                                            },
+                                            child: wrapWithModel(
+                                              model: _model.profileStatModel2,
+                                              updateCallback: () => safeSetState(() {}),
+                                              child: ProfileStatWidget(
+                                                label: 'Винтовок',
+                                                value: count.toString(),
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
-                                    ),
                                     Container(
                                       width: 1.0,
                                       height: 30.0,
@@ -302,14 +332,26 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                         shape: BoxShape.rectangle,
                                       ),
                                     ),
-                                    wrapWithModel(
-                                      model: _model.profileStatModel3,
-                                      updateCallback: () => safeSetState(() {}),
-                                      child: ProfileStatWidget(
-                                        label: 'Точность',
-                                        value: '94%',
+                                      StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('shootResults')
+                                            .where('userId', isEqualTo: currentUserUid)
+                                            .snapshots(),
+                                        builder: (context, snapshot) {
+                                          final total = snapshot.data?.docs.length ?? 0;
+                                          final hits = snapshot.data?.docs.where((doc) => (doc.data() as Map<String, dynamic>)['isHit'] == true).length ?? 0;
+                                          final accuracy = total > 0 ? (hits / total * 100).toInt() : 0;
+                                          
+                                          return wrapWithModel(
+                                            model: _model.profileStatModel3,
+                                            updateCallback: () => safeSetState(() {}),
+                                            child: ProfileStatWidget(
+                                              label: 'Точность',
+                                              value: '$accuracy%',
+                                            ),
+                                          );
+                                        },
                                       ),
-                                    ),
                                   ],
                                 ),
                               ),
@@ -328,8 +370,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           variant: 'primary',
                           size: 'medium',
                           full_width: false,
-                          loading: false,
-                          disabled: false,
+                          loading: _model.isLoadingDevices,
+                          disabled: _model.isLoadingDevices,
+                          onPressed: () async {
+                            safeSetState(() => _model.isLoadingDevices = true);
+                            await context.pushNamed('myDevices');
+                            safeSetState(() => _model.isLoadingDevices = false);
+                          },
                         ),
                       ),
                       Container(
@@ -484,83 +531,112 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                       lineHeight: 1.2,
                                     ),
                               ),
-                              Text(
-                                'См. все',
-                                style: FlutterFlowTheme.of(context)
-                                    .labelLarge
-                                    .override(
-                                      font: GoogleFonts.spaceGrotesk(
+                              InkWell(
+                                onTap: () async {
+                                  context.pushNamed('history');
+                                },
+                                child: Text(
+                                  'См. все',
+                                  style: FlutterFlowTheme.of(context)
+                                      .labelLarge
+                                      .override(
+                                        font: GoogleFonts.spaceGrotesk(
+                                          fontWeight: FlutterFlowTheme.of(context)
+                                              .labelLarge
+                                              .fontWeight,
+                                          fontStyle: FlutterFlowTheme.of(context)
+                                              .labelLarge
+                                              .fontStyle,
+                                        ),
+                                        color:
+                                            FlutterFlowTheme.of(context).primary,
+                                        letterSpacing: 0.0,
                                         fontWeight: FlutterFlowTheme.of(context)
                                             .labelLarge
                                             .fontWeight,
                                         fontStyle: FlutterFlowTheme.of(context)
                                             .labelLarge
                                             .fontStyle,
+                                        lineHeight: 1.1,
                                       ),
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .labelLarge
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .labelLarge
-                                          .fontStyle,
-                                      lineHeight: 1.1,
-                                    ),
+                                ),
                               ),
                             ],
                           ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              wrapWithModel(
-                                model: _model.historyCardModel1,
-                                updateCallback: () => safeSetState(() {}),
-                                child: HistoryCardWidget(
-                                  date: 'Сегодня, 14:20',
-                                  distance: '850',
-                                  elevation: '7.4',
-                                  weapon: 'Tikka T3x TAC A1',
-                                  wind: '1.2',
-                                ),
-                              ),
-                              wrapWithModel(
-                                model: _model.historyCardModel2,
-                                updateCallback: () => safeSetState(() {}),
-                                child: HistoryCardWidget(
-                                  date: 'Вчера, 10:15',
-                                  distance: '1200',
-                                  elevation: '12.8',
-                                  weapon: 'Sako TRG-42',
-                                  wind: '2.4',
-                                ),
-                              ),
-                              wrapWithModel(
-                                model: _model.historyCardModel3,
-                                updateCallback: () => safeSetState(() {}),
-                                child: HistoryCardWidget(
-                                  date: '15 Окт, 16:45',
-                                  distance: '600',
-                                  elevation: '4.2',
-                                  weapon: 'Tikka T3x TAC A1',
-                                  wind: '0.8',
-                                ),
-                              ),
-                              wrapWithModel(
-                                model: _model.historyCardModel4,
-                                updateCallback: () => safeSetState(() {}),
-                                child: HistoryCardWidget(
-                                  date: '12 Окт, 09:30',
-                                  distance: '1500',
-                                  elevation: '18.6',
-                                  weapon: 'Lobaev Arms DXL-3',
-                                  wind: '3.1',
-                                ),
-                              ),
-                            ].divide(SizedBox(height: 8.0)),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('shootResults')
+                                .where('userId', isEqualTo: currentUserUid)
+                                .orderBy('timestamp', descending: true)
+                                .limit(4)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                print('FIRESTORE ERROR: ${snapshot.error}');
+                                return Center(
+                                  child: Text('Ошибка загрузки истории: ${snapshot.error}'),
+                                );
+                              }
+                              if (!snapshot.hasData) {
+                                return Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(20.0),
+                                    child: CircularProgressIndicator(
+                                      color: FlutterFlowTheme.of(context).primary,
+                                    ),
+                                  ),
+                                );
+                              }
+                              final docs = snapshot.data!.docs;
+                              if (docs.isEmpty) {
+                                return Center(
+                                  child: Text('История пока пуста'),
+                                );
+                              }
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: docs.map((doc) {
+                                  final data = doc.data() as Map<String, dynamic>;
+                                  final timestamp = data['timestamp'] as Timestamp?;
+                                  final dateStr = timestamp != null
+                                      ? dateTimeFormat('d MMM, HH:mm', timestamp.toDate())
+                                      : 'Недавно';
+
+                                  return InkWell(
+                                    onTap: () async {
+                                      context.pushNamed(
+                                        'shootResult',
+                                        queryParameters: {
+                                          'resultId': doc.id,
+                                          'distance': data['distance']?.toString(),
+                                          'windSpeed': data['windSpeed']?.toString(),
+                                          'windDirection': data['windDirection']?.toString(),
+                                          'muzzleVelocity': data['muzzleVelocity']?.toString(),
+                                          'bcValue': data['bcValue']?.toString(),
+                                          'bulletWeight': data['bulletWeight']?.toString(),
+                                          'temperature': data['temperature']?.toString(),
+                                          'pressure': data['pressure']?.toString(),
+                                          'angle': data['angle']?.toString(),
+                                          'sightHeight': data['sightHeight']?.toString(),
+                                          'clickValue': data['clickValue']?.toString(),
+                                        }.withoutNulls,
+                                      );
+                                    },
+                                    child: HistoryCardWidget(
+                                      date: dateStr,
+                                      distance: data['distance']?.toString() ?? '0',
+                                      elevation: data['vertical_correction']?.toString() ?? '0.0',
+                                      weapon: data['weaponName'] ?? 'Оружие',
+                                      wind: data['horizontal_correction']?.toString() ?? '0.0',
+                                      resultId: doc.id,
+                                      isHit: data['isHit'] == true,
+                                    ),
+                                  );
+                                }).toList().divide(SizedBox(height: 8.0)),
+                              );
+                            },
                           ),
                         ].divide(SizedBox(height: 16.0)),
                       ),
@@ -573,10 +649,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             model: _model.buttonModel2,
                             updateCallback: () => safeSetState(() {}),
                             child: ButtonWidget(
-                              content: 'Настройки приложения',
+                              content: 'Выйти из аккаунта',
                               icon: Icon(
-                                Icons.settings_rounded,
-                                color: FlutterFlowTheme.of(context).primaryText,
+                                Icons.logout_rounded,
+                                color: FlutterFlowTheme.of(context).error,
                                 size: 16.0,
                               ),
                               icon_present: true,
@@ -588,7 +664,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               loading: false,
                               disabled: false,
                               onPressed: () async {
-                                context.pushNamed('settings');
+                                await showDialog(
+                                  context: context,
+                                  builder: (dialogContext) {
+                                    return Dialog(
+                                      elevation: 0,
+                                      insetPadding: EdgeInsets.zero,
+                                      backgroundColor: Colors.transparent,
+                                      alignment: AlignmentDirectional(0, 0),
+                                      child: LogoutWidget(),
+                                    );
+                                  },
+                                );
                               },
                             ),
                           ),

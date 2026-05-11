@@ -27,6 +27,7 @@ class TextFieldWidget extends StatefulWidget {
     this.height,
     this.inputFormatters,
     this.keyboardType,
+    this.focusNode,
   })  : this.label = label,
         this.helper = helper,
         this.hint = hint ?? '900 000-00-00',
@@ -53,6 +54,7 @@ class TextFieldWidget extends StatefulWidget {
   final double? height;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
+  final FocusNode? focusNode;
 
   @override
   State<TextFieldWidget> createState() => _TextFieldWidgetState();
@@ -73,7 +75,10 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
     _model = createModel(context, () => TextFieldModel());
 
     _model.inputTextController ??= TextEditingController(text: widget!.value);
-    _model.inputFocusNode ??= FocusNode();
+    _model.inputFocusNode ??= widget!.focusNode ?? FocusNode();
+    _model.inputFocusNode!.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -179,6 +184,8 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
                 color: () {
                   if (widget!.error) {
                     return FlutterFlowTheme.of(context).error;
+                  } else if (_model.inputFocusNode?.hasFocus ?? false) {
+                    return FlutterFlowTheme.of(context).tertiary;
                   } else if (widget!.variant == 'filled') {
                     return Colors.transparent;
                   } else if (widget!.variant == 'ghost') {

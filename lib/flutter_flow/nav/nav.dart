@@ -15,6 +15,7 @@ import '/flutter_flow/place.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
 import '/flutter_flow/units_util.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '/index.dart';
 
@@ -147,7 +148,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: EditWeaponWidget.routeName,
           path: EditWeaponWidget.routePath,
-          builder: (context, params) => EditWeaponWidget(),
+          builder: (context, params) => EditWeaponWidget(
+            weaponRef: params.state.extraMap['weaponRef'] as DocumentReference?,
+            weaponData:
+                params.state.extraMap['weaponData'] as Map<String, dynamic>?,
+          ),
         ),
         FFRoute(
           name: MyDevicesWidget.routeName,
@@ -157,7 +162,20 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: ShootPageWidget.routeName,
           path: ShootPageWidget.routePath,
-          builder: (context, params) => ShootPageWidget(),
+          builder: (context, params) => ShootPageWidget(
+            selectedWeaponId: params.getParam<String>(
+              'selectedWeaponId',
+              ParamType.String,
+            ),
+            selectedWeaponName: params.getParam<String>(
+              'selectedWeaponName',
+              ParamType.String,
+            ),
+            selectedWeaponCaliber: params.getParam<String>(
+              'selectedWeaponCaliber',
+              ParamType.String,
+            ),
+          ),
         ),
         FFRoute(
           name: OnboardingWidget.routeName,
@@ -192,7 +210,61 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: ShootResultWidget.routeName,
           path: ShootResultWidget.routePath,
-          builder: (context, params) => ShootResultWidget(),
+          builder: (context, params) => ShootResultWidget(
+            distance: params.getParam<double>(
+              'distance',
+              ParamType.double,
+            ),
+            windSpeed: params.getParam<double>(
+              'windSpeed',
+              ParamType.double,
+            ),
+            windDirection: params.getParam<double>(
+              'windDirection',
+              ParamType.double,
+            ),
+            muzzleVelocity: params.getParam<double>(
+              'muzzleVelocity',
+              ParamType.double,
+            ),
+            bcValue: params.getParam<double>(
+              'bcValue',
+              ParamType.double,
+            ),
+            bulletWeight: params.getParam<double>(
+              'bulletWeight',
+              ParamType.double,
+            ),
+            temperature: params.getParam<double>(
+              'temperature',
+              ParamType.double,
+            ),
+            pressure: params.getParam<double>(
+              'pressure',
+              ParamType.double,
+            ),
+            angle: params.getParam<double>(
+              'angle',
+              ParamType.double,
+            ),
+            sightHeight: params.getParam<double>(
+              'sightHeight',
+              ParamType.double,
+            ),
+            clickValue: params.getParam<double>(
+              'clickValue',
+              ParamType.double,
+            ),
+            resultId: params.getParam<String>(
+              'resultId',
+              ParamType.String,
+            ),
+          ),
+        ),
+        FFRoute(
+          name: HistoryWidget.routeName,
+          path: HistoryWidget.routePath,
+          builder: (context, params) => HistoryWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

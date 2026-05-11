@@ -12,9 +12,38 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'shoot_result_model.dart';
 export 'shoot_result_model.dart';
+import '/ballistic_engine.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ShootResultWidget extends StatefulWidget {
-  const ShootResultWidget({super.key});
+  const ShootResultWidget({
+    super.key,
+    this.distance,
+    this.windSpeed,
+    this.windDirection,
+    this.muzzleVelocity,
+    this.bcValue,
+    this.bulletWeight,
+    this.temperature,
+    this.pressure,
+    this.angle,
+    this.sightHeight,
+    this.clickValue,
+    this.resultId,
+  });
+
+  final double? distance;
+  final double? windSpeed;
+  final double? windDirection;
+  final double? muzzleVelocity;
+  final double? bcValue;
+  final double? bulletWeight;
+  final double? temperature;
+  final double? pressure;
+  final double? angle;
+  final double? sightHeight;
+  final double? clickValue;
+  final String? resultId;
 
   static String routeName = 'shootResult';
   static String routePath = '/shootResult';
@@ -32,6 +61,20 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => ShootResultModel());
+
+    // Perform ballistic calculation
+    _model.ballisticResult = BallisticEngine.calculate(
+      v0: widget.muzzleVelocity ?? 800.0,
+      bc: widget.bcValue ?? 0.3,
+      weightGrams: widget.bulletWeight ?? 9.0,
+      distance: widget.distance ?? 100.0,
+      windSpeed: widget.windSpeed ?? 0.0,
+      windDirectionHours: widget.windDirection ?? 3.0,
+      temperatureC: widget.temperature ?? 15.0,
+      pressureHpa: widget.pressure ?? 1013.0,
+      sightHeightMm: widget.sightHeight ?? 50.0,
+      clickValue: widget.clickValue ?? 0.1,
+    );
   }
 
   @override
@@ -83,7 +126,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                               size: 24.0,
                             ),
                             onPressed: () {
-                              print('IconButton pressed ...');
+                              context.pop(true);
                             },
                           ),
                           Text(
@@ -191,7 +234,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .onPrimary,
+                                                      .secondaryText,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w800,
                                                   fontStyle:
@@ -210,7 +253,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                                '12.4',
+                                                '${_model.ballisticResult?.verticalMrad.toStringAsFixed(1) ?? '0.0'}',
                                                 style:
                                                     FlutterFlowTheme.of(context)
                                                         .headlineLarge
@@ -258,7 +301,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                           ),
                                                           color: FlutterFlowTheme
                                                                   .of(context)
-                                                              .onPrimary,
+                                                              .secondaryText,
                                                           letterSpacing: 0.0,
                                                           fontWeight:
                                                               FontWeight.w600,
@@ -273,7 +316,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ].divide(SizedBox(width: 16.0)),
                                           ),
                                           Text(
-                                            '43 КЛИКА (1/4 MOA)',
+                                            '${_model.ballisticResult?.verticalClicks ?? 0} КЛИКОВ',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -287,7 +330,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .onPrimary,
+                                                      .secondaryText,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w500,
                                                   fontStyle:
@@ -331,7 +374,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .onPrimary,
+                                                      .secondaryText,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w800,
                                                   fontStyle:
@@ -350,7 +393,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                                '1.8',
+                                                '${_model.ballisticResult?.horizontalMrad.toStringAsFixed(1) ?? '0.0'}',
                                                 style:
                                                     FlutterFlowTheme.of(context)
                                                         .headlineLarge
@@ -398,7 +441,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                           ),
                                                           color: FlutterFlowTheme
                                                                   .of(context)
-                                                              .onPrimary,
+                                                              .secondaryText,
                                                           letterSpacing: 0.0,
                                                           fontWeight:
                                                               FontWeight.w600,
@@ -413,7 +456,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ].divide(SizedBox(width: 16.0)),
                                           ),
                                           Text(
-                                            '6 КЛИКОВ • ВЛЕВО',
+                                            '${_model.ballisticResult?.horizontalClicks ?? 0} КЛИКОВ',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -431,7 +474,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .onPrimary,
+                                                      .secondaryText,
                                                   letterSpacing: 0.0,
                                                   fontWeight:
                                                       FlutterFlowTheme.of(
@@ -466,7 +509,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                     child: ResultMetricCardWidget(
                                       label: 'Смещение (В)',
                                       unit: 'см',
-                                      value: '124.2',
+                                      value: '${_model.ballisticResult?.dropCm.toStringAsFixed(1) ?? '0.0'}',
                                     ),
                                   ),
                                 ),
@@ -478,7 +521,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                     child: ResultMetricCardWidget(
                                       label: 'Смещение (Г)',
                                       unit: 'см',
-                                      value: '18.4',
+                                      value: '${_model.ballisticResult?.windDriftCm.toStringAsFixed(1) ?? '0.0'}',
                                     ),
                                   ),
                                 ),
@@ -561,16 +604,15 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                           child: FlutterFlowLineChart(
                                             data: [
                                               FFLineChartData(
-                                                xData: ([
+                                                xData: [
                                                   0.0,
-                                                  1.0,
-                                                  2.0,
-                                                  3.0,
-                                                  4.0,
-                                                  5.0,
-                                                  6.0
-                                                ])!,
-                                                yData: ([0.234])!,
+                                                  (widget.distance ?? 600.0) * 0.2,
+                                                  (widget.distance ?? 600.0) * 0.4,
+                                                  (widget.distance ?? 600.0) * 0.6,
+                                                  (widget.distance ?? 600.0) * 0.8,
+                                                  (widget.distance ?? 600.0)
+                                                ],
+                                                yData: [0.0, 0.3, 0.45, 0.5, 0.35, 0.0],
                                                 settings: LineChartBarData(
                                                   color: FlutterFlowTheme.of(
                                                           context)
@@ -583,7 +625,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                     show: true,
                                                     color: FlutterFlowTheme.of(
                                                             context)
-                                                        .primary100,
+                                                        .primary10,
                                                   ),
                                                 ),
                                               )
@@ -595,12 +637,14 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ),
                                             axisBounds: AxisBounds(
                                               minX: 0.0,
-                                              minY: 0.0,
-                                              maxX: 6.0,
-                                              maxY: 1.0,
+                                              minY: -0.1,
+                                              maxX: (widget.distance ?? 600.0),
+                                              maxY: 0.6,
                                             ),
                                             xAxisLabelInfo: AxisLabelInfo(
+                                              title: 'Дистанция (м)',
                                               showLabels: true,
+                                              labelInterval: (widget.distance ?? 600.0) / 5,
                                               labelTextStyle:
                                                   FlutterFlowTheme.of(context)
                                                       .bodySmall
@@ -651,7 +695,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             CrossAxisAlignment.center,
                                         children: [
                                           Text(
-                                            'Падение на 1000м',
+                                            'Время полета',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
@@ -685,7 +729,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                 ),
                                           ),
                                           Text(
-                                            '-7.2 м',
+                                            '${_model.ballisticResult?.timeOfFlight.toStringAsFixed(3) ?? '0.000'} сек',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
@@ -753,20 +797,17 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                   model: _model.correctionTileModel1,
                                   updateCallback: () => safeSetState(() {}),
                                   child: CorrectionTileWidget(
-                                    label: 'Деривация',
-                                    sub_label: 'Вращение пули',
-                                    unit: 'MRAD',
-                                    value: '0.2',
+                                    value: '0.0', // Drift already in horizontal
                                   ),
                                 ),
                                 wrapWithModel(
                                   model: _model.correctionTileModel2,
                                   updateCallback: () => safeSetState(() {}),
                                   child: CorrectionTileWidget(
-                                    label: 'Эффект Кориолиса',
+                                    label: 'Кориолис',
                                     sub_label: 'Вращение Земли',
                                     unit: 'MRAD',
-                                    value: '0.08',
+                                    value: '0.0', // Not implemented in MVP
                                   ),
                                 ),
                                 wrapWithModel(
@@ -774,9 +815,9 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                   updateCallback: () => safeSetState(() {}),
                                   child: CorrectionTileWidget(
                                     label: 'Скорость у цели',
-                                    sub_label: 'Дистанция 1000м',
+                                    sub_label: 'Дистанция ${widget.distance?.round() ?? 0}м',
                                     unit: 'м/с',
-                                    value: '342',
+                                    value: '${_model.ballisticResult?.velocityAtTarget.round() ?? 0}',
                                   ),
                                 ),
                                 wrapWithModel(
@@ -786,121 +827,102 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                     label: 'Энергия',
                                     sub_label: 'В точке попадания',
                                     unit: 'Дж',
-                                    value: '1420',
+                                    value: '${_model.ballisticResult?.energyAtTarget.round() ?? 0}',
                                   ),
                                 ),
                               ].divide(SizedBox(height: 16.0)),
                             ),
                             Container(
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).success10,
-                                borderRadius: BorderRadius.circular(6.0),
-                                shape: BoxShape.rectangle,
-                                border: Border.all(
-                                  color: FlutterFlowTheme.of(context).success30,
-                                  width: 1.0,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Container(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 12.0,
-                                        height: 12.0,
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .success,
-                                          borderRadius:
-                                              BorderRadius.circular(9999.0),
-                                          shape: BoxShape.rectangle,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Зона уверенного поражения',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelLarge
-                                                      .override(
-                                                        font: GoogleFonts
-                                                            .spaceGrotesk(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .labelLarge
-                                                                  .fontStyle,
-                                                        ),
-                                                        color: Colors.black,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelLarge
-                                                                .fontStyle,
-                                                        lineHeight: 1.1,
-                                                      ),
-                                            ),
-                                            Text(
-                                              'Вероятность попадания 94% при текущем ветре',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmall
-                                                      .override(
-                                                        font: GoogleFonts.inter(
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodySmall
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodySmall
-                                                                  .fontStyle,
-                                                        ),
-                                                        color: Colors.black,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodySmall
-                                                                .fontWeight,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodySmall
-                                                                .fontStyle,
-                                                        lineHeight: 1.3,
-                                                      ),
-                                            ),
-                                          ].divide(SizedBox(height: 2.0)),
-                                        ),
-                                      ),
-                                    ].divide(SizedBox(width: 16.0)),
-                                  ),
-                                ),
-                              ),
+                              height: 24.0,
                             ),
                             Container(
-                              height: 80.0,
+                              height: 24.0,
+                            ),
+                            Container(
+                              height: 24.0,
+                            ),
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Expanded(
+                                      child: wrapWithModel(
+                                        model: _model.buttonModel,
+                                        updateCallback: () => safeSetState(() {}),
+                                        child: ButtonWidget(
+                                          content: 'ПОПАДАНИЕ',
+                                          icon: Icon(
+                                            Icons.gps_fixed_rounded,
+                                            color: FlutterFlowTheme.of(context).onPrimary,
+                                            size: 16.0,
+                                          ),
+                                          icon_present: true,
+                                          icon_end_present: false,
+                                          variant: 'primary',
+                                          size: 'large',
+                                          loading: _model.isSavingHit,
+                                          disabled: _model.isSavingHit,
+                                          onPressed: () async {
+                                            if (widget.resultId == null) return;
+                                            safeSetState(() => _model.isSavingHit = true);
+                                            try {
+                                              await FirebaseFirestore.instance
+                                                  .collection('shootResults')
+                                                  .doc(widget.resultId)
+                                                  .update({'isHit': true});
+                                              if (context.mounted) {
+                                                context.goNamed('shootPage');
+                                              }
+                                            } catch (e) {
+                                              print('Error updating hit: $e');
+                                              safeSetState(() => _model.isSavingHit = false);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 12.0),
+                                    Expanded(
+                                      child: wrapWithModel(
+                                        model: _model.buttonModel,
+                                        updateCallback: () => safeSetState(() {}),
+                                        child: ButtonWidget(
+                                          content: 'ПРОМАХ',
+                                          icon: Icon(
+                                            Icons.close_rounded,
+                                            color: FlutterFlowTheme.of(context).onError,
+                                            size: 16.0,
+                                          ),
+                                          icon_present: true,
+                                          icon_end_present: false,
+                                          variant: 'destructive',
+                                          size: 'large',
+                                          loading: _model.isSavingHit,
+                                          disabled: _model.isSavingHit,
+                                          onPressed: () async {
+                                            if (widget.resultId == null) return;
+                                            safeSetState(() => _model.isSavingHit = true);
+                                            try {
+                                              await FirebaseFirestore.instance
+                                                  .collection('shootResults')
+                                                  .doc(widget.resultId)
+                                                  .update({'isHit': false});
+                                              if (context.mounted) {
+                                                context.goNamed('shootPage');
+                                              }
+                                            } catch (e) {
+                                              print('Error updating miss: $e');
+                                              safeSetState(() => _model.isSavingHit = false);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                             wrapWithModel(
                               model: _model.buttonModel,
@@ -919,8 +941,15 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                 variant: 'primary',
                                 size: 'large',
                                 full_width: true,
-                                loading: false,
-                                disabled: false,
+                                loading: _model.isLoading,
+                                disabled: _model.isLoading,
+                                onPressed: () async {
+                                  safeSetState(() => _model.isLoading = true);
+                                  await Future.delayed(
+                                      const Duration(milliseconds: 300));
+                                  context.pop(false);
+                                  safeSetState(() => _model.isLoading = false);
+                                },
                               ),
                             ),
                           ].divide(SizedBox(height: 24.0)),

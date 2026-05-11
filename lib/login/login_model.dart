@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 
 class LoginModel extends FlutterFlowModel<LoginWidget> {
   ///  State fields for stateful widgets in this page.
+  bool isLoading = false;
 
   // Model for TextField.
   late TextFieldModel textFieldModel;

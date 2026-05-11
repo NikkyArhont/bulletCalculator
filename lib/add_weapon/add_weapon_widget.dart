@@ -1173,16 +1173,23 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                           size: 'large',
                           full_width: true,
                           loading: _model.isLoading,
-                          disabled: _model.isLoading || !isFormValid,
+                          disabled: _model.isLoading,
                           onPressed: () async {
                             safeSetState(() => _model.isLoading = true);
                             try {
                               final uid = currentUserUid;
-                              if (uid == null || uid.isEmpty) return;
+                              if (uid == null || uid.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Ошибка авторизации')));
+                                safeSetState(() => _model.isLoading = false);
+                                return;
+                              }
                               final name = _model.textFieldModel1
                                       .inputTextController?.text.trim() ??
                                   '';
                               if (name.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Введите название профиля')));
                                 safeSetState(() => _model.isLoading = false);
                                 return;
                               }
@@ -1212,7 +1219,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               }
                               if (!isMetric) sH *= 25.4;
                               if (sH < 20 || sH > 120) {
-                                showError('Высота прицела: 20–120 мм');
+                                showError(isMetric 
+                                  ? 'Высота прицела: 20–120 мм' 
+                                  : 'Высота прицела: 0.8–4.7 дюйма');
                                 return;
                               }
 
@@ -1224,7 +1233,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               }
                               if (!isMetric) zD *= 0.9144;
                               if (zD < 10 || zD > 1000) {
-                                showError('Дистанция пристрелки: 10–1000 м');
+                                showError(isMetric 
+                                  ? 'Дистанция пристрелки: 10–1000 м'
+                                  : 'Дистанция пристрелки: 10–1100 ярд');
                                 return;
                               }
 
@@ -1236,14 +1247,16 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               }
                               if (!isMetric) tw *= 25.4;
                               if (tw < 100 || tw > 600) {
-                                showError('Твист: 100–600 мм');
+                                showError(isMetric
+                                  ? 'Твист: 100–600 мм'
+                                  : 'Твист: 4–24 дюйма');
                                 return;
                               }
 
                               double? cV = parseValue(_model.textFieldModel5
                                   .inputTextController?.text);
-                              if (cV == null || cV <= 0) {
-                                showError('Цена клика должна быть > 0');
+                              if (cV == null || cV <= 0 || cV > 5.0) {
+                                showError('Цена клика: 0.001–5.0');
                                 return;
                               }
                               if (_model.clickTypeValue == null) {
@@ -1261,7 +1274,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               double? bL = parseValue(_model.textFieldModel7
                                   .inputTextController?.text);
                               if (bL == null || bL < 3 || bL > 80) {
-                                showError('Длина пули: 3–80 мм');
+                                showError(isMetric
+                                  ? 'Длина пули: 3–80 мм'
+                                  : 'Длина пули: 0.12–3.15 дюйма');
                                 return;
                               }
 
@@ -1273,7 +1288,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               }
                               if (!isMetric) mV *= 0.3048;
                               if (mV < 100 || mV > 1500) {
-                                showError('Скорость: 100–1500 м/с');
+                                showError(isMetric
+                                  ? 'Скорость: 100–1500 м/с'
+                                  : 'Скорость: 330–4900 fps');
                                 return;
                               }
 
@@ -1305,6 +1322,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                 'created_at': FieldValue.serverTimestamp(),
                               });
                               if (context.mounted) context.safePop();
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Ошибка при сохранении: $e')));
                             } finally {
                               if (mounted) {
                                 safeSetState(

@@ -17,3 +17,4 @@ export '/sms/sms_widget.dart' show SmsWidget;
 export '/succsed_enter/succsed_enter_widget.dart' show SuccsedEnterWidget;
 export '/profile/profile_widget.dart' show ProfileWidget;
 export '/shoot_result/shoot_result_widget.dart' show ShootResultWidget;
+export '/history/history_widget.dart' show HistoryWidget;

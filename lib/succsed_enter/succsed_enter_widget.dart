@@ -211,6 +211,9 @@ class _SuccsedEnterWidgetState extends State<SuccsedEnterWidget> {
                               full_width: true,
                               loading: false,
                               disabled: false,
+                              onPressed: () async {
+                                context.goNamed('shootPage');
+                              },
                             ),
                           ),
                           Container(

@@ -8,6 +8,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '/auth/firebase_auth/auth_util.dart';
 import 'weapon_list_model.dart';
 export 'weapon_list_model.dart';
 
@@ -78,7 +80,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'MY ARSENAL',
+                                'МОЙ АРСЕНАЛ',
                                 style: FlutterFlowTheme.of(context)
                                     .headlineMedium
                                     .override(
@@ -98,30 +100,40 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                       lineHeight: 1.1,
                                     ),
                               ),
-                              Text(
-                                '3 ACTIVE SYSTEMS',
-                                style: FlutterFlowTheme.of(context)
-                                    .labelSmall
-                                    .override(
-                                      font: GoogleFonts.spaceGrotesk(
-                                        fontWeight: FlutterFlowTheme.of(context)
-                                            .labelSmall
-                                            .fontWeight,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .labelSmall
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .labelSmall
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .labelSmall
-                                          .fontStyle,
-                                      lineHeight: 1.1,
-                                    ),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(currentUserUid)
+                                    .collection('weapons')
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  final count = snapshot.data?.docs.length ?? 0;
+                                  return Text(
+                                    '$count АКТИВНЫХ СИСТЕМ',
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelSmall
+                                        .override(
+                                          font: GoogleFonts.spaceGrotesk(
+                                            fontWeight: FlutterFlowTheme.of(context)
+                                                .labelSmall
+                                                .fontWeight,
+                                            fontStyle: FlutterFlowTheme.of(context)
+                                                .labelSmall
+                                                .fontStyle,
+                                          ),
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FlutterFlowTheme.of(context)
+                                              .labelSmall
+                                              .fontWeight,
+                                          fontStyle: FlutterFlowTheme.of(context)
+                                              .labelSmall
+                                              .fontStyle,
+                                          lineHeight: 1.1,
+                                        ),
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -200,7 +212,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                             child: TextFieldWidget(
                                               label: null,
                                               helper: null,
-                                              hint: 'SEARCH INVENTORY...',
+                                              hint: 'ПОИСК ПО ИНВЕНТАРЮ...',
                                               value: '',
                                               leading_icon_present: false,
                                               trailing_icon_present: false,
@@ -216,44 +228,80 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                   ),
                                 ),
                               ),
-                              wrapWithModel(
-                                model: _model.tacticalWeaponCardModel1,
-                                updateCallback: () => safeSetState(() {}),
-                                child: TacticalWeaponCardWidget(
-                                  bc_type: 'G7',
-                                  bc_value: '0.315',
-                                  caliber: '6.5 CREEDMOOR',
-                                  name: 'ACCURACY INTERNATIONAL AT-X',
-                                  twist: '1:8\"',
-                                  v0: '820',
-                                  weight: '9.1',
-                                ),
-                              ),
-                              wrapWithModel(
-                                model: _model.tacticalWeaponCardModel2,
-                                updateCallback: () => safeSetState(() {}),
-                                child: TacticalWeaponCardWidget(
-                                  bc_type: 'G7',
-                                  bc_value: '0.395',
-                                  caliber: '.338 LAPUA MAG',
-                                  name: 'SAKO TRG 42',
-                                  twist: '1:10\"',
-                                  v0: '860',
-                                  weight: '16.2',
-                                ),
-                              ),
-                              wrapWithModel(
-                                model: _model.tacticalWeaponCardModel3,
-                                updateCallback: () => safeSetState(() {}),
-                                child: TacticalWeaponCardWidget(
-                                  bc_type: 'G1',
-                                  bc_value: '0.505',
-                                  caliber: '.308 WIN',
-                                  name: 'REMINGTON 700 CUSTOM',
-                                  twist: '1:11.25\"',
-                                  v0: '790',
-                                  weight: '11.3',
-                                ),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(currentUserUid)
+                                    .collection('weapons')
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return Center(child: CircularProgressIndicator());
+                                  }
+                                  final docs = snapshot.data!.docs;
+                                  final searchQuery = _model.textFieldModel.inputTextController?.text.toLowerCase() ?? '';
+                                  final filteredDocs = docs.where((doc) {
+                                    final data = doc.data() as Map<String, dynamic>;
+                                    final name = (data['name'] ?? '').toString().toLowerCase();
+                                    return name.contains(searchQuery);
+                                  }).toList();
+
+                                  if (filteredDocs.isEmpty) {
+                                    return Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(24.0),
+                                        child: Text(searchQuery.isEmpty ? 'Арсенал пуст' : 'Ничего не найдено'),
+                                      ),
+                                    );
+                                  }
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: filteredDocs.map((doc) {
+                                      final data = doc.data() as Map<String, dynamic>;
+                                      return TacticalWeaponCardWidget(
+                                        bc_type: data['bc_model'] ?? 'G7',
+                                        bc_value: data['bc_value'] ?? '0.315',
+                                        caliber: data['caliber'] ?? 'КАЛИБР',
+                                        name: data['name'] ?? 'ОРУЖИЕ',
+                                        twist: data['twist'] ?? '1:8\"',
+                                        twist_dir: data['twist_direction'] == 'left' ? 'ЛЕВО' : 'ПРАВО',
+                                        bullet_length: data['bullet_length']?.toString() ?? '30.0',
+                                        v0: data['muzzle_velocity'] ?? '820',
+                                        weight: data['bullet_weight'] ?? '9.1',
+                                        sight_height: data['sight_height'] ?? '50',
+                                        zero_distance: data['zero_distance'] ?? '100',
+                                        click_value: data['click_value'] ?? '0.1',
+                                        click_type: data['click_type'] ?? 'MRAD',
+                                        onSelect: () async {
+                                          context.goNamed(
+                                            'shootPage',
+                                            queryParameters: {
+                                              'selectedWeaponId': doc.id,
+                                              'selectedWeaponName':
+                                                  data['name'] ?? 'Оружие',
+                                              'selectedWeaponCaliber':
+                                                  data['caliber'] ?? '',
+                                              'muzzleVelocity':
+                                                  data['muzzle_velocity']
+                                                      ?.toString(),
+                                              'bcValue': data['bc_value']
+                                                  ?.toString(),
+                                            }.withoutNulls,
+                                          );
+                                        },
+                                        onEdit: () async {
+                                          context.pushNamed(
+                                            'editWeapon',
+                                            extra: {
+                                              'weaponRef': doc.reference,
+                                              'weaponData': data,
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }).toList().divide(SizedBox(height: 16.0)),
+                                  );
+                                },
                               ),
                               Container(
                                 child: Padding(
@@ -275,7 +323,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                             size: 16.0,
                                           ),
                                           Text(
-                                            'VERIFY BALLISTIC DATA BEFORE ENGAGEMENT',
+                                            'ПРОВЕРЯЙТЕ ДАННЫЕ ПЕРЕД СТРЕЛЬБОЙ',
                                             textAlign: TextAlign.center,
                                             style: FlutterFlowTheme.of(context)
                                                 .labelSmall
@@ -348,7 +396,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                         model: _model.buttonModel,
                         updateCallback: () => safeSetState(() {}),
                         child: ButtonWidget(
-                          content: 'ADD NEW WEAPON',
+                          content: 'ДОБАВИТЬ НОВОЕ ОРУЖИЕ',
                           icon: Icon(
                             Icons.add_rounded,
                             color: FlutterFlowTheme.of(context).onPrimary,
@@ -362,6 +410,9 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                           full_width: true,
                           loading: false,
                           disabled: false,
+                          onPressed: () async {
+                            context.pushNamed('addWeapon');
+                          },
                         ),
                       ),
                     ),

@@ -275,17 +275,20 @@ class _LoginWidgetState extends State<LoginWidget> {
                                   content: 'Получить SMS-код',
                                   icon_present: false,
                                   icon_end_present: false,
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
+                                  color: (_model.textFieldModel.inputTextController?.text.length ?? 0) >= 14
+                                      ? FlutterFlowTheme.of(context).primary
+                                      : FlutterFlowTheme.of(context).secondaryText,
                                   variant: 'primary',
                                   size: 'large',
                                   full_width: true,
-                                  loading: false,
+                                  loading: _model.isLoading,
                                   disabled: (_model.textFieldModel
                                               .inputTextController?.text.length ??
                                           0) <
                                       14, // (###)###-##-## is 14 chars,
                                   onPressed: () async {
+                                    if (_model.isLoading) return;
+                                    safeSetState(() => _model.isLoading = true);
                                     final phoneNumber = _model
                                         .textFieldModel.inputTextController.text
                                         .replaceAll(RegExp(r'\D'), '');
@@ -311,6 +314,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                                               'Ошибка: ${e.toString()}. Убедитесь, что вход по номеру телефона включен в консоли Firebase.'),
                                         ),
                                       );
+                                    } finally {
+                                      if (mounted) {
+                                        safeSetState(() => _model.isLoading = false);
+                                      }
                                     }
                                   },
                                 ),
