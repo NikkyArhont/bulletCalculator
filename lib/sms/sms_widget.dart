@@ -72,7 +72,8 @@ class _SmsWidgetState extends State<SmsWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        body: PopScope(
+        body: SafeArea(
+          child: PopScope(
           canPop: !_model.isLoading,
           child: Padding(
             padding: EdgeInsets.all(24.0),
@@ -343,6 +344,7 @@ class _SmsWidgetState extends State<SmsWidget> {
             ].divide(SizedBox(height: 32.0)),
             ),
           ),
+        ),
         ),
       ),
     );

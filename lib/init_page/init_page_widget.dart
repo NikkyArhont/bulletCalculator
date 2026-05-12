@@ -63,7 +63,8 @@ class _InitPageWidgetState extends State<InitPageWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        body: Stack(
+        body: SafeArea(
+          child: Stack(
           alignment: AlignmentDirectional(-1.0, -1.0),
           children: [
             LayoutBuilder(
@@ -305,6 +306,7 @@ class _InitPageWidgetState extends State<InitPageWidget> {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

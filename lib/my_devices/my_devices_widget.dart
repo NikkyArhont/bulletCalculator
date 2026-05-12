@@ -51,7 +51,8 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        body: Column(
+        body: SafeArea(
+          child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -750,6 +751,7 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

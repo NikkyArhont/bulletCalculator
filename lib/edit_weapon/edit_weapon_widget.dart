@@ -193,7 +193,8 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        body: SingleChildScrollView(
+        body: SafeArea(
+          child: SingleChildScrollView(
           primary: false,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1208,6 +1209,7 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

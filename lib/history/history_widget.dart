@@ -71,94 +71,96 @@ class _HistoryWidgetState extends State<HistoryWidget> {
         centerTitle: false,
         elevation: 0.0,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('shootResults')
-            .where('userId', isEqualTo: currentUserUid)
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(24.0),
-                child: Text('Ошибка загрузки: ${snapshot.error}'),
-              ),
-            );
-          }
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(
-                color: FlutterFlowTheme.of(context).primary,
-              ),
-            );
-          }
-          final docs = snapshot.data!.docs;
-          if (docs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.history_rounded,
-                    size: 64.0,
-                    color: FlutterFlowTheme.of(context).secondaryText,
-                  ),
-                  SizedBox(height: 16.0),
-                  Text(
-                    'История пока пуста',
-                    style: FlutterFlowTheme.of(context).titleMedium.override(
-                          font: GoogleFonts.spaceGrotesk(),
-                          color: FlutterFlowTheme.of(context).secondaryText,
-                        ),
-                  ),
-                ],
-              ),
-            );
-          }
-          return ListView.builder(
-            padding: EdgeInsets.all(24.0),
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              final data = docs[index].data() as Map<String, dynamic>;
-              final timestamp = data['timestamp'] as Timestamp?;
-              final dateStr = timestamp != null
-                  ? dateTimeFormat('d MMM, HH:mm', timestamp.toDate())
-                  : 'Недавно';
-
-              return InkWell(
-                onTap: () async {
-                  context.pushNamed(
-                    'shootResult',
-                    queryParameters: {
-                      'resultId': docs[index].id,
-                      'distance': data['distance']?.toString(),
-                      'windSpeed': data['windSpeed']?.toString(),
-                      'windDirection': data['windDirection']?.toString(),
-                      'muzzleVelocity': data['muzzleVelocity']?.toString(),
-                      'bcValue': data['bcValue']?.toString(),
-                      'bulletWeight': data['bulletWeight']?.toString(),
-                      'temperature': data['temperature']?.toString(),
-                      'pressure': data['pressure']?.toString(),
-                      'angle': data['angle']?.toString(),
-                      'sightHeight': data['sightHeight']?.toString(),
-                      'clickValue': data['clickValue']?.toString(),
-                    }.withoutNulls,
-                  );
-                },
-                child: HistoryCardWidget(
-                  date: dateStr,
-                  distance: data['distance']?.toString() ?? '0',
-                  elevation: data['vertical_correction']?.toString() ?? '0.0',
-                  weapon: data['weaponName'] ?? 'Оружие',
-                  wind: data['horizontal_correction']?.toString() ?? '0.0',
-                  resultId: docs[index].id,
-                  isHit: data['isHit'] == true,
+      body: SafeArea(
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('shootResults')
+              .where('userId', isEqualTo: currentUserUid)
+              .orderBy('timestamp', descending: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Text('Ошибка загрузки: ${snapshot.error}'),
                 ),
               );
-            },
-          );
-        },
+            }
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+              );
+            }
+            final docs = snapshot.data!.docs;
+            if (docs.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.history_rounded,
+                      size: 64.0,
+                      color: FlutterFlowTheme.of(context).secondaryText,
+                    ),
+                    SizedBox(height: 16.0),
+                    Text(
+                      'История пока пуста',
+                      style: FlutterFlowTheme.of(context).titleMedium.override(
+                            font: GoogleFonts.spaceGrotesk(),
+                            color: FlutterFlowTheme.of(context).secondaryText,
+                          ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              padding: EdgeInsets.all(24.0),
+              itemCount: docs.length,
+              itemBuilder: (context, index) {
+                final data = docs[index].data() as Map<String, dynamic>;
+                final timestamp = data['timestamp'] as Timestamp?;
+                final dateStr = timestamp != null
+                    ? dateTimeFormat('d MMM, HH:mm', timestamp.toDate())
+                    : 'Недавно';
+
+                return InkWell(
+                  onTap: () async {
+                    context.pushNamed(
+                      'shootResult',
+                      queryParameters: {
+                        'resultId': docs[index].id,
+                        'distance': data['distance']?.toString(),
+                        'windSpeed': data['windSpeed']?.toString(),
+                        'windDirection': data['windDirection']?.toString(),
+                        'muzzleVelocity': data['muzzleVelocity']?.toString(),
+                        'bcValue': data['bcValue']?.toString(),
+                        'bulletWeight': data['bulletWeight']?.toString(),
+                        'temperature': data['temperature']?.toString(),
+                        'pressure': data['pressure']?.toString(),
+                        'angle': data['angle']?.toString(),
+                        'sightHeight': data['sightHeight']?.toString(),
+                        'clickValue': data['clickValue']?.toString(),
+                      }.withoutNulls,
+                    );
+                  },
+                  child: HistoryCardWidget(
+                    date: dateStr,
+                    distance: data['distance']?.toString() ?? '0',
+                    elevation: data['vertical_correction']?.toString() ?? '0.0',
+                    weapon: data['weaponName'] ?? 'Оружие',
+                    wind: data['horizontal_correction']?.toString() ?? '0.0',
+                    resultId: docs[index].id,
+                    isHit: data['isHit'] == true,
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

@@ -94,7 +94,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        body: Column(
+        body: SafeArea(
+          child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -961,6 +962,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

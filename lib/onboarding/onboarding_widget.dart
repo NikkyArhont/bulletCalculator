@@ -54,7 +54,8 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        body: Padding(
+        body: SafeArea(
+          child: Padding(
           padding: EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.max,
@@ -247,6 +248,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
               const SizedBox(height: 12.0),
             ],
           ),
+        ),
         ),
       ),
     );

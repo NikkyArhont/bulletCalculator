@@ -47,8 +47,8 @@ class _PinDigitWidgetState extends State<PinDigitWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 64.0,
-      height: 72.0,
+      width: 48.0,
+      height: 56.0,
       decoration: BoxDecoration(
         color: FlutterFlowTheme.of(context).secondaryBackground,
         borderRadius: BorderRadius.circular(6.0),
