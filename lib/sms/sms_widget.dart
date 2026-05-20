@@ -32,6 +32,7 @@ class SmsWidget extends StatefulWidget {
 
 class _SmsWidgetState extends State<SmsWidget> {
   late SmsModel _model;
+  bool _hasError = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -178,7 +179,9 @@ class _SmsWidgetState extends State<SmsWidget> {
                           FilteringTextInputFormatter.digitsOnly,
                         ],
                         maxLength: 6,
-                        onChanged: (_) => safeSetState(() {}),
+                         onChanged: (_) => safeSetState(() {
+                            _hasError = false;
+                          }),
                       ),
                     ),
                   ),
@@ -192,68 +195,91 @@ class _SmsWidgetState extends State<SmsWidget> {
                         wrapWithModel(
                           model: _model.pinDigitModel1,
                           updateCallback: () => safeSetState(() {}),
-                          child: PinDigitWidget(
-                            digit: _model.pinCodeController!.text.length > 0
-                                ? _model.pinCodeController!.text[0]
-                                : '',
-                            active: _model.pinCodeController!.text.length == 0,
-                          ),
+                           child: PinDigitWidget(
+                             digit: _model.pinCodeController!.text.length > 0
+                                 ? _model.pinCodeController!.text[0]
+                                 : '',
+                             active: _model.pinCodeController!.text.length == 0 && !_hasError,
+                             error: _hasError,
+                           ),
                         ),
                         wrapWithModel(
                           model: _model.pinDigitModel2,
                           updateCallback: () => safeSetState(() {}),
-                          child: PinDigitWidget(
-                            digit: _model.pinCodeController!.text.length > 1
-                                ? _model.pinCodeController!.text[1]
-                                : '',
-                            active: _model.pinCodeController!.text.length == 1,
-                          ),
+                           child: PinDigitWidget(
+                             digit: _model.pinCodeController!.text.length > 1
+                                 ? _model.pinCodeController!.text[1]
+                                 : '',
+                             active: _model.pinCodeController!.text.length == 1 && !_hasError,
+                             error: _hasError,
+                           ),
                         ),
                         wrapWithModel(
                           model: _model.pinDigitModel3,
                           updateCallback: () => safeSetState(() {}),
-                          child: PinDigitWidget(
-                            digit: _model.pinCodeController!.text.length > 2
-                                ? _model.pinCodeController!.text[2]
-                                : '',
-                            active: _model.pinCodeController!.text.length == 2,
-                          ),
+                           child: PinDigitWidget(
+                             digit: _model.pinCodeController!.text.length > 2
+                                 ? _model.pinCodeController!.text[2]
+                                 : '',
+                             active: _model.pinCodeController!.text.length == 2 && !_hasError,
+                             error: _hasError,
+                           ),
                         ),
                         wrapWithModel(
                           model: _model.pinDigitModel4,
                           updateCallback: () => safeSetState(() {}),
-                          child: PinDigitWidget(
-                            digit: _model.pinCodeController!.text.length > 3
-                                ? _model.pinCodeController!.text[3]
-                                : '',
-                            active: _model.pinCodeController!.text.length == 3,
-                          ),
+                           child: PinDigitWidget(
+                             digit: _model.pinCodeController!.text.length > 3
+                                 ? _model.pinCodeController!.text[3]
+                                 : '',
+                             active: _model.pinCodeController!.text.length == 3 && !_hasError,
+                             error: _hasError,
+                           ),
                         ),
                         wrapWithModel(
                           model: _model.pinDigitModel5,
                           updateCallback: () => safeSetState(() {}),
-                          child: PinDigitWidget(
-                            digit: _model.pinCodeController!.text.length > 4
-                                ? _model.pinCodeController!.text[4]
-                                : '',
-                            active: _model.pinCodeController!.text.length == 4,
-                          ),
+                           child: PinDigitWidget(
+                             digit: _model.pinCodeController!.text.length > 4
+                                 ? _model.pinCodeController!.text[4]
+                                 : '',
+                             active: _model.pinCodeController!.text.length == 4 && !_hasError,
+                             error: _hasError,
+                           ),
                         ),
                         wrapWithModel(
                           model: _model.pinDigitModel6,
                           updateCallback: () => safeSetState(() {}),
-                          child: PinDigitWidget(
-                            digit: _model.pinCodeController!.text.length > 5
-                                ? _model.pinCodeController!.text[5]
-                                : '',
-                            active: _model.pinCodeController!.text.length == 5,
-                          ),
+                           child: PinDigitWidget(
+                             digit: _model.pinCodeController!.text.length > 5
+                                 ? _model.pinCodeController!.text[5]
+                                 : '',
+                             active: _model.pinCodeController!.text.length == 5 && !_hasError,
+                             error: _hasError,
+                           ),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
+              if (_hasError)
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                  child: Text(
+                    'Неверный код. Попробуйте ещё раз.',
+                    textAlign: TextAlign.center,
+                    style: FlutterFlowTheme.of(context).bodySmall.override(
+                      font: GoogleFonts.inter(
+                        fontWeight: FlutterFlowTheme.of(context).bodySmall.fontWeight,
+                        fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
+                      ),
+                      color: FlutterFlowTheme.of(context).error,
+                      letterSpacing: 0.0,
+                      lineHeight: 1.3,
+                    ),
+                  ),
+                ),
                   Container(
                     alignment: AlignmentDirectional(0.0, 0.0),
                     child: Row(
@@ -309,9 +335,10 @@ class _SmsWidgetState extends State<SmsWidget> {
                   full_width: true,
                   loading: _model.isLoading,
                   disabled: _model.pinCodeController!.text.length < 6,
-                  onPressed: () async {
+                   onPressed: () async {
                     safeSetState(() {
                       _model.isLoading = true;
+                      _hasError = false;
                     });
                     try {
                       final user = await authManager.verifySmsCode(
@@ -331,7 +358,16 @@ class _SmsWidgetState extends State<SmsWidget> {
                         }, SetOptions(merge: true));
 
                         context.goNamedAuth('Subscribe', context.mounted);
+                      } else {
+                        // Wrong code — show inline error
+                        safeSetState(() {
+                          _hasError = true;
+                        });
                       }
+                    } catch (_) {
+                      safeSetState(() {
+                        _hasError = true;
+                      });
                     } finally {
                       safeSetState(() {
                         _model.isLoading = false;

@@ -7,6 +7,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,9 @@ class ShootResultWidget extends StatefulWidget {
     this.angle,
     this.sightHeight,
     this.clickValue,
+    this.zeroDistance,
+    this.humidity,
+    this.bcModel,
     this.resultId,
   });
 
@@ -43,6 +47,9 @@ class ShootResultWidget extends StatefulWidget {
   final double? angle;
   final double? sightHeight;
   final double? clickValue;
+  final double? zeroDistance;
+  final double? humidity;
+  final String? bcModel;
   final String? resultId;
 
   static String routeName = 'shootResult';
@@ -66,14 +73,18 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
     _model.ballisticResult = BallisticEngine.calculate(
       v0: widget.muzzleVelocity ?? 800.0,
       bc: widget.bcValue ?? 0.3,
-      weightGrams: widget.bulletWeight ?? 9.0,
+      weightGrains: widget.bulletWeight ?? 9.0,
       distance: widget.distance ?? 100.0,
+      zeroDistance: widget.zeroDistance ?? 100.0,
       windSpeed: widget.windSpeed ?? 0.0,
       windDirectionHours: widget.windDirection ?? 3.0,
       temperatureC: widget.temperature ?? 15.0,
       pressureHpa: widget.pressure ?? 1013.0,
+      humidity: widget.humidity ?? 50.0,
+      angleDegrees: widget.angle ?? 0.0,
       sightHeightMm: widget.sightHeight ?? 50.0,
       clickValue: widget.clickValue ?? 0.1,
+      bcModel: widget.bcModel ?? 'G1',
     );
   }
 
@@ -254,7 +265,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                                '${_model.ballisticResult?.verticalMrad.toStringAsFixed(1) ?? '0.0'}',
+                                                '${(_model.ballisticResult?.verticalMrad ?? 0.0).abs().toStringAsFixed(1)}',
                                                 style:
                                                     FlutterFlowTheme.of(context)
                                                         .headlineLarge
@@ -317,7 +328,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ].divide(SizedBox(width: 16.0)),
                                           ),
                                           Text(
-                                            '${_model.ballisticResult?.verticalClicks ?? 0} КЛИКОВ',
+                                            '${(_model.ballisticResult?.verticalClicks ?? 0).abs()} КЛИКОВ ${(_model.ballisticResult?.verticalClicks ?? 0) >= 0 ? "ВВЕРХ" : "ВНИЗ"}',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -394,7 +405,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                                '${_model.ballisticResult?.horizontalMrad.toStringAsFixed(1) ?? '0.0'}',
+                                                '${(_model.ballisticResult?.horizontalMrad ?? 0.0).abs().toStringAsFixed(1)}',
                                                 style:
                                                     FlutterFlowTheme.of(context)
                                                         .headlineLarge
@@ -457,7 +468,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ].divide(SizedBox(width: 16.0)),
                                           ),
                                           Text(
-                                            '${_model.ballisticResult?.horizontalClicks ?? 0} КЛИКОВ',
+                                            '${(_model.ballisticResult?.horizontalClicks ?? 0).abs()} КЛИКОВ ${(_model.ballisticResult?.horizontalClicks ?? 0) >= 0 ? "ВПРАВО" : "ВЛЕВО"}',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -508,7 +519,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                     model: _model.resultMetricCardModel1,
                                     updateCallback: () => safeSetState(() {}),
                                     child: ResultMetricCardWidget(
-                                      label: 'Смещение (В)',
+                                      label: 'Падение',
                                       unit: 'см',
                                       value: '${_model.ballisticResult?.dropCm.toStringAsFixed(1) ?? '0.0'}',
                                     ),
@@ -520,7 +531,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                     model: _model.resultMetricCardModel2,
                                     updateCallback: () => safeSetState(() {}),
                                     child: ResultMetricCardWidget(
-                                      label: 'Смещение (Г)',
+                                      label: 'Снос ветром',
                                       unit: 'см',
                                       value: '${_model.ballisticResult?.windDriftCm.toStringAsFixed(1) ?? '0.0'}',
                                     ),
@@ -529,16 +540,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                               ].divide(SizedBox(width: 16.0)),
                             ),
                             Container(
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                borderRadius: BorderRadius.circular(6.0),
-                                shape: BoxShape.rectangle,
-                                border: Border.all(
-                                  color: FlutterFlowTheme.of(context).alternate,
-                                  width: 1.0,
-                                ),
-                              ),
+                              decoration: BoxDecoration(),
                               child: Padding(
                                 padding: EdgeInsets.all(24.0),
                                 child: Container(
@@ -605,21 +607,14 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                           child: FlutterFlowLineChart(
                                             data: [
                                               FFLineChartData(
-                                                xData: [
-                                                  0.0,
-                                                  (widget.distance ?? 600.0) * 0.2,
-                                                  (widget.distance ?? 600.0) * 0.4,
-                                                  (widget.distance ?? 600.0) * 0.6,
-                                                  (widget.distance ?? 600.0) * 0.8,
-                                                  (widget.distance ?? 600.0)
-                                                ],
-                                                yData: [0.0, 0.3, 0.45, 0.5, 0.35, 0.0],
+                                                xData: _model.ballisticResult?.trajectoryPoints.map((p) => p.x).toList() ?? [0.0, (widget.distance ?? 600.0)],
+                                                yData: _model.ballisticResult?.trajectoryPoints.map((p) => p.y).toList() ?? [0.0, 0.0],
                                                 settings: LineChartBarData(
                                                   color: FlutterFlowTheme.of(
                                                           context)
                                                       .primary,
                                                   barWidth: 3.0,
-                                                  isCurved: true,
+                                                  isCurved: false,
                                                   dotData:
                                                       FlDotData(show: false),
                                                   belowBarData: BarAreaData(
@@ -638,9 +633,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ),
                                             axisBounds: AxisBounds(
                                               minX: 0.0,
-                                              minY: -0.1,
                                               maxX: (widget.distance ?? 600.0),
-                                              maxY: 0.6,
                                             ),
                                             xAxisLabelInfo: AxisLabelInfo(
                                               title: 'Дистанция (м)',
@@ -794,29 +787,13 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         lineHeight: 1.1,
                                       ),
                                 ),
-                                wrapWithModel(
-                                  model: _model.correctionTileModel1,
-                                  updateCallback: () => safeSetState(() {}),
-                                  child: CorrectionTileWidget(
-                                    value: '0.0', // Drift already in horizontal
-                                  ),
-                                ),
-                                wrapWithModel(
-                                  model: _model.correctionTileModel2,
-                                  updateCallback: () => safeSetState(() {}),
-                                  child: CorrectionTileWidget(
-                                    label: 'Кориолис',
-                                    sub_label: 'Вращение Земли',
-                                    unit: 'MRAD',
-                                    value: '0.0', // Not implemented in MVP
-                                  ),
-                                ),
+
                                 wrapWithModel(
                                   model: _model.correctionTileModel3,
                                   updateCallback: () => safeSetState(() {}),
                                   child: CorrectionTileWidget(
                                     label: 'Скорость у цели',
-                                    sub_label: 'Дистанция ${widget.distance?.round() ?? 0}м',
+                                    sub_label: 'Дистанция ${widget.distance?.round() ?? 0} м',
                                     unit: 'м/с',
                                     value: '${_model.ballisticResult?.velocityAtTarget.round() ?? 0}',
                                   ),

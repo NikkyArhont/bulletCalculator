@@ -12,11 +12,14 @@ class PinDigitWidget extends StatefulWidget {
     super.key,
     String? digit,
     bool? active,
+    bool? error,
   })  : this.digit = digit ?? '',
-        this.active = active ?? true;
+        this.active = active ?? true,
+        this.error = error ?? false;
 
   final String digit;
   final bool active;
+  final bool error;
 
   @override
   State<PinDigitWidget> createState() => _PinDigitWidgetState();
@@ -46,30 +49,38 @@ class _PinDigitWidgetState extends State<PinDigitWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = widget.error
+        ? FlutterFlowTheme.of(context).error
+        : widget.active
+            ? FlutterFlowTheme.of(context).primary
+            : FlutterFlowTheme.of(context).alternate;
+
     return Container(
       width: 48.0,
       height: 56.0,
       decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).secondaryBackground,
+        color: widget.error
+            ? FlutterFlowTheme.of(context).error.withOpacity(0.08)
+            : FlutterFlowTheme.of(context).secondaryBackground,
         borderRadius: BorderRadius.circular(6.0),
         shape: BoxShape.rectangle,
         border: Border.all(
-          color: widget!.active
-              ? FlutterFlowTheme.of(context).primary
-              : FlutterFlowTheme.of(context).alternate,
-          width: widget!.active ? 2.0 : 2.0,
+          color: borderColor,
+          width: 2.0,
         ),
       ),
       alignment: AlignmentDirectional(0.0, 0.0),
       child: Text(
-        widget!.digit,
+        widget.digit,
         style: FlutterFlowTheme.of(context).headlineMedium.override(
               font: GoogleFonts.spaceGrotesk(
                 fontWeight: FontWeight.bold,
                 fontStyle:
                     FlutterFlowTheme.of(context).headlineMedium.fontStyle,
               ),
-              color: FlutterFlowTheme.of(context).primaryText,
+              color: widget.error
+                  ? FlutterFlowTheme.of(context).error
+                  : FlutterFlowTheme.of(context).primaryText,
               letterSpacing: 0.0,
               fontWeight: FontWeight.bold,
               fontStyle: FlutterFlowTheme.of(context).headlineMedium.fontStyle,

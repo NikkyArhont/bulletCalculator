@@ -32,10 +32,10 @@ class TacticalWeaponCardWidget extends StatefulWidget {
         this.bc_value = bc_value ?? '0.315',
         this.caliber = caliber ?? '6.5 CREEDMOOR',
         this.name = name ?? 'ACCURACY INTERNATIONAL AT-X',
-        this.twist = twist ?? '1:8\"',
+        this.twist = twist ?? '203.2',
         this.v0 = v0 ?? '820',
         this.weight = weight ?? '9.1',
-        this.sight_height = sight_height ?? '5.0',
+        this.sight_height = sight_height ?? '50.0',
         this.zero_distance = zero_distance ?? '100',
         this.click_value = click_value ?? '0.1',
         this.click_type = click_type ?? 'MRAD',
@@ -66,6 +66,20 @@ class TacticalWeaponCardWidget extends StatefulWidget {
 class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
   late TacticalWeaponCardModel _model;
   bool _isSelecting = false;
+
+  String _formatTwist(String raw) {
+    final val = double.tryParse(raw.replaceAll(RegExp(r'[^\d.]'), ''));
+    if (val == null) return raw;
+    final inches = val / 25.4;
+    return '${inches.toStringAsFixed(1)} дюйм';
+  }
+
+  String _formatSightHeight(String raw) {
+    final val = double.tryParse(raw);
+    if (val == null) return raw;
+    final cm = val / 10.0;
+    return '${cm.toStringAsFixed(1)} см';
+  }
 
   Widget _buildGridItem(BuildContext context, String label, String value) {
     if (label.isEmpty && value.isEmpty) {
@@ -240,7 +254,7 @@ class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
                             Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                _buildGridItem(context, 'ТВИСТ', widget!.twist),
+                                _buildGridItem(context, 'ТВИСТ', _formatTwist(widget!.twist)),
                                 _buildGridItem(context, 'НАПР.', widget!.twist_dir),
                                 _buildGridItem(context, 'V0 (М/С)', widget!.v0),
                                 _buildGridItem(context, 'ВЕС (Г)', widget!.weight),
@@ -253,7 +267,7 @@ class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
                                 _buildGridItem(context, 'ДЛИНА (ММ)', widget!.bullet_length),
                                 _buildGridItem(context, 'БК МОДЕЛЬ', widget!.bc_type),
                                 _buildGridItem(context, 'БК ЗНАЧ.', widget!.bc_value),
-                                _buildGridItem(context, 'ПРИЦЕЛ (ММ)', widget!.sight_height),
+                                _buildGridItem(context, 'ПРИЦЕЛ', _formatSightHeight(widget!.sight_height)),
                               ],
                             ),
                             // Row 3: Zero Dist, Click, Click Type, Empty

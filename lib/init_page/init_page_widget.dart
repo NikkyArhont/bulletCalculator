@@ -63,8 +63,7 @@ class _InitPageWidgetState extends State<InitPageWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        body: SafeArea(
-          child: Stack(
+        body: Stack(
           alignment: AlignmentDirectional(-1.0, -1.0),
           children: [
             LayoutBuilder(
@@ -72,8 +71,10 @@ class _InitPageWidgetState extends State<InitPageWidget> {
                 return FbmGradientShaderFill(
                   width: constraints.maxWidth.isFinite
                       ? constraints.maxWidth
-                      : 200.0,
-                  height: 200.0,
+                      : MediaQuery.of(context).size.width,
+                  height: constraints.maxHeight.isFinite
+                      ? constraints.maxHeight
+                      : MediaQuery.of(context).size.height,
                   params: ShaderParams(values: {
                     'gradientAngle': 135.0,
                     'gradientScale': 1.27,
@@ -305,8 +306,7 @@ class _InitPageWidgetState extends State<InitPageWidget> {
                 ),
               ),
             ),
-          ],
-        ),
+           ],
         ),
       ),
     );

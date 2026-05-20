@@ -54,9 +54,9 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
       _model.textFieldModel1.inputTextController ??= TextEditingController();
       _model.textFieldModel1.inputTextController?.text = wd['name'] ?? '';
 
-      // Conversions for display if not metric
+      // Conversions for display: DB stores mm, we display cm/inches
       double rawSH = double.tryParse(wd['sight_height']?.toString() ?? '0') ?? 0;
-      final sH = isMetric ? rawSH : rawSH / 25.4;
+      final sH = rawSH / 10.0; // Always display in cm
       _model.textFieldModel2.inputTextController ??= TextEditingController();
       _model.textFieldModel2.inputTextController?.text = sH.toStringAsFixed(1);
 
@@ -66,7 +66,7 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
       _model.textFieldModel3.inputTextController?.text = zD.toStringAsFixed(0);
 
       double rawTwist = double.tryParse(wd['twist']?.toString() ?? '0') ?? 0;
-      final tw = isMetric ? rawTwist : rawTwist / 25.4;
+      final tw = rawTwist / 25.4; // Always display in inches
       _model.textFieldModel4.inputTextController ??= TextEditingController();
       _model.textFieldModel4.inputTextController?.text = tw.toStringAsFixed(1);
 
@@ -115,13 +115,10 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
     final name = _model.textFieldModel1.inputTextController?.text.trim() ?? '';
     final nameValid = name.isNotEmpty;
 
-    // Sight Height (20-120 mm)
+    // Sight Height (2-12 cm)
     final sHText = _model.textFieldModel2.inputTextController?.text ?? '';
     final sH = parseVal(sHText);
-    final sHValid = sH != null &&
-        (isMetric
-            ? (sH >= 20 && sH <= 120)
-            : (sH * 25.4 >= 20 && sH * 25.4 <= 120));
+    final sHValid = sH != null && (sH >= 2.0 && sH <= 12.0);
     final sHErr = sHText.trim().isNotEmpty && !sHValid;
 
     // Zero Distance (10-1000 m)
@@ -133,13 +130,10 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
             : (zD * 0.9144 >= 10 && zD * 0.9144 <= 1000));
     final zDErr = zDText.trim().isNotEmpty && !zDValid;
 
-    // Twist (100-600 mm)
+    // Twist (4-24 inches)
     final twText = _model.textFieldModel4.inputTextController?.text ?? '';
     final tw = parseVal(twText);
-    final twValid = tw != null &&
-        (isMetric
-            ? (tw >= 100 && tw <= 600)
-            : (tw * 25.4 >= 100 && tw * 25.4 <= 600));
+    final twValid = tw != null && (tw >= 4.0 && tw <= 24.0);
     final twErr = twText.trim().isNotEmpty && !twValid;
 
     // Click Value (0.001 - 5.0)
@@ -335,7 +329,7 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                                       updateCallback: () => safeSetState(() {}),
                                       child: TextFieldWidget(
                                         label: 'Высота прицела',
-                                        helper: sHErr ? (isMetric ? '20–120 мм' : '0.8–4.7 дюйм') : (isMetric ? 'мм' : 'дюймов'),
+                                        helper: sHErr ? '2–12 см' : 'см',
                                         hint: '5.0',
                                         value: '',
                                         leading_icon_present: false,
@@ -420,7 +414,7 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                                       updateCallback: () => safeSetState(() {}),
                                       child: TextFieldWidget(
                                         label: 'Твист (шаг)',
-                                        helper: twErr ? (isMetric ? '100–600 мм' : '4–24 дюйма') : (isMetric ? 'мм' : 'дюймов'),
+                                        helper: twErr ? '4–24 дюйма' : 'дюймов',
                                         hint: '10',
                                         value: '',
                                         leading_icon_present: false,
@@ -501,15 +495,13 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                                                 lineHeight: 1.1,
                                               ),
                                         ),
-                                        SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
                                               InkWell(
                                                 onTap: () async {
                                                   _model.twistDir = 'Правое';
@@ -668,8 +660,7 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                                                   ),
                                                 ),
                                               ),
-                                            ].divide(SizedBox(width: 8.0)),
-                                          ),
+                                            ].divide(SizedBox(height: 8.0)),
                                         ),
                                       ].divide(SizedBox(height: 8.0)),
                                     ),
@@ -1125,12 +1116,10 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                           safeSetState(() => _isSaving = true);
                           try {
                             // Final conversion before persistence
-                            final finalSH =
-                                isMetric ? sH! : sH! * 25.4; // inches to mm
+                            final finalSH = sH! * 10.0; // cm to mm
                             final finalZD =
                                 isMetric ? zD! : zD! * 0.9144; // yards to m
-                            final finalTwist =
-                                isMetric ? tw! : tw! * 25.4; // inches to mm
+                            final finalTwist = tw! * 25.4; // inches to mm
                             final finalMV =
                                 isMetric ? mV! : mV! * 0.3048; // fps to m/s
 

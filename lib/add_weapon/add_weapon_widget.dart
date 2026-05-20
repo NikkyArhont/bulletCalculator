@@ -60,13 +60,10 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
     final name = _model.textFieldModel1.inputTextController?.text.trim() ?? '';
     final nameValid = name.isNotEmpty;
 
-    // Sight Height (20-120 mm)
+    // Sight Height (2-12 cm)
     final sHText = _model.textFieldModel2.inputTextController?.text ?? '';
     final sH = parseVal(sHText);
-    final sHValid = sH != null &&
-        (isMetric
-            ? (sH >= 20 && sH <= 120)
-            : (sH * 25.4 >= 20 && sH * 25.4 <= 120));
+    final sHValid = sH != null && (sH >= 2.0 && sH <= 12.0);
     final sHErr = sHText.trim().isNotEmpty && !sHValid;
 
     // Zero Distance (10-1000 m)
@@ -78,13 +75,10 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
             : (zD * 0.9144 >= 10 && zD * 0.9144 <= 1000));
     final zDErr = zDText.trim().isNotEmpty && !zDValid;
 
-    // Twist (100-600 mm)
+    // Twist (4-24 inches)
     final twText = _model.textFieldModel4.inputTextController?.text ?? '';
     final tw = parseVal(twText);
-    final twValid = tw != null &&
-        (isMetric
-            ? (tw >= 100 && tw <= 600)
-            : (tw * 25.4 >= 100 && tw * 25.4 <= 600));
+    final twValid = tw != null && (tw >= 4.0 && tw <= 24.0);
     final twErr = twText.trim().isNotEmpty && !twValid;
 
     // Click Value (> 0)
@@ -285,7 +279,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
                                             label: 'Высота прицела',
-                                            helper: sHErr ? (isMetric ? '20–120 мм' : '0.8–4.7 дюйм') : (isMetric ? 'мм' : 'дюймов'),
+                                            helper: sHErr ? '2–12 см' : 'см',
                                             hint: '5.0',
                                             value: '',
                                             leading_icon_present: false,
@@ -381,7 +375,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
                                             label: 'Твист (шаг)',
-                                            helper: twErr ? (isMetric ? '100–600 мм' : '4–24 дюйма') : (isMetric ? 'мм' : 'дюймов'),
+                                            helper: twErr ? '4–24 дюйма' : 'дюймов',
                                             hint: '10',
                                             value: '',
                                             leading_icon: Icon(
@@ -579,12 +573,12 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                                         lineHeight: 1.1,
                                                       ),
                                             ),
-                                            Row(
-                                              mainAxisSize: MainAxisSize.max,
+                                            Column(
+                                              mainAxisSize: MainAxisSize.min,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
+                                                  CrossAxisAlignment.stretch,
                                               children: [
                                                 GestureDetector(
                                                   onTap: () => safeSetState(() =>
@@ -761,7 +755,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                                     ),
                                                   ),
                                                 ),
-                                              ].divide(SizedBox(width: 8.0)),
+                                              ].divide(SizedBox(height: 8.0)),
                                             ),
                                           ].divide(SizedBox(height: 8.0)),
                                         ),
@@ -1218,11 +1212,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                 showError('Введите высоту прицела');
                                 return;
                               }
-                              if (!isMetric) sH *= 25.4;
-                              if (sH < 20 || sH > 120) {
-                                showError(isMetric 
-                                  ? 'Высота прицела: 20–120 мм' 
-                                  : 'Высота прицела: 0.8–4.7 дюйма');
+                              if (sH < 2.0 || sH > 12.0) {
+                                showError('Высота прицела: 2–12 см');
                                 return;
                               }
 
@@ -1246,11 +1237,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                 showError('Введите твист');
                                 return;
                               }
-                              if (!isMetric) tw *= 25.4;
-                              if (tw < 100 || tw > 600) {
-                                showError(isMetric
-                                  ? 'Твист: 100–600 мм'
-                                  : 'Твист: 4–24 дюйма');
+                              if (tw < 4.0 || tw > 24.0) {
+                                showError('Твист: 4–24 дюйма');
                                 return;
                               }
 
@@ -1308,9 +1296,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                   .collection('weapons')
                                   .add({
                                 'name': name,
-                                'sight_height': sH.toString(),
+                                'sight_height': (sH * 10.0).toString(),
                                 'zero_distance': zD.toString(),
-                                'twist': tw.toString(),
+                                'twist': (tw * 25.4).toString(),
                                 'click_value': cV.toString(),
                                 'click_type': _model.clickTypeValue,
                                 'twist_direction':

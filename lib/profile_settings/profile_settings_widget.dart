@@ -143,10 +143,12 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                 });
 
                                 try {
-                                  await FirebaseAuth.instance.currentUser
-                                      ?.updateDisplayName(combinedName);
+                                  try {
+                                    await FirebaseAuth.instance.currentUser
+                                        ?.updateDisplayName(combinedName);
+                                  } catch (_) {}
 
-                                  // Also save to Firestore
+                                  // Save to Firestore (always, independently of Auth update)
                                   final user = FirebaseAuth.instance.currentUser;
                                   if (user != null) {
                                     await FirebaseFirestore.instance
@@ -217,10 +219,26 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                     final pUnit = userData['pressure_unit'] as String? ?? 'mm';
 
                     if (!_model.isInitialized && snapshot.hasData) {
-                      _model.distanceUnit = distUnit;
-                      _model.temperatureUnit = tUnit;
-                      _model.pressureUnit = pUnit;
-                      _model.isInitialized = true;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (!_model.isInitialized) {
+                          _model.distanceUnit = distUnit;
+                          _model.temperatureUnit = tUnit;
+                          _model.pressureUnit = pUnit;
+
+                          // Pre-fill name/surname from Firestore if available
+                          final fsName = userData['name'] as String? ?? '';
+                          final fsSurname = userData['surname'] as String? ?? '';
+                          if (fsName.isNotEmpty) {
+                            _model.textFieldModel1.inputTextController?.text = fsName;
+                          }
+                          if (fsSurname.isNotEmpty) {
+                            _model.textFieldModel2.inputTextController?.text = fsSurname;
+                          }
+
+                          _model.isInitialized = true;
+                          safeSetState(() {});
+                        }
+                      });
                     }
 
                     return Column(
@@ -640,7 +658,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
-                                              _model.distanceUnit = 'm';
+                                              safeSetState(() {
+                                                _model.distanceUnit = 'm';
+                                              });
                                               await UnitsManager.instance.updateDistanceUnit('m');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'distance_unit': 'm',
@@ -712,7 +732,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
-                                              _model.distanceUnit = 'yd';
+                                              safeSetState(() {
+                                                _model.distanceUnit = 'yd';
+                                              });
                                               await UnitsManager.instance.updateDistanceUnit('yd');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'distance_unit': 'yd',
@@ -830,7 +852,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
-                                              _model.temperatureUnit = 'c';
+                                              safeSetState(() {
+                                                _model.temperatureUnit = 'c';
+                                              });
                                               await UnitsManager.instance.updateTemperatureUnit('c');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'temp_unit': 'c',
@@ -902,7 +926,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
-                                              _model.temperatureUnit = 'f';
+                                              safeSetState(() {
+                                                _model.temperatureUnit = 'f';
+                                              });
                                               await UnitsManager.instance.updateTemperatureUnit('f');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'temp_unit': 'f',
@@ -1020,7 +1046,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
-                                              _model.pressureUnit = 'hpa';
+                                              safeSetState(() {
+                                                _model.pressureUnit = 'hpa';
+                                              });
                                               await UnitsManager.instance.updatePressureUnit('hpa');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'pressure_unit': 'hpa',
@@ -1092,7 +1120,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
-                                              _model.pressureUnit = 'inhg';
+                                              safeSetState(() {
+                                                _model.pressureUnit = 'inhg';
+                                              });
                                               await UnitsManager.instance.updatePressureUnit('inhg');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'pressure_unit': 'inhg',
@@ -1164,7 +1194,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                           flex: 1,
                                           child: InkWell(
                                             onTap: () async {
-                                              _model.pressureUnit = 'mm';
+                                              safeSetState(() {
+                                                _model.pressureUnit = 'mm';
+                                              });
                                               await UnitsManager.instance.updatePressureUnit('mm');
                                               await FirebaseFirestore.instance.collection('users').doc(currentUserUid).set({
                                                 'pressure_unit': 'mm',

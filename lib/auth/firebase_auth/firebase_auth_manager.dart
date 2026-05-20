@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../auth_manager.dart';
 import '../base_auth_user_provider.dart';
 import '../../flutter_flow/flutter_flow_util.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'anonymous_auth.dart';
 import 'apple_auth.dart';
@@ -67,6 +68,23 @@ class FirebaseAuthManager extends AuthManager
         print('Error: delete user attempted with no logged in user!');
         return;
       }
+      final uid = currentUser?.uid;
+      if (uid != null) {
+        // Delete weapons subcollection
+        final weaponsSnapshot = await FirebaseFirestore.instance
+            .collection('weapons')
+            .where('user_id', isEqualTo: uid)
+            .get();
+        for (final doc in weaponsSnapshot.docs) {
+          await doc.reference.delete();
+        }
+        // Delete user document
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .delete();
+      }
+      // Delete Firebase Auth account last
       await currentUser?.delete();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
@@ -74,9 +92,14 @@ class FirebaseAuthManager extends AuthManager
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  'Too long since most recent sign in. Sign in again before deleting your account.')),
+                  'Требуется повторный вход. Выйдите из аккаунта и войдите снова, затем удалите аккаунт.')),
         );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка удаления аккаунта: $e')),
+      );
     }
   }
 
@@ -271,26 +294,30 @@ class FirebaseAuthManager extends AuthManager
   }
 
   @override
-  Future verifySmsCode({
+  Future<BaseAuthUser?> verifySmsCode({
     required BuildContext context,
     required String smsCode,
-  }) {
-    if (kIsWeb) {
-      return _signInOrCreateAccount(
-        context,
-        () => phoneAuthManager.webPhoneAuthConfirmationResult!.confirm(smsCode),
-        'PHONE',
-      );
-    } else {
-      final authCredential = PhoneAuthProvider.credential(
-        verificationId: phoneAuthManager.phoneAuthVerificationCode!,
-        smsCode: smsCode,
-      );
-      return _signInOrCreateAccount(
-        context,
-        () => FirebaseAuth.instance.signInWithCredential(authCredential),
-        'PHONE',
-      );
+  }) async {
+    try {
+      UserCredential? userCredential;
+      if (kIsWeb) {
+        userCredential = await phoneAuthManager
+            .webPhoneAuthConfirmationResult!
+            .confirm(smsCode);
+      } else {
+        final authCredential = PhoneAuthProvider.credential(
+          verificationId: phoneAuthManager.phoneAuthVerificationCode!,
+          smsCode: smsCode,
+        );
+        userCredential =
+            await FirebaseAuth.instance.signInWithCredential(authCredential);
+      }
+      return userCredential == null
+          ? null
+          : BulletCalculatorFirebaseUser.fromUserCredential(userCredential);
+    } on FirebaseAuthException {
+      // Wrong or expired code — return null silently so UI shows inline error
+      return null;
     }
   }
 

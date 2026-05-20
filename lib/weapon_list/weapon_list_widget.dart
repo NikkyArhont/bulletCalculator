@@ -4,6 +4,7 @@ import '/components/text_field_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -75,13 +76,30 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Column(
+                          Row(
                             mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'МОЙ АРСЕНАЛ',
+                              FlutterFlowIconButton(
+                                borderRadius: 8.0,
+                                buttonSize: 40.0,
+                                fillColor: Colors.transparent,
+                                icon: Icon(
+                                  Icons.arrow_back_rounded,
+                                  color: FlutterFlowTheme.of(context).primaryText,
+                                  size: 24.0,
+                                ),
+                                onPressed: () async {
+                                  context.safePop();
+                                },
+                              ),
+                              SizedBox(width: 12.0),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'МОЙ АРСЕНАЛ',
                                 style: FlutterFlowTheme.of(context)
                                     .headlineMedium
                                     .override(
@@ -138,8 +156,10 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                               ),
                             ],
                           ),
-                          Icon(
-                            Icons.military_tech_rounded,
+                        ],
+                      ),
+                      Icon(
+                        Icons.military_tech_rounded,
                             color: FlutterFlowTheme.of(context).primary,
                             size: 32.0,
                           ),
@@ -264,7 +284,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                         bc_value: data['bc_value'] ?? '0.315',
                                         caliber: data['caliber'] ?? 'КАЛИБР',
                                         name: data['name'] ?? 'ОРУЖИЕ',
-                                        twist: data['twist'] ?? '1:8\"',
+                                        twist: data['twist'] ?? '203.2',
                                         twist_dir: data['twist_direction'] == 'left' ? 'ЛЕВО' : 'ПРАВО',
                                         bullet_length: data['bullet_length']?.toString() ?? '30.0',
                                         v0: data['muzzle_velocity'] ?? '820',

@@ -1325,17 +1325,27 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                   '0') ??
                                           0.1;
 
+                                      final zeroDistance = double.tryParse(
+                                              weaponData['zero_distance']
+                                                      ?.toString() ??
+                                                  '0') ??
+                                          100.0;
+
                                       // Calculate results to save them in history
                                       final ballisticResult =
                                           BallisticEngine.calculate(
                                         v0: muzzleVelocity,
                                         bc: bcValue,
-                                        weightGrams: bulletWeight,
+                                        bcModel: weaponData['bc_model']?.toString() ?? 'G1',
+                                        weightGrains: bulletWeight,
                                         distance: double.tryParse(distanceText) ?? 0.0,
+                                        zeroDistance: zeroDistance,
                                         windSpeed: double.tryParse(speedText) ?? 0.0,
                                         windDirectionHours: _model.windDirectionHours.toDouble(),
                                         temperatureC: double.tryParse(tempText) ?? 0.0,
                                         pressureHpa: double.tryParse(pressureText) ?? 0.0,
+                                        humidity: double.tryParse(humidityText) ?? 50.0,
+                                        angleDegrees: double.tryParse(angleText) ?? 0.0,
                                         sightHeightMm: sightHeight,
                                         clickValue: clickValue,
                                       );
@@ -1404,6 +1414,10 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                 sightHeight.toString(),
                                             'clickValue':
                                                 clickValue.toString(),
+                                            'zeroDistance':
+                                                zeroDistance.toString(),
+                                            'humidity': humidityText,
+                                            'bcModel': weaponData['bc_model']?.toString() ?? 'G1',
                                           }.withoutNulls,
                                         );
 

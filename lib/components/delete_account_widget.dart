@@ -19,6 +19,7 @@ class DeleteAccountWidget extends StatefulWidget {
 
 class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   late DeleteAccountModel _model;
+  bool _isLoading = false;
 
   @override
   void setState(VoidCallback callback) {
@@ -142,11 +143,14 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                       variant: 'destructive',
                       size: 'medium',
                       full_width: true,
-                      loading: false,
-                      disabled: false,
+                      loading: _isLoading,
+                      disabled: _isLoading,
                       onPressed: () async {
+                        setState(() => _isLoading = true);
                         await authManager.deleteUser(context);
-                        context.goNamedAuth('initPage', context.mounted);
+                        if (mounted) {
+                          context.goNamedAuth('initPage', context.mounted);
+                        }
                       },
                     ),
                   ),
