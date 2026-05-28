@@ -11,6 +11,8 @@ class BallisticResult {
   final double timeOfFlight;
   final double velocityAtTarget;
   final double energyAtTarget;
+  final double coriolisMrad; // TODO: Implement Coriolis effect
+  final double spinDriftMrad; // TODO: Implement Spin Drift/Derivation
   final List<math.Point<double>> trajectoryPoints;
 
   BallisticResult({
@@ -23,6 +25,8 @@ class BallisticResult {
     required this.timeOfFlight,
     required this.velocityAtTarget,
     required this.energyAtTarget,
+    required this.coriolisMrad,
+    required this.spinDriftMrad,
     required this.trajectoryPoints,
   });
 }
@@ -176,7 +180,13 @@ class BallisticEngine {
        correctedTrajectory.add(math.Point(p.x, yCorr * 100));
     }
 
-    final double driftCm = zAtTarget * 100;
+    // Analytical wind drift calculation based on lag time
+    // Z = Wind_cross * (Time_of_flight - Distance / Initial_Velocity)
+    final double lagTime = tAtTarget - (distance / (v0 > 0 ? v0 : 1.0));
+    // WindX is the crosswind component. A positive WindX means wind pushing in +Z.
+    final double analyticalDriftMeters = windX * lagTime;
+    final double driftCm = analyticalDriftMeters * 100;
+    
     final double weightKg = weightGrains * 0.00006479891;
     final double energy = 0.5 * weightKg * finalVel * finalVel;
 
@@ -196,6 +206,8 @@ class BallisticEngine {
       timeOfFlight: tAtTarget,
       velocityAtTarget: finalVel,
       energyAtTarget: energy,
+      coriolisMrad: 0.0, // Placeholder for future implementation
+      spinDriftMrad: 0.0, // Placeholder for future implementation
       trajectoryPoints: correctedTrajectory,
     );
   }
