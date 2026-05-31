@@ -12,6 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '/ballistic_engine.dart';
 import 'shoot_page_model.dart';
 export 'shoot_page_model.dart';
@@ -1032,6 +1035,122 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                     value: '45',
                                   ),
                                 ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: wrapWithModel(
+                                        model: createModel(context, () => ButtonModel()),
+                                        updateCallback: () => safeSetState(() {}),
+                                        child: ButtonWidget(
+                                          content: 'Погода (GPS)',
+                                          icon: Icon(
+                                            Icons.cloud_download_rounded,
+                                            color: Colors.white,
+                                            size: 20.0,
+                                          ),
+                                          icon_present: true,
+                                          variant: 'primary',
+                                          color: FlutterFlowTheme.of(context).success,
+                                          size: 'large',
+                                          full_width: true,
+                                          onPressed: () async {
+                                            bool serviceEnabled;
+                                            LocationPermission permission;
+
+                                            serviceEnabled = await Geolocator.isLocationServiceEnabled();
+                                            if (!serviceEnabled) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text('Службы геолокации отключены.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                              );
+                                              return;
+                                            }
+
+                                            permission = await Geolocator.checkPermission();
+                                            if (permission == LocationPermission.denied) {
+                                              permission = await Geolocator.requestPermission();
+                                              if (permission == LocationPermission.denied) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text('Доступ к геолокации запрещен.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                                );
+                                                return;
+                                              }
+                                            }
+
+                                            if (permission == LocationPermission.deniedForever) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text('Геолокация запрещена навсегда. Разрешите в настройках.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                              );
+                                              return;
+                                            }
+
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Получение погоды...')),
+                                            );
+
+                                            try {
+                                              Position position = await Geolocator.getCurrentPosition();
+                                              final url = 'https://api.open-meteo.com/v1/forecast?latitude=${position.latitude}&longitude=${position.longitude}&current=temperature_2m,relative_humidity_2m,surface_pressure';
+                                              final response = await http.get(Uri.parse(url));
+                                              if (response.statusCode == 200) {
+                                                final data = json.decode(response.body);
+                                                final current = data['current'];
+                                                final temp = current['temperature_2m'];
+                                                final hum = current['relative_humidity_2m'];
+                                                final press = current['surface_pressure'];
+                                                
+                                                safeSetState(() {
+                                                  _model.dataInputFieldModel3.textFieldModel.inputTextController?.text = temp.toString();
+                                                  _model.dataInputFieldModel4.textFieldModel.inputTextController?.text = press.toString();
+                                                  _model.dataInputFieldModel5.textFieldModel.inputTextController?.text = hum.toString();
+                                                });
+                                                
+                                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text('Погода успешно обновлена!', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
+                                                );
+                                              } else {
+                                                throw Exception('Ошибка сервера API');
+                                              }
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text('Ошибка получения погоды', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: wrapWithModel(
+                                        model: createModel(context, () => ButtonModel()),
+                                        updateCallback: () => safeSetState(() {}),
+                                        child: ButtonWidget(
+                                          content: 'С устройств',
+                                          icon: Icon(
+                                            Icons.bluetooth_connected_rounded,
+                                            color: FlutterFlowTheme.of(context).success,
+                                            size: 20.0,
+                                          ),
+                                          icon_present: true,
+                                          variant: 'outline',
+                                          color: FlutterFlowTheme.of(context).success,
+                                          size: 'large',
+                                          full_width: true,
+                                          onPressed: () {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('В разработке...')),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ].divide(SizedBox(width: 8.0)),
+                                ),
                               ].divide(SizedBox(height: 8.0)),
                             ),
                           ].divide(SizedBox(height: 16.0)),
@@ -1330,6 +1449,20 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                       ?.toString() ??
                                                   '0') ??
                                           100.0;
+                                          
+                                      final twistMm = double.tryParse(
+                                              weaponData['twist']?.toString() ?? '0') ?? 254.0;
+                                      final bulletLengthMm = double.tryParse(
+                                              weaponData['bullet_length']?.toString() ?? '0') ?? 32.0;
+                                      final caliberMm = double.tryParse(
+                                              weaponData['caliber']?.toString() ?? '0') ?? 7.62;
+                                      final twistDirection = weaponData['twist_direction']?.toString() ?? 'right';
+
+                                      final useMultiBc = weaponData['use_multi_bc'] as bool? ?? false;
+                                      final cpRaw = weaponData['calibration_points'] as List<dynamic>?;
+                                      final List<Map<String, dynamic>> calibrationPoints = cpRaw != null
+                                          ? cpRaw.map((e) => Map<String, dynamic>.from(e as Map)).toList()
+                                          : [];
 
                                       // Calculate results to save them in history
                                       final ballisticResult =
@@ -1348,6 +1481,12 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         angleDegrees: double.tryParse(angleText) ?? 0.0,
                                         sightHeightMm: sightHeight,
                                         clickValue: clickValue,
+                                        caliberMm: caliberMm,
+                                        twistMm: twistMm,
+                                        twistDirection: twistDirection,
+                                        bulletLengthMm: bulletLengthMm,
+                                        useMultiBc: useMultiBc,
+                                        calibrationPoints: calibrationPoints,
                                       );
 
                                       final resultData = {
@@ -1381,6 +1520,8 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         'horizontal_correction': ballisticResult.horizontalMrad.toStringAsFixed(1),
                                         'timestamp': FieldValue.serverTimestamp(),
                                         'userId': currentUserUid,
+                                        'useMultiBc': useMultiBc,
+                                        'calibrationPoints': calibrationPoints,
                                       };
 
                                       final docRef = await FirebaseFirestore.instance
@@ -1418,6 +1559,12 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                 zeroDistance.toString(),
                                             'humidity': humidityText,
                                             'bcModel': weaponData['bc_model']?.toString() ?? 'G1',
+                                            'caliber': caliberMm.toString(),
+                                            'twist': twistMm.toString(),
+                                            'twistDirection': twistDirection,
+                                            'bulletLength': bulletLengthMm.toString(),
+                                            'useMultiBc': useMultiBc.toString(),
+                                            'calibrationPointsJson': jsonEncode(calibrationPoints),
                                           }.withoutNulls,
                                         );
 

@@ -81,12 +81,14 @@ class _ButtonWidgetState extends State<ButtonWidget> {
         child: Container(
         decoration: BoxDecoration(
           color: () {
+            if (widget!.variant == 'outline' || widget!.variant == 'ghost') {
+              return Colors.transparent;
+            }
+            if (widget!.color != null) {
+              return widget!.color!;
+            }
             if (widget!.variant == 'secondary') {
               return FlutterFlowTheme.of(context).secondary;
-            } else if (widget!.variant == 'outline') {
-              return Colors.transparent;
-            } else if (widget!.variant == 'ghost') {
-              return Colors.transparent;
             } else if (widget!.variant == 'destructive') {
               return FlutterFlowTheme.of(context).error;
             } else {
@@ -146,7 +148,7 @@ class _ButtonWidgetState extends State<ButtonWidget> {
           shape: BoxShape.rectangle,
           border: Border.all(
             color: widget!.variant == 'outline'
-                ? FlutterFlowTheme.of(context).alternate
+                ? (widget!.color ?? FlutterFlowTheme.of(context).alternate)
                 : Colors.transparent,
             width: widget!.variant == 'outline' ? 1.0 : 0.0,
           ),
@@ -232,6 +234,12 @@ class _ButtonWidgetState extends State<ButtonWidget> {
                                   .fontStyle,
                             ),
                             color: () {
+                              if (widget!.color != null) {
+                                if (widget!.variant == 'outline' || widget!.variant == 'ghost') {
+                                  return widget!.color!;
+                                }
+                                return Colors.white;
+                              }
                               if (widget!.variant == 'secondary') {
                                 return FlutterFlowTheme.of(context).onSecondary;
                               } else if (widget!.variant == 'outline') {
@@ -272,6 +280,12 @@ class _ButtonWidgetState extends State<ButtonWidget> {
                 animation: true,
                 animateFromLastPercent: true,
                 progressColor: () {
+                  if (widget!.color != null) {
+                    if (widget!.variant == 'outline' || widget!.variant == 'ghost') {
+                      return widget!.color!;
+                    }
+                    return Colors.white;
+                  }
                   if (widget!.variant == 'secondary') {
                     return FlutterFlowTheme.of(context).onSecondary;
                   } else if (widget!.variant == 'outline') {

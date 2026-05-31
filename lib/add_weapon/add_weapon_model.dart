@@ -18,6 +18,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AddWeaponModel extends FlutterFlowModel<AddWeaponWidget> {
   ///  State fields for stateful widgets in this page.
 
+  bool useMultiBc = false;
+  List<Map<String, dynamic>> calibrationPoints = [];
+
   // Loading state for save button
   bool isLoading = false;
   // Twist direction: true = right, false = left
@@ -52,6 +55,8 @@ class AddWeaponModel extends FlutterFlowModel<AddWeaponWidget> {
   FormFieldController<String>? clickTypeController;
   // Model for TextField.
   late TextFieldModel textFieldModel9;
+  // Model for TextField.
+  late TextFieldModel textFieldModel10;
   // Model for Button.
   late ButtonModel buttonModel;
 
@@ -69,6 +74,7 @@ class AddWeaponModel extends FlutterFlowModel<AddWeaponWidget> {
     textFieldModel7 = createModel(context, () => TextFieldModel());
     textFieldModel8 = createModel(context, () => TextFieldModel());
     textFieldModel9 = createModel(context, () => TextFieldModel());
+    textFieldModel10 = createModel(context, () => TextFieldModel());
     buttonModel = createModel(context, () => ButtonModel());
   }
 
@@ -86,6 +92,7 @@ class AddWeaponModel extends FlutterFlowModel<AddWeaponWidget> {
     textFieldModel7.dispose();
     textFieldModel8.dispose();
     textFieldModel9.dispose();
+    textFieldModel10.dispose();
     buttonModel.dispose();
   }
 }

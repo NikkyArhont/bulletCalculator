@@ -12,7 +12,20 @@
           "package_name": "com.mycompany.bulletcalculator"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "111658630134-hoi0ngct6m4cff1uffo2nhgcumb1ckdt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mycompany.bulletcalculator",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "111658630134-9bo9r5ukdoghl1bnsltldhvqmtdfe6gk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCs06d5MI5YOUlgpPMbkM44qgZhoyO065g"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "111658630134-9bo9r5ukdoghl1bnsltldhvqmtdfe6gk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "111658630134-tpqfne7o5ekjp8q2p4cg6c2inv0ado5s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mycompany.bulletcalculator"
+              }
+            }
+          ]
         }
       }
     }

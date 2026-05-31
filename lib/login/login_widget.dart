@@ -389,6 +389,23 @@ class _LoginWidgetState extends State<LoginWidget> {
                                   name: 'Google',
                                   provider:
                                       'https://cdn.simpleicons.org/google/111827.svg',
+                                  onTap: () async {
+                                    try {
+                                      GoRouter.of(context).prepareAuthEvent();
+                                      final user = await authManager.signInWithGoogle(context);
+                                      if (user != null) {
+                                        context.goNamedAuth('initPage', context.mounted);
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Авторизация отменена или не удалась.')),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Ошибка входа: $e')),
+                                      );
+                                    }
+                                  },
                                 ),
                               ),
                               wrapWithModel(
@@ -398,6 +415,13 @@ class _LoginWidgetState extends State<LoginWidget> {
                                   name: 'Apple',
                                   provider:
                                       'https://cdn.simpleicons.org/apple/111827.svg',
+                                  onTap: () async {
+                                    GoRouter.of(context).prepareAuthEvent();
+                                    final user = await authManager.signInWithApple(context);
+                                    if (user != null) {
+                                      context.goNamedAuth('initPage', context.mounted);
+                                    }
+                                  },
                                 ),
                               ),
                               wrapWithModel(

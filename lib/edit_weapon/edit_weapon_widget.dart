@@ -15,6 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/ballistic_engine.dart';
 import 'edit_weapon_model.dart';
 export 'edit_weapon_model.dart';
 
@@ -91,7 +92,18 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
       _model.textFieldModel9.inputTextController ??= TextEditingController();
       _model.textFieldModel9.inputTextController?.text =
           wd['bc_value']?.toString() ?? '';
+          
+      double rawCal = double.tryParse(wd['caliber']?.toString() ?? '0') ?? 0;
+      final calVal = isMetric ? rawCal : rawCal / 25.4;
+      _model.textFieldModel10.inputTextController ??= TextEditingController();
+      _model.textFieldModel10.inputTextController?.text = calVal > 0 ? calVal.toStringAsFixed(2) : '';
+      
       _model.twistDir = wd['twist_direction'] == 'left' ? 'Левое' : 'Правое';
+      _model.useMultiBc = wd['use_multi_bc'] as bool? ?? false;
+      final cpRaw = wd['calibration_points'] as List<dynamic>?;
+      _model.calibrationPoints = cpRaw != null
+          ? cpRaw.map((e) => Map<String, dynamic>.from(e as Map)).toList()
+          : [];
     }
   }
 
@@ -169,6 +181,12 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
     final bcVValid = bcV != null && bcV >= 0.05 && bcV <= 1.5;
     final bcVErr = bcVText.trim().isNotEmpty && !bcVValid;
 
+    // Caliber (4-20 mm)
+    final calText = _model.textFieldModel10.inputTextController?.text ?? '';
+    final cal = parseVal(calText);
+    final calValid = cal != null && (isMetric ? (cal >= 4.0 && cal <= 20.0) : (cal * 25.4 >= 4.0 && cal * 25.4 <= 20.0));
+    final calErr = calText.trim().isNotEmpty && !calValid;
+
     final isFormValid = nameValid &&
         sHValid &&
         zDValid &&
@@ -177,7 +195,8 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
         bWValid &&
         bLValid &&
         mVValid &&
-        bcVValid;
+        bcVValid &&
+        calValid;
 
     return GestureDetector(
       onTap: () {
@@ -845,26 +864,60 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                                   ),
                                 ].divide(SizedBox(width: 16.0)),
                               ),
-                              wrapWithModel(
-                                model: _model.textFieldModel8,
-                                updateCallback: () => safeSetState(() {}),
-                                child: TextFieldWidget(
-                                  label: 'Начальная скорость',
-                                  helper: mVErr ? (isMetric ? '100–1500 м/с' : '328–4921 fps') : (isMetric ? 'м/с' : 'fps'),
-                                  hint: '820',
-                                  value: '',
-                                  leading_icon: Icon(
-                                    Icons.speed_rounded,
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: wrapWithModel(
+                                      model: _model.textFieldModel10,
+                                      updateCallback: () => safeSetState(() {}),
+                                      child: TextFieldWidget(
+                                        label: 'Диаметр калибра',
+                                        helper: calErr ? (isMetric ? '4–20 мм' : '0.15–0.8 дюйма') : (isMetric ? 'мм' : 'дюймы'),
+                                        hint: '7.62',
+                                        value: '',
+                                        leading_icon: Icon(
+                                          Icons.radio_button_checked,
+                                        ),
+                                        leading_icon_present: true,
+                                        trailing_icon_present: false,
+                                        border: Color(0x00000000),
+                                        hint_color: 'hint',
+                                        variant: 'outlined',
+                                        error: calErr,
+                                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+                                      ),
+                                    ),
                                   ),
-                                  leading_icon_present: true,
-                                  trailing_icon_present: false,
-                                  border: Color(0x00000000),
-                                  hint_color: 'hint',
-                                  variant: 'outlined',
-                                  error: mVErr,
-                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
-                                ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: wrapWithModel(
+                                      model: _model.textFieldModel8,
+                                      updateCallback: () => safeSetState(() {}),
+                                      child: TextFieldWidget(
+                                        label: 'Нач. скорость',
+                                        helper: mVErr ? (isMetric ? '100–1500 м/с' : '328–4921 fps') : (isMetric ? 'м/с' : 'fps'),
+                                        hint: '820',
+                                        value: '',
+                                        leading_icon: Icon(
+                                          Icons.speed_rounded,
+                                        ),
+                                        leading_icon_present: true,
+                                        trailing_icon_present: false,
+                                        border: Color(0x00000000),
+                                        hint_color: 'hint',
+                                        variant: 'outlined',
+                                        error: mVErr,
+                                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+                                      ),
+                                    ),
+                                  ),
+                                ].divide(SizedBox(width: 16.0)),
                               ),
                               Divider(
                                 height: 16.0,
@@ -1095,6 +1148,35 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                         ),
                       ),
                     ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        wrapWithModel(
+                          model: _model.sectionHeaderModel3,
+                          updateCallback: () => safeSetState(() {}),
+                          child: SectionHeaderWidget(
+                            title: 'КАЛИБРОВКА BC / MULTI BC',
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            borderRadius: BorderRadius.circular(6.0),
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(24.0),
+                            child: _buildCalibrationUI(context, isMetric, parseVal),
+                          ),
+                        ),
+                      ].divide(SizedBox(height: 16.0)),
+                    ),
                     wrapWithModel(
                       model: _model.buttonModel1,
                       updateCallback: () => safeSetState(() {}),
@@ -1115,16 +1197,18 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
 
                           safeSetState(() => _isSaving = true);
                           try {
-                            // Final conversion before persistence
                             final finalSH = sH! * 10.0; // cm to mm
                             final finalZD =
                                 isMetric ? zD! : zD! * 0.9144; // yards to m
                             final finalTwist = tw! * 25.4; // inches to mm
                             final finalMV =
                                 isMetric ? mV! : mV! * 0.3048; // fps to m/s
+                            final finalCal = 
+                                isMetric ? cal! : cal! * 25.4; // inches to mm
 
                             await widget.weaponRef!.update({
                               'name': name,
+                              'caliber': finalCal.toString(),
                               'sight_height': finalSH.toString(),
                               'zero_distance': finalZD.toString(),
                               'twist': finalTwist.toString(),
@@ -1137,6 +1221,8 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
                               'muzzle_velocity': finalMV.toString(),
                               'bc_model': _model.dropdownValue,
                               'bc_value': bcV.toString(),
+                              'use_multi_bc': _model.useMultiBc,
+                              'calibration_points': _model.calibrationPoints,
                               'updated_at': FieldValue.serverTimestamp(),
                             });
 
@@ -1201,6 +1287,371 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
         ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCalibrationUI(BuildContext context, bool isMetric, double? Function(String?) parseVal) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Использовать Multi BC',
+                    style: FlutterFlowTheme.of(context).bodyLarge.override(
+                      font: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Text(
+                    'Расчет по разным BC для ближней, средней и дальней дистанций',
+                    style: FlutterFlowTheme.of(context).labelMedium.override(
+                      font: GoogleFonts.inter(color: FlutterFlowTheme.of(context).secondaryText),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Switch.adaptive(
+              value: _model.useMultiBc,
+              activeColor: FlutterFlowTheme.of(context).primary,
+              onChanged: (val) {
+                safeSetState(() {
+                  _model.useMultiBc = val;
+                });
+              },
+            ),
+          ],
+        ),
+        SizedBox(height: 16.0),
+        if (!_model.useMultiBc) ...[
+          Text(
+            'Калибровка позволяет автоматически рассчитать точный базовый BC по одному реальному выстрелу на дистанции.',
+            style: FlutterFlowTheme.of(context).bodyMedium.override(
+              font: GoogleFonts.inter(color: FlutterFlowTheme.of(context).secondaryText),
+            ),
+          ),
+          SizedBox(height: 16.0),
+          ButtonWidget(
+            content: 'Калибровать базовый BC',
+            icon: Icon(Icons.calculate_rounded, color: Colors.white, size: 16.0),
+            icon_present: true,
+            color: FlutterFlowTheme.of(context).primary,
+            onPressed: () => _showCalibrationDialog(context, isMetric, parseVal, isMultiBcPoint: false),
+          ),
+        ] else ...[
+          Text(
+            'Настройте до 3 калибровочных дистанций для зон: ближней (до 1-й точки), средней (до 2-й) и дальней (выше 2-й).',
+            style: FlutterFlowTheme.of(context).bodyMedium.override(
+              font: GoogleFonts.inter(color: FlutterFlowTheme.of(context).secondaryText),
+            ),
+          ),
+          SizedBox(height: 12.0),
+          if (_model.calibrationPoints.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Center(
+                child: Text(
+                  'Нет калибровочных точек',
+                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                    font: GoogleFonts.inter(fontStyle: FontStyle.italic),
+                  ),
+                ),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: _model.calibrationPoints.length,
+              separatorBuilder: (context, index) => Divider(color: FlutterFlowTheme.of(context).alternate),
+              itemBuilder: (context, index) {
+                final pt = _model.calibrationPoints[index];
+                final dist = pt['distance'];
+                final corr = pt['actual_correction'];
+                final unit = pt['unit'];
+                final bcVal = pt['calculated_bc'];
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Дистанция: ${dist.toStringAsFixed(0)} ${isMetric ? 'м' : 'yd'}',
+                            style: FlutterFlowTheme.of(context).bodyMedium.override(
+                              font: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Text(
+                            'Поправка: $corr $unit • Расчетный BC: ${bcVal.toStringAsFixed(4)}',
+                            style: FlutterFlowTheme.of(context).bodySmall.override(
+                              font: GoogleFonts.inter(color: FlutterFlowTheme.of(context).secondaryText),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete_outline_rounded, color: FlutterFlowTheme.of(context).error),
+                      onPressed: () {
+                        safeSetState(() {
+                          _model.calibrationPoints.removeAt(index);
+                          _recalibrateAllPoints(isMetric, parseVal);
+                        });
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          SizedBox(height: 16.0),
+          ButtonWidget(
+            content: '+ Добавить точку калибровки',
+            icon: Icon(Icons.add_rounded, color: Colors.white, size: 16.0),
+            icon_present: true,
+            color: _model.calibrationPoints.length >= 3 
+                ? FlutterFlowTheme.of(context).secondaryText 
+                : FlutterFlowTheme.of(context).primary,
+            disabled: _model.calibrationPoints.length >= 3,
+            onPressed: _model.calibrationPoints.length >= 3
+                ? null
+                : () => _showCalibrationDialog(context, isMetric, parseVal, isMultiBcPoint: true),
+          ),
+        ],
+      ],
+    );
+  }
+
+  void _recalibrateAllPoints(bool isMetric, double? Function(String?) parseVal) {
+    if (_model.calibrationPoints.isEmpty) return;
+
+    final double? mV = parseVal(_model.textFieldModel8.inputTextController?.text);
+    final double? bW = parseVal(_model.textFieldModel6.inputTextController?.text);
+    final double? bL = parseVal(_model.textFieldModel7.inputTextController?.text);
+    final double? cal = parseVal(_model.textFieldModel10.inputTextController?.text);
+    final double? sH = parseVal(_model.textFieldModel2.inputTextController?.text);
+    final double? zD = parseVal(_model.textFieldModel3.inputTextController?.text);
+    final double? tw = parseVal(_model.textFieldModel4.inputTextController?.text);
+    final double? cV = parseVal(_model.textFieldModel5.inputTextController?.text);
+
+    if (mV == null || bW == null || bL == null || cal == null || sH == null || zD == null || tw == null || cV == null) {
+      return;
+    }
+
+    final finalSH = sH * 10.0;
+    final finalZD = isMetric ? zD : zD * 0.9144;
+    final finalTwist = tw * 25.4;
+    final finalMV = isMetric ? mV : mV * 0.3048;
+    final finalCal = isMetric ? cal : cal * 25.4;
+
+    final recalibrated = BallisticEngine.recalibrateMultiBc(
+      points: _model.calibrationPoints,
+      v0: finalMV,
+      bcModel: _model.dropdownValue ?? 'G7',
+      weightGrains: bW,
+      zeroDistance: finalZD,
+      windSpeed: 0.0,
+      windDirectionHours: 3.0,
+      temperatureC: 15.0,
+      pressureHpa: 1013.25,
+      humidity: 50.0,
+      angleDegrees: 0.0,
+      sightHeightMm: finalSH,
+      clickValue: cV,
+      clickType: _model.clickTypeValue ?? 'MRAD',
+      caliberMm: finalCal,
+      twistMm: finalTwist,
+      twistDirection: _model.twistDir == 'Левое' ? 'left' : 'right',
+      bulletLengthMm: bL,
+    );
+
+    safeSetState(() {
+      _model.calibrationPoints = recalibrated;
+    });
+  }
+
+  void _showCalibrationDialog(BuildContext context, bool isMetric, double? Function(String?) parseVal, {required bool isMultiBcPoint}) {
+    final double? mV = parseVal(_model.textFieldModel8.inputTextController?.text);
+    final double? bW = parseVal(_model.textFieldModel6.inputTextController?.text);
+    final double? bL = parseVal(_model.textFieldModel7.inputTextController?.text);
+    final double? cal = parseVal(_model.textFieldModel10.inputTextController?.text);
+    final double? sH = parseVal(_model.textFieldModel2.inputTextController?.text);
+    final double? zD = parseVal(_model.textFieldModel3.inputTextController?.text);
+    final double? tw = parseVal(_model.textFieldModel4.inputTextController?.text);
+    final double? cV = parseVal(_model.textFieldModel5.inputTextController?.text);
+
+    if (mV == null || bW == null || bL == null || cal == null || sH == null || zD == null || tw == null || cV == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Пожалуйста, сначала заполните все основные параметры оружия (скорость, твист, калибр, высоту прицела и т.д.).'),
+          backgroundColor: FlutterFlowTheme.of(context).error,
+        ),
+      );
+      return;
+    }
+
+    final distController = TextEditingController();
+    final corrController = TextEditingController();
+    String unitValue = 'MRAD';
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+              title: Text(
+                isMultiBcPoint ? 'Добавление точки Multi BC' : 'Калибровка базового BC',
+                style: FlutterFlowTheme.of(context).titleMedium.override(
+                  font: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.bold),
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: distController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Дистанция выстрела (${isMetric ? 'м' : 'yd'})',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: corrController,
+                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                          decoration: InputDecoration(
+                            labelText: 'Вертикальная поправка',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12.0),
+                      DropdownButton<String>(
+                        value: unitValue,
+                        dropdownColor: FlutterFlowTheme.of(context).secondaryBackground,
+                        onChanged: (val) {
+                          if (val != null) {
+                            setStateDialog(() {
+                              unitValue = val;
+                            });
+                          }
+                        },
+                        items: ['MRAD', 'MOA', 'клики', 'см'].map((u) {
+                          return DropdownMenuItem<String>(
+                            value: u,
+                            child: Text(u),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text('Отмена', style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FlutterFlowTheme.of(context).primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                  ),
+                  onPressed: () {
+                    final dVal = double.tryParse(distController.text.trim().replaceAll(',', '.'));
+                    final cValText = double.tryParse(corrController.text.trim().replaceAll(',', '.'));
+                    if (dVal == null || dVal <= 0 || cValText == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Пожалуйста, введите корректные значения.')),
+                      );
+                      return;
+                    }
+
+                    final double targetDistMeters = isMetric ? dVal : dVal * 0.9144;
+                    final double finalSH = sH * 10.0;
+                    final double finalZD = isMetric ? zD : zD * 0.9144;
+                    final double finalTwist = tw * 25.4;
+                    final double finalMV = isMetric ? mV : mV * 0.3048;
+                    final double finalCal = isMetric ? cal : cal * 25.4;
+
+                    if (isMultiBcPoint) {
+                      if (_model.calibrationPoints.any((pt) => (pt['distance'] - targetDistMeters).abs() < 0.1)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Точка для этой дистанции уже существует.')),
+                        );
+                        return;
+                      }
+
+                      Navigator.pop(dialogContext);
+
+                      safeSetState(() {
+                        _model.calibrationPoints.add({
+                          'distance': targetDistMeters,
+                          'actual_correction': cValText,
+                          'unit': unitValue,
+                          'calculated_bc': 0.1,
+                        });
+                        _recalibrateAllPoints(isMetric, parseVal);
+                      });
+                    } else {
+                      final calBc = BallisticEngine.calibrateBc(
+                        targetDistance: targetDistMeters,
+                        actualCorrection: cValText,
+                        correctionUnit: unitValue,
+                        v0: finalMV,
+                        bcModel: _model.dropdownValue ?? 'G7',
+                        weightGrains: bW,
+                        zeroDistance: finalZD,
+                        windSpeed: 0.0,
+                        windDirectionHours: 3.0,
+                        temperatureC: 15.0,
+                        pressureHpa: 1013.25,
+                        humidity: 50.0,
+                        angleDegrees: 0.0,
+                        sightHeightMm: finalSH,
+                        clickValue: cV,
+                        clickType: _model.clickTypeValue ?? 'MRAD',
+                        caliberMm: finalCal,
+                        twistMm: finalTwist,
+                        twistDirection: _model.twistDir == 'Левое' ? 'left' : 'right',
+                        bulletLengthMm: bL,
+                      );
+
+                      Navigator.pop(dialogContext);
+
+                      safeSetState(() {
+                        _model.textFieldModel9.inputTextController?.text = calBc.toStringAsFixed(4);
+                      });
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Базовый БК успешно откалиброван: $calBc'),
+                          backgroundColor: FlutterFlowTheme.of(context).success,
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('Рассчитать', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

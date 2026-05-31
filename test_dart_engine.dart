@@ -18,6 +18,10 @@ void main() {
       angleDegrees: 0,
       sightHeightMm: 90,
       clickValue: 0.1,
+      caliberMm: 7.62,
+      twistMm: 305.0,
+      twistDirection: 'right',
+      bulletLengthMm: 32.0,
     );
     if ((res.velocityAtTarget - 629.0).abs() < 1.0) {
       print('BC = $testBc gives ${res.velocityAtTarget} m/s in G1');
@@ -41,6 +45,10 @@ void main() {
       angleDegrees: 0,
       sightHeightMm: 90,
       clickValue: 0.1,
+      caliberMm: 7.62,
+      twistMm: 305.0,
+      twistDirection: 'right',
+      bulletLengthMm: 32.0,
     );
     if ((res.velocityAtTarget - 629.0).abs() < 1.0) {
       print('BC = $testBc gives ${res.velocityAtTarget} m/s in G7');

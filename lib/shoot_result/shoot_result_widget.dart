@@ -7,6 +7,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
+import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,6 +35,12 @@ class ShootResultWidget extends StatefulWidget {
     this.humidity,
     this.bcModel,
     this.resultId,
+    this.caliber,
+    this.twist,
+    this.twistDirection,
+    this.bulletLength,
+    this.useMultiBc,
+    this.calibrationPointsJson,
   });
 
   final double? distance;
@@ -51,6 +58,12 @@ class ShootResultWidget extends StatefulWidget {
   final double? humidity;
   final String? bcModel;
   final String? resultId;
+  final String? caliber;
+  final String? twist;
+  final String? twistDirection;
+  final String? bulletLength;
+  final bool? useMultiBc;
+  final String? calibrationPointsJson;
 
   static String routeName = 'shootResult';
   static String routePath = '/shootResult';
@@ -69,6 +82,19 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
     super.initState();
     _model = createModel(context, () => ShootResultModel());
 
+    // Deserialize calibration points if present
+    List<Map<String, dynamic>> calibrationPoints = [];
+    if (widget.calibrationPointsJson != null && widget.calibrationPointsJson!.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(widget.calibrationPointsJson!);
+        if (decoded is List) {
+          calibrationPoints = decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        }
+      } catch (e) {
+        print('Error decoding calibration points: $e');
+      }
+    }
+
     // Perform ballistic calculation
     _model.ballisticResult = BallisticEngine.calculate(
       v0: widget.muzzleVelocity ?? 800.0,
@@ -85,6 +111,12 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
       sightHeightMm: widget.sightHeight ?? 50.0,
       clickValue: widget.clickValue ?? 0.1,
       bcModel: widget.bcModel ?? 'G1',
+      caliberMm: double.tryParse(widget.caliber ?? '0') ?? 7.62,
+      twistMm: double.tryParse(widget.twist ?? '0') ?? 254.0,
+      twistDirection: widget.twistDirection ?? 'right',
+      bulletLengthMm: double.tryParse(widget.bulletLength ?? '0') ?? 32.0,
+      useMultiBc: widget.useMultiBc ?? false,
+      calibrationPoints: calibrationPoints,
     );
   }
 
@@ -508,36 +540,72 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                 ),
                               ),
                             ),
-                            Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: wrapWithModel(
-                                    model: _model.resultMetricCardModel1,
-                                    updateCallback: () => safeSetState(() {}),
-                                    child: ResultMetricCardWidget(
-                                      label: 'Падение',
-                                      unit: 'см',
-                                      value: '${_model.ballisticResult?.dropCm.toStringAsFixed(1) ?? '0.0'}',
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: wrapWithModel(
+                                        model: _model.resultMetricCardModel1,
+                                        updateCallback: () => safeSetState(() {}),
+                                        child: ResultMetricCardWidget(
+                                          label: 'Падение',
+                                          unit: 'см',
+                                          value: '${_model.ballisticResult?.dropCm.toStringAsFixed(1) ?? '0.0'}',
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: wrapWithModel(
-                                    model: _model.resultMetricCardModel2,
-                                    updateCallback: () => safeSetState(() {}),
-                                    child: ResultMetricCardWidget(
-                                      label: 'Снос ветром',
-                                      unit: 'см',
-                                      value: '${_model.ballisticResult?.windDriftCm.toStringAsFixed(1) ?? '0.0'}',
+                                    Expanded(
+                                      flex: 1,
+                                      child: wrapWithModel(
+                                        model: _model.resultMetricCardModel2,
+                                        updateCallback: () => safeSetState(() {}),
+                                        child: ResultMetricCardWidget(
+                                          label: 'Снос ветром',
+                                          unit: 'см',
+                                          value: '${_model.ballisticResult?.windDriftCm.toStringAsFixed(1) ?? '0.0'}',
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ].divide(SizedBox(width: 8.0)),
                                 ),
-                              ].divide(SizedBox(width: 16.0)),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: wrapWithModel(
+                                        model: createModel(context, () => ResultMetricCardModel()),
+                                        updateCallback: () => safeSetState(() {}),
+                                        child: ResultMetricCardWidget(
+                                          label: 'Деривация',
+                                          unit: 'см',
+                                          value: '${_model.ballisticResult?.spinDriftCm.toStringAsFixed(1) ?? '0.0'}',
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: wrapWithModel(
+                                        model: createModel(context, () => ResultMetricCardModel()),
+                                        updateCallback: () => safeSetState(() {}),
+                                        child: ResultMetricCardWidget(
+                                          label: 'Фактор стаб.',
+                                          unit: 'SG',
+                                          value: '${_model.ballisticResult?.sg.toStringAsFixed(2) ?? '0.00'}',
+                                        ),
+                                      ),
+                                    ),
+                                  ].divide(SizedBox(width: 8.0)),
+                                ),
+                              ].divide(SizedBox(height: 8.0)),
                             ),
                             Container(
                               decoration: BoxDecoration(),

@@ -12,7 +12,9 @@ class BallisticResult {
   final double velocityAtTarget;
   final double energyAtTarget;
   final double coriolisMrad; // TODO: Implement Coriolis effect
-  final double spinDriftMrad; // TODO: Implement Spin Drift/Derivation
+  final double spinDriftMrad; 
+  final double spinDriftCm;
+  final double sg; // Gyroscopic Stability Factor (Miller)
   final List<math.Point<double>> trajectoryPoints;
 
   BallisticResult({
@@ -27,6 +29,8 @@ class BallisticResult {
     required this.energyAtTarget,
     required this.coriolisMrad,
     required this.spinDriftMrad,
+    required this.spinDriftCm,
+    required this.sg,
     required this.trajectoryPoints,
   });
 }
@@ -52,6 +56,12 @@ class BallisticEngine {
     required double angleDegrees,     // Target inclination angle (degrees)
     required double sightHeightMm,    // Sight height above bore (mm)
     required double clickValue,       // Scope click value (e.g. 0.1 for MRAD)
+    required double caliberMm,        // Bullet diameter (mm)
+    required double twistMm,          // Twist rate (mm)
+    required String twistDirection,   // 'right' or 'left'
+    required double bulletLengthMm,   // Bullet length (mm)
+    bool useMultiBc = false,
+    List<Map<String, dynamic>>? calibrationPoints,
   }) {
     // 1. Environmental correction (Air Density & Speed of Sound)
     final double temperatureK = temperatureC + 273.15;
@@ -100,12 +110,32 @@ class BallisticEngine {
     
     double yRawAtZero = 0.0;
     bool passedZero = false;
+    if (zD <= 0.0) {
+      yRawAtZero = 0.0;
+      passedZero = true;
+    }
     
     double yRawAtTarget = 0.0;
-    double zAtTarget = 0.0;
     double tAtTarget = 0.0;
     double finalVel = v0;
     bool passedTarget = false;
+    if (distance <= 0.0) {
+      yRawAtTarget = 0.0;
+      tAtTarget = 0.0;
+      finalVel = v0;
+      passedTarget = true;
+    }
+
+    // Ensure calibration points are sorted by distance if present
+    List<Map<String, dynamic>> sortedPoints = [];
+    if (useMultiBc && calibrationPoints != null && calibrationPoints.isNotEmpty) {
+      sortedPoints = List.from(calibrationPoints);
+      sortedPoints.sort((a, b) {
+        double distA = double.tryParse(a['distance']?.toString() ?? '0') ?? 0.0;
+        double distB = double.tryParse(b['distance']?.toString() ?? '0') ?? 0.0;
+        return distA.compareTo(distB);
+      });
+    }
     
     while (x <= maxDist + (vx * dt * 2)) {
       if (x <= distance && x >= nextSaveDist) {
@@ -113,18 +143,14 @@ class BallisticEngine {
          nextSaveDist += saveInterval;
       }
       
-      if (!passedZero && x >= zD) {
-         yRawAtZero = y;
-         passedZero = true;
-      }
-      
-      if (!passedTarget && x >= distance) {
-         yRawAtTarget = y;
-         zAtTarget = z;
-         tAtTarget = t;
-         finalVel = math.sqrt(vx*vx + vy*vy + vz*vz);
-         passedTarget = true;
-      }
+      // Store previous state before update
+      double xPrev = x;
+      double yPrev = y;
+      double zPrev = z;
+      double tPrev = t;
+      double vxPrev = vx;
+      double vyPrev = vy;
+      double vzPrev = vz;
 
       // Air resistance
       double vrx = vx + windZ * math.cos(angleRad); // headwind adjusted for inclination
@@ -141,7 +167,22 @@ class BallisticEngine {
       // Formula: a = 0.5 * rho * v^2 * Cd_std * A_ref / m
       // Using BC (lb/in^2) definition standardizes area and mass.
       // Constant 0.00055855 resolves pi/8 * (0.0254^2 / 0.453592)
-      double safeBc = bc > 0.01 ? bc : 0.01;
+      double activeBc = bc;
+      if (useMultiBc && sortedPoints.isNotEmpty) {
+        bool found = false;
+        for (var pt in sortedPoints) {
+          double ptDist = double.tryParse(pt['distance']?.toString() ?? '0') ?? 0.0;
+          if (x <= ptDist) {
+            activeBc = double.tryParse(pt['calculated_bc']?.toString() ?? '0') ?? bc;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          activeBc = double.tryParse(sortedPoints.last['calculated_bc']?.toString() ?? '0') ?? bc;
+        }
+      }
+      double safeBc = activeBc > 0.01 ? activeBc : 0.01;
       double dragAccel = (0.00055855 * rho * vr * vr * cdStd) / safeBc;
       
       double ax = -(dragAccel * (vrx / vr)) - gx;
@@ -156,6 +197,35 @@ class BallisticEngine {
       y += vy * dt;
       z += vz * dt;
       t += dt;
+
+      // Check zero crossing using linear interpolation
+      if (!passedZero && x >= zD) {
+         if (x > xPrev) {
+           double w = (zD - xPrev) / (x - xPrev);
+           yRawAtZero = yPrev + w * (y - yPrev);
+         } else {
+           yRawAtZero = y;
+         }
+         passedZero = true;
+      }
+      
+      // Check target crossing using linear interpolation
+      if (!passedTarget && x >= distance) {
+         if (x > xPrev) {
+           double w = (distance - xPrev) / (x - xPrev);
+           yRawAtTarget = yPrev + w * (y - yPrev);
+           tAtTarget = tPrev + w * (t - tPrev);
+           double vxAtTarget = vxPrev + w * (vx - vxPrev);
+           double vyAtTarget = vyPrev + w * (vy - vyPrev);
+           double vzAtTarget = vzPrev + w * (vz - vzPrev);
+           finalVel = math.sqrt(vxAtTarget * vxAtTarget + vyAtTarget * vyAtTarget + vzAtTarget * vzAtTarget);
+         } else {
+           yRawAtTarget = y;
+           tAtTarget = t;
+           finalVel = math.sqrt(vx * vx + vy * vy + vz * vz);
+         }
+         passedTarget = true;
+      }
 
       if (vx < 50) break;
     }
@@ -185,13 +255,49 @@ class BallisticEngine {
     final double lagTime = tAtTarget - (distance / (v0 > 0 ? v0 : 1.0));
     // WindX is the crosswind component. A positive WindX means wind pushing in +Z.
     final double analyticalDriftMeters = windX * lagTime;
-    final double driftCm = analyticalDriftMeters * 100;
+    
+    // --- Gyroscopic Stability (Miller Twist Rule) ---
+    double sg = 0.0;
+    if (caliberMm > 0 && twistMm > 0 && bulletLengthMm > 0 && weightGrains > 0) {
+      double dInches = caliberMm / 25.4;
+      double tInches = twistMm / 25.4;
+      double lInches = bulletLengthMm / 25.4;
+      
+      double tCalibers = tInches / dInches;
+      double lCalibers = lInches / dInches;
+      
+      // Basic Miller formula
+      double sgBasic = (30.0 * weightGrains) / (math.pow(tCalibers, 2) * math.pow(dInches, 3) * lCalibers * (1.0 + math.pow(lCalibers, 2)));
+      
+      // Velocity correction (Miller assumes 2800 fps standard)
+      double vFps = v0 * 3.28084;
+      sg = sgBasic * math.pow((vFps / 2800.0), 1.0/3.0);
+    }
+
+    // --- Spin Drift (Derivation) ---
+    // Using simple empirical formula: Spin Drift (inches) = 1.25 * (Sg + 1.2) * T_flight^1.83
+    double spinDriftInches = 0.0;
+    if (sg > 0 && tAtTarget > 0) {
+       spinDriftInches = 1.25 * (sg + 1.2) * math.pow(tAtTarget, 1.83);
+    }
+    double spinDriftCm = spinDriftInches * 2.54;
+    
+    // Direction: right-hand twist pushes right (positive Z), left-hand pushes left (negative Z)
+    if (twistDirection.toLowerCase() == 'left') {
+      spinDriftCm = -spinDriftCm;
+    }
+    
+    // Total horizontal drift = Wind drift + Spin drift
+    final double windDriftCm = analyticalDriftMeters * 100;
+    final double totalDriftCm = windDriftCm + spinDriftCm;
+    
     
     final double weightKg = weightGrains * 0.00006479891;
     final double energy = 0.5 * weightKg * finalVel * finalVel;
 
     final double verticalMrad = distance > 0 ? (correctionDropCm / (distance / 10.0)) : 0.0;
-    final double horizontalMrad = distance > 0 ? (driftCm / (distance / 10.0)) : 0.0;
+    final double horizontalMrad = distance > 0 ? (totalDriftCm / (distance / 10.0)) : 0.0;
+    final double spinDriftMradValue = distance > 0 ? (spinDriftCm / (distance / 10.0)) : 0.0;
 
     final int vClicks = clickValue > 0 ? (verticalMrad / clickValue).round() : 0;
     final int hClicks = clickValue > 0 ? (horizontalMrad / clickValue).round() : 0;
@@ -202,14 +308,205 @@ class BallisticEngine {
       verticalClicks: vClicks,
       horizontalClicks: hClicks,
       dropCm: correctionDropCm, 
-      windDriftCm: driftCm,
+      windDriftCm: totalDriftCm,
       timeOfFlight: tAtTarget,
       velocityAtTarget: finalVel,
       energyAtTarget: energy,
       coriolisMrad: 0.0, // Placeholder for future implementation
-      spinDriftMrad: 0.0, // Placeholder for future implementation
+      spinDriftMrad: spinDriftMradValue, 
+      spinDriftCm: spinDriftCm,
+      sg: sg,
       trajectoryPoints: correctedTrajectory,
     );
+  }
+
+  /// Binary search calibration to find the BC that matches the actual vertical correction at the target distance.
+  static double calibrateBc({
+    required double targetDistance,     // Distance of calibration shot (meters)
+    required double actualCorrection,   // Actual vertical correction dialed/measured
+    required String correctionUnit,     // 'MRAD', 'MOA', 'clicks', 'cm'
+    required double v0,
+    required String bcModel,
+    required double weightGrains,
+    required double zeroDistance,
+    required double windSpeed,
+    required double windDirectionHours,
+    required double temperatureC,
+    required double pressureHpa,
+    required double humidity,
+    required double angleDegrees,
+    required double sightHeightMm,
+    required double clickValue,
+    required String clickType,
+    required double caliberMm,
+    required double twistMm,
+    required String twistDirection,
+    required double bulletLengthMm,
+    bool useMultiBc = false,
+    List<Map<String, dynamic>>? existingCalibrationPoints,
+  }) {
+    // 1. Convert actual correction to MRAD
+    double actualMrad = 0.0;
+    if (correctionUnit == 'MRAD') {
+      actualMrad = actualCorrection;
+    } else if (correctionUnit == 'MOA') {
+      actualMrad = actualCorrection / 3.43774677;
+    } else if (correctionUnit == 'см' || correctionUnit == 'cm') {
+      actualMrad = targetDistance > 0 ? (actualCorrection / (targetDistance / 10.0)) : 0.0;
+    } else if (correctionUnit == 'клики' || correctionUnit == 'clicks') {
+      double valInClickType = actualCorrection * clickValue;
+      if (clickType == 'MOA') {
+        actualMrad = valInClickType / 3.43774677;
+      } else {
+        actualMrad = valInClickType;
+      }
+    }
+
+    // Binary search for BC between 0.05 and 1.5
+    double lowBc = 0.05;
+    double highBc = 1.5;
+    double tolerance = 0.0001;
+    int maxIterations = 50;
+
+    double runCalc(double trialBc) {
+      // Build a temporary list of calibration points including the trial BC for the target distance
+      List<Map<String, dynamic>> tempPoints = [];
+      if (useMultiBc && existingCalibrationPoints != null) {
+        // filter out any existing point at the exact targetDistance
+        for (var pt in existingCalibrationPoints) {
+          double dist = double.tryParse(pt['distance']?.toString() ?? '0') ?? 0.0;
+          if ((dist - targetDistance).abs() > 0.1) {
+            tempPoints.add(pt);
+          }
+        }
+      }
+      // Add the new targetDistance point with the trialBc
+      tempPoints.add({
+        'distance': targetDistance,
+        'calculated_bc': trialBc,
+      });
+
+      final res = calculate(
+        v0: v0,
+        bc: trialBc, // Fallback if no multi-bc
+        bcModel: bcModel,
+        weightGrains: weightGrains,
+        distance: targetDistance,
+        zeroDistance: zeroDistance,
+        windSpeed: windSpeed,
+        windDirectionHours: windDirectionHours,
+        temperatureC: temperatureC,
+        pressureHpa: pressureHpa,
+        humidity: humidity,
+        angleDegrees: angleDegrees,
+        sightHeightMm: sightHeightMm,
+        clickValue: clickValue,
+        caliberMm: caliberMm,
+        twistMm: twistMm,
+        twistDirection: twistDirection,
+        bulletLengthMm: bulletLengthMm,
+        useMultiBc: useMultiBc,
+        calibrationPoints: tempPoints,
+      );
+      return res.verticalMrad;
+    }
+
+    double mradAtLow = runCalc(lowBc);
+    double mradAtHigh = runCalc(highBc);
+
+    // If actualMrad is outside the range, clamp to boundary
+    if (actualMrad >= mradAtLow) return lowBc;
+    if (actualMrad <= mradAtHigh) return highBc;
+
+    double midBc = 0.0;
+    for (int i = 0; i < maxIterations; i++) {
+      midBc = (lowBc + highBc) / 2.0;
+      double midMrad = runCalc(midBc);
+      if ((midMrad - actualMrad).abs() < tolerance) {
+        break;
+      }
+      if (midMrad > actualMrad) {
+        lowBc = midBc; // Need larger BC to reduce calculated drop (mrad)
+      } else {
+        highBc = midBc; // Need smaller BC to increase calculated drop (mrad)
+      }
+    }
+    return double.parse(midBc.toStringAsFixed(4));
+  }
+
+  /// Recalibrates all points in order of increasing distance.
+  static List<Map<String, dynamic>> recalibrateMultiBc({
+    required List<Map<String, dynamic>> points,
+    required double v0,
+    required String bcModel,
+    required double weightGrains,
+    required double zeroDistance,
+    required double windSpeed,
+    required double windDirectionHours,
+    required double temperatureC,
+    required double pressureHpa,
+    required double humidity,
+    required double angleDegrees,
+    required double sightHeightMm,
+    required double clickValue,
+    required String clickType,
+    required double caliberMm,
+    required double twistMm,
+    required String twistDirection,
+    required double bulletLengthMm,
+  }) {
+    if (points.isEmpty) return [];
+
+    // 1. Sort points by distance
+    List<Map<String, dynamic>> sortedPoints = List.from(points);
+    sortedPoints.sort((a, b) {
+      double distA = double.tryParse(a['distance']?.toString() ?? '0') ?? 0.0;
+      double distB = double.tryParse(b['distance']?.toString() ?? '0') ?? 0.0;
+      return distA.compareTo(distB);
+    });
+
+    List<Map<String, dynamic>> calibratedPoints = [];
+
+    // 2. Sequentially calibrate each point, using the previously calibrated points
+    for (var pt in sortedPoints) {
+      double targetDistance = double.tryParse(pt['distance']?.toString() ?? '0') ?? 0.0;
+      double actualCorrection = double.tryParse(pt['actual_correction']?.toString() ?? '0') ?? 0.0;
+      String correctionUnit = pt['unit']?.toString() ?? 'MRAD';
+
+      double calBc = calibrateBc(
+        targetDistance: targetDistance,
+        actualCorrection: actualCorrection,
+        correctionUnit: correctionUnit,
+        v0: v0,
+        bcModel: bcModel,
+        weightGrains: weightGrains,
+        zeroDistance: zeroDistance,
+        windSpeed: windSpeed,
+        windDirectionHours: windDirectionHours,
+        temperatureC: temperatureC,
+        pressureHpa: pressureHpa,
+        humidity: humidity,
+        angleDegrees: angleDegrees,
+        sightHeightMm: sightHeightMm,
+        clickValue: clickValue,
+        clickType: clickType,
+        caliberMm: caliberMm,
+        twistMm: twistMm,
+        twistDirection: twistDirection,
+        bulletLengthMm: bulletLengthMm,
+        useMultiBc: true,
+        existingCalibrationPoints: calibratedPoints,
+      );
+
+      calibratedPoints.add({
+        'distance': targetDistance,
+        'actual_correction': actualCorrection,
+        'unit': correctionUnit,
+        'calculated_bc': calBc,
+      });
+    }
+
+    return calibratedPoints;
   }
 
   /// Linear interpolation of standard G1/G7 drag coefficients (Source: JBM / McCoy standard tables)

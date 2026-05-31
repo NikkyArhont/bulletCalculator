@@ -247,6 +247,19 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                   );
                                 },
                               ),
+                              Text(
+                                'v 1.2.1',
+                                style: FlutterFlowTheme.of(context).labelSmall.override(
+                                      font: GoogleFonts.inter(
+                                        fontWeight: FlutterFlowTheme.of(context).labelSmall.fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context).labelSmall.fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FlutterFlowTheme.of(context).labelSmall.fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context).labelSmall.fontStyle,
+                                    ),
+                              ),
                             ].divide(SizedBox(height: 4.0)),
                           ),
                           Container(

@@ -15,12 +15,14 @@ class SocialButtonWidget extends StatefulWidget {
     super.key,
     String? name,
     String? provider,
+    this.onTap,
   })  : this.name = name ?? 'Google',
         this.provider =
             provider ?? 'https://cdn.simpleicons.org/google/111827.svg';
 
   final String name;
   final String provider;
+  final Future<void> Function()? onTap;
 
   @override
   State<SocialButtonWidget> createState() => _SocialButtonWidgetState();
@@ -52,7 +54,12 @@ class _SocialButtonWidgetState extends State<SocialButtonWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
-      child: Container(
+      child: InkWell(
+        onTap: () async {
+          if (widget.onTap != null) {
+            await widget.onTap!();
+          }
+        },
         child: Container(
           decoration: BoxDecoration(
             color: FlutterFlowTheme.of(context).secondaryBackground,

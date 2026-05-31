@@ -16,6 +16,9 @@ import 'package:provider/provider.dart';
 class EditWeaponModel extends FlutterFlowModel<EditWeaponWidget> {
   ///  State fields for stateful widgets in this page.
 
+  bool useMultiBc = false;
+  List<Map<String, dynamic>> calibrationPoints = [];
+
   // Model for SectionHeader.
   late SectionHeaderModel sectionHeaderModel1;
   // Model for TextField.
@@ -48,6 +51,8 @@ class EditWeaponModel extends FlutterFlowModel<EditWeaponWidget> {
   FormFieldController<String>? clickTypeController;
   // Model for TextField.
   late TextFieldModel textFieldModel9;
+  // Model for TextField.
+  late TextFieldModel textFieldModel10;
   // Model for Button.
   late ButtonModel buttonModel1;
   // Model for Button.
@@ -67,6 +72,7 @@ class EditWeaponModel extends FlutterFlowModel<EditWeaponWidget> {
     textFieldModel7 = createModel(context, () => TextFieldModel());
     textFieldModel8 = createModel(context, () => TextFieldModel());
     textFieldModel9 = createModel(context, () => TextFieldModel());
+    textFieldModel10 = createModel(context, () => TextFieldModel());
     buttonModel1 = createModel(context, () => ButtonModel());
     buttonModel2 = createModel(context, () => ButtonModel());
   }
@@ -85,6 +91,7 @@ class EditWeaponModel extends FlutterFlowModel<EditWeaponWidget> {
     textFieldModel7.dispose();
     textFieldModel8.dispose();
     textFieldModel9.dispose();
+    textFieldModel10.dispose();
     buttonModel1.dispose();
     buttonModel2.dispose();
   }

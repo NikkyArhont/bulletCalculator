@@ -259,6 +259,42 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               'resultId',
               ParamType.String,
             ),
+            zeroDistance: params.getParam<double>(
+              'zeroDistance',
+              ParamType.double,
+            ),
+            humidity: params.getParam<double>(
+              'humidity',
+              ParamType.double,
+            ),
+            bcModel: params.getParam<String>(
+              'bcModel',
+              ParamType.String,
+            ),
+            caliber: params.getParam<String>(
+              'caliber',
+              ParamType.String,
+            ),
+            twist: params.getParam<String>(
+              'twist',
+              ParamType.String,
+            ),
+            twistDirection: params.getParam<String>(
+              'twistDirection',
+              ParamType.String,
+            ),
+            bulletLength: params.getParam<String>(
+              'bulletLength',
+              ParamType.String,
+            ),
+            useMultiBc: params.getParam<bool>(
+              'useMultiBc',
+              ParamType.bool,
+            ),
+            calibrationPointsJson: params.getParam<String>(
+              'calibrationPointsJson',
+              ParamType.String,
+            ),
           ),
         ),
         FFRoute(
