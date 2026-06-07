@@ -382,7 +382,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                           children: [
                             Icon(
                               Icons.info_rounded,
-                              color: Colors.black,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                               size: 24.0,
                             ),
                             Expanded(
@@ -400,7 +400,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                                             .bodySmall
                                             .fontStyle,
                                       ),
-                                      color: Colors.black,
+                                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                                       letterSpacing: 0.0,
                                       fontWeight: FlutterFlowTheme.of(context)
                                           .bodySmall
@@ -480,7 +480,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                                   .labelSmall
                                   .fontStyle,
                             ),
-                            color: FlutterFlowTheme.of(context).onPrimary,
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                             letterSpacing: 0.0,
                             fontWeight: FlutterFlowTheme.of(context)
                                 .labelSmall
@@ -503,7 +503,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                                   .labelSmall
                                   .fontStyle,
                             ),
-                            color: FlutterFlowTheme.of(context).onPrimary,
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                             letterSpacing: 0.0,
                             fontWeight: FlutterFlowTheme.of(context)
                                 .labelSmall

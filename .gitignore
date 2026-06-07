@@ -40,3 +40,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase
+firebase/functions/.env
+node_modules/
+firebase/functions/node_modules/  
+ 

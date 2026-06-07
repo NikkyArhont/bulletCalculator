@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'login_model.dart';
 import '/main.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 export 'login_model.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -296,23 +297,43 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     final fullPhoneNumber = '+7$phoneNumber';
 
                                     try {
-                                      await authManager.beginPhoneAuth(
-                                        context: context,
-                                        phoneNumber: fullPhoneNumber,
-                                        onCodeSent: (context) async {
-                                          context.goNamed(
-                                            'SMS',
-                                            queryParameters: {
-                                              'phoneNumber': phoneNumber,
-                                            }.withoutNulls,
-                                          );
-                                        },
-                                      );
+                                      final testNumbers = [
+                                        '+79180000000',
+                                        '+79181111111',
+                                        '+79182222222',
+                                        '+79183333333'
+                                      ];
+
+                                      if (testNumbers.contains(fullPhoneNumber)) {
+                                        await authManager.beginPhoneAuth(
+                                          context: context,
+                                          phoneNumber: fullPhoneNumber,
+                                          onCodeSent: (context) async {
+                                            context.goNamed(
+                                              'SMS',
+                                              queryParameters: {
+                                                'phoneNumber': phoneNumber,
+                                              }.withoutNulls,
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        final httpsCallable = FirebaseFunctions.instance.httpsCallable('sendSmsCode');
+                                        await httpsCallable.call(<String, dynamic>{
+                                          'phoneNumber': fullPhoneNumber,
+                                        });
+                                        context.goNamed(
+                                          'SMS',
+                                          queryParameters: {
+                                            'phoneNumber': phoneNumber,
+                                          }.withoutNulls,
+                                        );
+                                      }
                                     } catch (e) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                              'Ошибка: ${e.toString()}. Убедитесь, что вход по номеру телефона включен в консоли Firebase.'),
+                                              'Ошибка: ${e.toString()}'),
                                         ),
                                       );
                                     } finally {
@@ -498,10 +519,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                                         lineHeight: 1.3,
                                       ),
                                 ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                Wrap(
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 4.0,
+                                  runSpacing: 4.0,
                                   children: [
                                     Text(
                                       'Условия использования',
@@ -594,7 +616,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                             lineHeight: 1.3,
                                           ),
                                     ),
-                                  ].divide(SizedBox(width: 4.0)),
+                                  ],
                                 ),
                               ].divide(SizedBox(height: 4.0)),
                             ),

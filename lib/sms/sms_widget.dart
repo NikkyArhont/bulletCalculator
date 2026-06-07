@@ -13,6 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'sms_model.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 export 'sms_model.dart';
 
 class SmsWidget extends StatefulWidget {
@@ -341,19 +343,56 @@ class _SmsWidgetState extends State<SmsWidget> {
                       _hasError = false;
                     });
                     try {
-                      final user = await authManager.verifySmsCode(
-                        context: context,
-                        smsCode: _model.pinCodeController!.text,
-                      );
-                      if (user != null) {
+                      String? uid;
+                      String? email;
+                      String? displayName;
+                      String? phone;
+
+                      final testNumbers = [
+                        '+79180000000',
+                        '+79181111111',
+                        '+79182222222',
+                        '+79183333333'
+                      ];
+                      final fullPhoneNumber = '+7${widget.phoneNumber}';
+
+                      if (testNumbers.contains(fullPhoneNumber)) {
+                        final baseUser = await authManager.verifySmsCode(
+                          context: context,
+                          smsCode: _model.pinCodeController!.text,
+                        );
+                        if (baseUser != null) {
+                          uid = baseUser.uid;
+                          email = baseUser.email;
+                          displayName = baseUser.displayName;
+                          phone = baseUser.phoneNumber;
+                        }
+                      } else {
+                        final httpsCallable = FirebaseFunctions.instance.httpsCallable('verifySmsCode');
+                        final response = await httpsCallable.call(<String, dynamic>{
+                          'phoneNumber': fullPhoneNumber,
+                          'code': _model.pinCodeController!.text,
+                        });
+                        final token = response.data['token'];
+                        final userCredential = await FirebaseAuth.instance.signInWithCustomToken(token);
+                        final fbUser = userCredential.user;
+                        if (fbUser != null) {
+                          uid = fbUser.uid;
+                          email = fbUser.email;
+                          displayName = fbUser.displayName;
+                          phone = fbUser.phoneNumber;
+                        }
+                      }
+
+                      if (uid != null) {
                         await FirebaseFirestore.instance
                             .collection('users')
-                            .doc(user.uid)
+                            .doc(uid)
                             .set({
-                          'uid': user.uid,
-                          'email': user.email,
-                          'display_name': user.displayName,
-                          'phone_number': user.phoneNumber,
+                          'uid': uid,
+                          'email': email,
+                          'display_name': displayName,
+                          'phone_number': phone,
                           'created_time': FieldValue.serverTimestamp(),
                         }, SetOptions(merge: true));
 

@@ -16,6 +16,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '/ballistic_engine.dart';
+import '/services/bluetooth_service.dart';
 import 'shoot_page_model.dart';
 export 'shoot_page_model.dart';
 
@@ -458,30 +459,93 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              'Цель и Дистанция',
-                              style: FlutterFlowTheme.of(context)
-                                  .titleMedium
-                                  .override(
-                                    font: GoogleFonts.spaceGrotesk(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontStyle,
-                                    lineHeight: 1.2,
-                                  ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Цель и Дистанция',
+                                  style: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .override(
+                                        font: GoogleFonts.spaceGrotesk(
+                                          fontWeight: FlutterFlowTheme.of(context)
+                                              .titleMedium
+                                              .fontWeight,
+                                          fontStyle: FlutterFlowTheme.of(context)
+                                              .titleMedium
+                                              .fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FlutterFlowTheme.of(context)
+                                            .titleMedium
+                                            .fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .titleMedium
+                                            .fontStyle,
+                                        lineHeight: 1.2,
+                                      ),
+                                ),
+                                AnimatedBuilder(
+                                  animation: BluetoothDeviceManager.instance,
+                                  builder: (context, _) {
+                                    final manager = BluetoothDeviceManager.instance;
+                                    final isConnected = manager.connectedVector != null;
+                                    return FlutterFlowIconButton(
+                                      borderColor: Colors.transparent,
+                                      borderRadius: 20.0,
+                                      buttonSize: 36.0,
+                                      fillColor: Colors.transparent,
+                                      icon: Icon(
+                                        Icons.bluetooth_connected_rounded,
+                                        color: isConnected
+                                            ? FlutterFlowTheme.of(context).success
+                                            : FlutterFlowTheme.of(context).secondaryText,
+                                        size: 20.0,
+                                      ),
+                                      onPressed: () {
+                                        if (!isConnected) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Дальномер Vector Optics не подключен. Подключите его в разделе "Мои устройства".', style: TextStyle(color: Colors.white)),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        final cache = manager.cache;
+                                        if (cache.lastDistanceTime == null) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Замеры еще не получены с дальномера. Сделайте замер на приборе.', style: TextStyle(color: Colors.white)),
+                                              backgroundColor: Colors.orange,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        safeSetState(() {
+                                          if (cache.distance != null) {
+                                            _model.dataInputFieldModelDistance.textFieldModel.inputTextController?.text = cache.distance!.toStringAsFixed(1);
+                                          }
+                                          if (cache.angle != null) {
+                                            _model.dataInputFieldModel1.textFieldModel.inputTextController?.text = cache.angle!.toStringAsFixed(1);
+                                          }
+                                        });
+
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Данные дистанции и угла обновлены с дальномера!', style: TextStyle(color: Colors.white)),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                             Row(
                               mainAxisSize: MainAxisSize.max,
@@ -1141,11 +1205,62 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                           color: FlutterFlowTheme.of(context).success,
                                           size: 'large',
                                           full_width: true,
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text('В разработке...')),
-                                            );
-                                          },
+                                                                                     onPressed: () {
+                                             final manager = BluetoothDeviceManager.instance;
+                                             if (manager.connectedKestrel == null) {
+                                               ScaffoldMessenger.of(context).showSnackBar(
+                                                 SnackBar(
+                                                   content: Text('Метеостанция Kestrel не подключена. Подключите её в разделе "Мои устройства".', style: TextStyle(color: Colors.white)),
+                                                   backgroundColor: Colors.red,
+                                                 ),
+                                               );
+                                               return;
+                                             }
+
+                                             final cache = manager.cache;
+                                             final hasAnyData = cache.windSpeed != null ||
+                                                 cache.temperature != null ||
+                                                 cache.pressure != null ||
+                                                 cache.humidity != null;
+
+                                             if (!hasAnyData) {
+                                               ScaffoldMessenger.of(context).showSnackBar(
+                                                 SnackBar(
+                                                   content: Text('Данные с метеостанции еще не получены. Убедитесь, что датчики активны.', style: TextStyle(color: Colors.white)),
+                                                   backgroundColor: Colors.orange,
+                                                 ),
+                                               );
+                                               return;
+                                             }
+
+                                             safeSetState(() {
+                                               if (cache.windSpeed != null) {
+                                                 _model.dataInputFieldModel2.textFieldModel.inputTextController?.text = cache.windSpeed.toString();
+                                               }
+                                               if (cache.windGust != null) {
+                                                 _model.dataInputFieldModelGust.textFieldModel.inputTextController?.text = cache.windGust.toString();
+                                               }
+                                               if (cache.windDirection != null) {
+                                                 _model.windDirectionHours = cache.windDirection!;
+                                               }
+                                               if (cache.temperature != null) {
+                                                 _model.dataInputFieldModel3.textFieldModel.inputTextController?.text = cache.temperature.toString();
+                                               }
+                                               if (cache.pressure != null) {
+                                                 _model.dataInputFieldModel4.textFieldModel.inputTextController?.text = cache.pressure.toString();
+                                               }
+                                               if (cache.humidity != null) {
+                                                 _model.dataInputFieldModel5.textFieldModel.inputTextController?.text = cache.humidity.toString();
+                                               }
+                                             });
+
+                                             ScaffoldMessenger.of(context).showSnackBar(
+                                               SnackBar(
+                                                 content: Text('Метеоданные успешно обновлены с Kestrel!', style: TextStyle(color: Colors.white)),
+                                                 backgroundColor: Colors.green,
+                                               ),
+                                             );
+                                           },
                                         ),
                                       ),
                                     ),

@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '/components/logout_widget.dart';
 import 'profile_model.dart';
+import '/services/bluetooth_service.dart';
 import '/auth/firebase_auth/auth_util.dart';
 export 'profile_model.dart';
 
@@ -87,6 +88,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                     color: FlutterFlowTheme.of(context).primary,
                                     width: 2.0,
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 12.0,
+                                      color: FlutterFlowTheme.of(context).primary.withOpacity(0.3),
+                                      offset: Offset(0.0, 4.0),
+                                    )
+                                  ],
                                 ),
                                 child: Padding(
                                   padding: EdgeInsets.all(4.0),
@@ -149,7 +157,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 alignment: AlignmentDirectional(1.0, 1.0),
                                 child: GestureDetector(
                                   onTap: () async {
-                                    context.pushNamed('profileSettings');
+                                    await context.pushNamed('profileSettings');
+                                    safeSetState(() {});
                                   },
                                   child: Container(
                                     width: 32.0,
@@ -248,7 +257,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 },
                               ),
                               Text(
-                                'v 1.2.1',
+                                'v 1.8.4',
                                 style: FlutterFlowTheme.of(context).labelSmall.override(
                                       font: GoogleFonts.inter(
                                         fontWeight: FlutterFlowTheme.of(context).labelSmall.fontWeight,
@@ -393,126 +402,126 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           },
                         ),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color:
-                              FlutterFlowTheme.of(context).secondaryBackground,
-                          borderRadius: BorderRadius.circular(6.0),
-                          shape: BoxShape.rectangle,
-                          border: Border.all(
-                            color: FlutterFlowTheme.of(context).alternate,
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Container(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryBackground,
-                                    borderRadius: BorderRadius.circular(4.0),
-                                    shape: BoxShape.rectangle,
-                                  ),
-                                  alignment: AlignmentDirectional(0.0, 0.0),
-                                  child: Icon(
-                                    Icons.bluetooth_connected_rounded,
-                                    color: FlutterFlowTheme.of(context).success,
-                                    size: 20.0,
-                                  ),
+                      AnimatedBuilder(
+                        animation: BluetoothDeviceManager.instance,
+                        builder: (context, _) {
+                          final manager = BluetoothDeviceManager.instance;
+                          final isKestrelConnected = manager.connectedKestrel != null;
+                          final isVectorConnected = manager.connectedVector != null;
+                          
+                          String deviceName = 'Устройства не подключены';
+                          String deviceStatus = 'Нажмите, чтобы настроить BLE';
+                          bool isAnyConnected = isKestrelConnected || isVectorConnected;
+                          Color statusColor = isAnyConnected 
+                              ? FlutterFlowTheme.of(context).success 
+                              : FlutterFlowTheme.of(context).secondaryText;
+                          IconData iconData = isAnyConnected 
+                              ? Icons.bluetooth_connected_rounded 
+                              : Icons.bluetooth_disabled_rounded;
+
+                          if (isKestrelConnected && isVectorConnected) {
+                            deviceName = 'Kestrel & Vector Optics';
+                            final windStr = manager.cache.windSpeed != null ? ' • ${manager.cache.windSpeed} м/с' : '';
+                            final distStr = manager.cache.distance != null ? ' • ${manager.cache.distance?.toStringAsFixed(0)}м' : '';
+                            deviceStatus = 'Подключены$windStr$distStr';
+                          } else if (isKestrelConnected) {
+                            deviceName = manager.connectedKestrel!.name;
+                            final windStr = manager.cache.windSpeed != null ? ' • ${manager.cache.windSpeed} м/с' : '';
+                            deviceStatus = 'Подключено$windStr';
+                          } else if (isVectorConnected) {
+                            deviceName = manager.connectedVector!.name;
+                            final distStr = manager.cache.distance != null ? ' • ${manager.cache.distance?.toStringAsFixed(0)}м' : '';
+                            deviceStatus = 'Подключено$distStr';
+                          }
+
+                          return InkWell(
+                            onTap: () async {
+                              await context.pushNamed('myDevices');
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context).secondaryBackground,
+                                borderRadius: BorderRadius.circular(6.0),
+                                shape: BoxShape.rectangle,
+                                border: Border.all(
+                                  color: FlutterFlowTheme.of(context).alternate,
+                                  width: 1.0,
                                 ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Kestrel 5700',
-                                        maxLines: 1,
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelLarge
-                                            .override(
-                                              font: GoogleFonts.spaceGrotesk(
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelLarge
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelLarge
-                                                        .fontStyle,
-                                              ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryText,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelLarge
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelLarge
-                                                      .fontStyle,
-                                              lineHeight: 1.1,
-                                            ),
-                                        overflow: TextOverflow.ellipsis,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 40.0,
+                                      height: 40.0,
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context).primaryBackground,
+                                        borderRadius: BorderRadius.circular(4.0),
+                                        shape: BoxShape.rectangle,
                                       ),
-                                      Text(
-                                        'Подключено • 0.8 м/с ЮЗ',
-                                        maxLines: 1,
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelSmall
-                                            .override(
-                                              font: GoogleFonts.spaceGrotesk(
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelSmall
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelSmall
-                                                        .fontStyle,
-                                              ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .success,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelSmall
-                                                      .fontStyle,
-                                              lineHeight: 1.1,
-                                            ),
-                                        overflow: TextOverflow.ellipsis,
+                                      alignment: const AlignmentDirectional(0.0, 0.0),
+                                      child: Icon(
+                                        iconData,
+                                        color: statusColor,
+                                        size: 20.0,
                                       ),
-                                    ].divide(SizedBox(height: 4.0)),
-                                  ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            deviceName,
+                                            maxLines: 1,
+                                            style: FlutterFlowTheme.of(context).labelLarge.override(
+                                                  font: GoogleFonts.spaceGrotesk(
+                                                    fontWeight: FlutterFlowTheme.of(context).labelLarge.fontWeight,
+                                                    fontStyle: FlutterFlowTheme.of(context).labelLarge.fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(context).primaryText,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FlutterFlowTheme.of(context).labelLarge.fontWeight,
+                                                  fontStyle: FlutterFlowTheme.of(context).labelLarge.fontStyle,
+                                                  lineHeight: 1.1,
+                                                ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            deviceStatus,
+                                            maxLines: 1,
+                                            style: FlutterFlowTheme.of(context).labelSmall.override(
+                                                  font: GoogleFonts.spaceGrotesk(
+                                                    fontWeight: FlutterFlowTheme.of(context).labelSmall.fontWeight,
+                                                    fontStyle: FlutterFlowTheme.of(context).labelSmall.fontStyle,
+                                                  ),
+                                                  color: statusColor,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FlutterFlowTheme.of(context).labelSmall.fontWeight,
+                                                  fontStyle: FlutterFlowTheme.of(context).labelSmall.fontStyle,
+                                                  lineHeight: 1.1,
+                                                ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ].divide(const SizedBox(height: 4.0)),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                      size: 24.0,
+                                    ),
+                                  ].divide(const SizedBox(width: 16.0)),
                                 ),
-                                Icon(
-                                  Icons.chevron_right_rounded,
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
-                                  size: 24.0,
-                                ),
-                              ].divide(SizedBox(width: 16.0)),
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                       Column(
                         mainAxisSize: MainAxisSize.min,

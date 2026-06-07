@@ -13,6 +13,8 @@ import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/nav/nav.dart';
 import 'index.dart';
 
+import 'services/bluetooth_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -21,6 +23,9 @@ void main() async {
   await initFirebase();
 
   await FlutterFlowTheme.initialize();
+
+  // Reconnect saved Bluetooth devices (non-blocking)
+  BluetoothDeviceManager.instance.reconnectSavedDevices();
 
   runApp(MyApp());
 }

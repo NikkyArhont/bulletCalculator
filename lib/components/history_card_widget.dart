@@ -87,70 +87,77 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: () async {
-                              if (widget.resultId == null) return;
-                              await FirebaseFirestore.instance
-                                  .collection('shootResults')
-                                  .doc(widget.resultId)
-                                  .update({'isHit': !widget.isHit});
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  widget.isHit
-                                      ? Icons.check_box_rounded
-                                      : Icons.check_box_outline_blank_rounded,
-                                  color: widget.isHit
-                                      ? FlutterFlowTheme.of(context).success
-                                      : FlutterFlowTheme.of(context).secondaryText,
-                                  size: 18.0,
-                                ),
-                                SizedBox(width: 4.0),
-                                Text(
-                                  'Попадание',
-                                  style: FlutterFlowTheme.of(context).labelSmall.override(
-                                    font: GoogleFonts.inter(),
+                      Expanded(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                if (widget.resultId == null) return;
+                                await FirebaseFirestore.instance
+                                    .collection('shootResults')
+                                    .doc(widget.resultId)
+                                    .update({'isHit': !widget.isHit});
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    widget.isHit
+                                        ? Icons.check_box_rounded
+                                        : Icons.check_box_outline_blank_rounded,
                                     color: widget.isHit
                                         ? FlutterFlowTheme.of(context).success
                                         : FlutterFlowTheme.of(context).secondaryText,
+                                    size: 18.0,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            valueOrDefault<String>(
-                              widget!.weapon,
-                              'Tikka T3x TAC A1',
-                            ),
-                            style: FlutterFlowTheme.of(context)
-                                .labelLarge
-                                .override(
-                                  font: GoogleFonts.spaceGrotesk(
-                                    fontWeight: FontWeight.w600,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelLarge
-                                        .fontStyle,
+                                  SizedBox(width: 4.0),
+                                  Text(
+                                    'Попадание',
+                                    style: FlutterFlowTheme.of(context).labelSmall.override(
+                                      font: GoogleFonts.inter(),
+                                      color: widget.isHit
+                                          ? FlutterFlowTheme.of(context).success
+                                          : FlutterFlowTheme.of(context).secondaryText,
+                                    ),
                                   ),
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.w600,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelLarge
-                                      .fontStyle,
-                                  lineHeight: 1.1,
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                valueOrDefault<String>(
+                                  widget!.weapon,
+                                  'Tikka T3x TAC A1',
                                 ),
-                          ),
-                        ].divide(SizedBox(width: 8.0)),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: FlutterFlowTheme.of(context)
+                                    .labelLarge
+                                    .override(
+                                      font: GoogleFonts.spaceGrotesk(
+                                        fontWeight: FontWeight.w600,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .labelLarge
+                                            .fontStyle,
+                                      ),
+                                      color:
+                                          FlutterFlowTheme.of(context).primaryText,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .labelLarge
+                                          .fontStyle,
+                                      lineHeight: 1.1,
+                                    ),
+                              ),
+                            ),
+                          ].divide(SizedBox(width: 8.0)),
+                        ),
                       ),
+                      SizedBox(width: 8.0),
                       Text(
                         valueOrDefault<String>(
                           widget!.date,

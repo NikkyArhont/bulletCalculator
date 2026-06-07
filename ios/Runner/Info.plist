@@ -51,7 +51,16 @@
     <string>Приложению требуется доступ к геолокации для получения текущих данных о погоде в месте стрельбы.</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Приложению требуется доступ к геолокации для получения текущих данных о погоде в месте стрельбы.</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Приложению требуется доступ к Bluetooth для подключения метеостанции Kestrel и дальномера.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Приложению требуется доступ к Bluetooth для подключения метеостанции Kestrel и дальномера.</string>
 
+
+    <key>NSCameraUsageDescription</key>
+    <string>Приложению требуется доступ к камере для того, чтобы вы могли сделать фото профиля.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Приложению требуется доступ к галерее для выбора фото профиля.</string>
 
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>

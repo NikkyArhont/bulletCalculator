@@ -12,6 +12,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_settings_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '/flutter_flow/units_util.dart';
 import '/components/choose_spec_widget.dart';
 import '/components/delete_account_widget.dart';
@@ -31,6 +36,7 @@ class ProfileSettingsWidget extends StatefulWidget {
 
 class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
   late ProfileSettingsModel _model;
+  bool isUploadingPhoto = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -271,63 +277,53 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                         shape: BoxShape.circle,
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
-                                      child: Text(
-                                        'АП',
-                                        textAlign: TextAlign.center,
-                                        maxLines: 1,
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelMedium
-                                            .override(
-                                              font: GoogleFonts.spaceGrotesk(
-                                                fontWeight: FontWeight.w600,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelMedium
-                                                        .fontStyle,
+                                      child: isUploadingPhoto
+                                          ? Padding(
+                                              padding: EdgeInsets.all(32.0),
+                                              child: CircularProgressIndicator(
+                                                color: FlutterFlowTheme.of(context).primary,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
-                                              fontSize: 38.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.w600,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
+                                            )
+                                          : (currentUserPhoto.isNotEmpty
+                                              ? ClipRRect(
+                                                  borderRadius: BorderRadius.circular(50.0),
+                                                  child: CachedNetworkImage(
+                                                    fadeInDuration: Duration(milliseconds: 0),
+                                                    fadeOutDuration: Duration(milliseconds: 0),
+                                                    imageUrl: currentUserPhoto,
+                                                    width: 100.0,
+                                                    height: 100.0,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+                                              : Text(
+                                                  'АП',
+                                                  textAlign: TextAlign.center,
+                                                  maxLines: 1,
+                                                  style: FlutterFlowTheme.of(context)
                                                       .labelMedium
-                                                      .fontStyle,
-                                              lineHeight: 1.1,
-                                            ),
-                                        overflow: TextOverflow.clip,
-                                      ),
-                                    ),
-                                    Align(
-                                      alignment: AlignmentDirectional(1.0, 1.0),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          borderRadius:
-                                              BorderRadius.circular(9999.0),
-                                          shape: BoxShape.rectangle,
-                                          border: Border.all(
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
-                                            width: 2.0,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(4.0),
-                                          child: Container(
-                                            child: Icon(
-                                              Icons.photo_camera_rounded,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .onPrimary,
-                                              size: 18.0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                                      .override(
+                                                        font: GoogleFonts.spaceGrotesk(
+                                                          fontWeight: FontWeight.w600,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(context)
+                                                                  .labelMedium
+                                                                  .fontStyle,
+                                                        ),
+                                                        color:
+                                                            FlutterFlowTheme.of(context)
+                                                                .primary,
+                                                        fontSize: 38.0,
+                                                        letterSpacing: 0.0,
+                                                        fontWeight: FontWeight.w600,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(context)
+                                                                .labelMedium
+                                                                .fontStyle,
+                                                        lineHeight: 1.1,
+                                                      ),
+                                                  overflow: TextOverflow.clip,
+                                                )),
                                     ),
                                   ],
                                 ),
@@ -343,8 +339,55 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                     variant: 'ghost',
                                     size: 'small',
                                     full_width: false,
-                                    loading: false,
-                                    disabled: false,
+                                    loading: isUploadingPhoto,
+                                    disabled: isUploadingPhoto,
+                                    onPressed: () async {
+                                      final picker = ImagePicker();
+                                      final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+                                      if (pickedFile != null) {
+                                        safeSetState(() {
+                                          isUploadingPhoto = true;
+                                        });
+                                        try {
+                                          final user = FirebaseAuth.instance.currentUser;
+                                          if (user != null) {
+                                            final storageRef = FirebaseStorage.instance
+                                                .ref()
+                                                .child('users/${user.uid}/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg');
+                                            
+                                            if (kIsWeb) {
+                                              final bytes = await pickedFile.readAsBytes();
+                                              await storageRef.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
+                                            } else {
+                                              final file = File(pickedFile.path);
+                                              await storageRef.putFile(file);
+                                            }
+                                            final downloadUrl = await storageRef.getDownloadURL();
+                                            await user.updatePhotoURL(downloadUrl);
+                                            await FirebaseFirestore.instance.collection('users').doc(user.uid).set({'photo_url': downloadUrl}, SetOptions(merge: true));
+                                            
+                                            await currentUser?.refreshUser();
+                                            
+                                            // Trigger auth util to rebuild if it depends on stream, or just setState to update local UI
+                                            safeSetState(() {});
+                                            
+                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                              content: Text('Фото профиля обновлено'),
+                                              backgroundColor: FlutterFlowTheme.of(context).success,
+                                            ));
+                                          }
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                            content: Text('Ошибка загрузки: $e'),
+                                            backgroundColor: FlutterFlowTheme.of(context).error,
+                                          ));
+                                        } finally {
+                                          safeSetState(() {
+                                            isUploadingPhoto = false;
+                                          });
+                                        }
+                                      }
+                                    },
                                   ),
                                 ),
                               ].divide(SizedBox(height: 16.0)),
