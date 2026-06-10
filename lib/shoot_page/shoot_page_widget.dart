@@ -15,6 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '/ballistic_engine.dart';
 import '/services/bluetooth_service.dart';
 import 'shoot_page_model.dart';
@@ -59,6 +60,55 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
     super.initState();
     _model = createModel(context, () => ShootPageModel());
     _handleParameters();
+    _loadSavedInputs();
+    _setupInputListeners();
+  }
+
+  Future<void> _loadSavedInputs() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    
+    safeSetState(() {
+      if (prefs.containsKey('sp_distance')) _model.dataInputFieldModelDistance.textFieldModel.inputTextController?.text = prefs.getString('sp_distance')!;
+      if (prefs.containsKey('sp_angle')) _model.dataInputFieldModel1.textFieldModel.inputTextController?.text = prefs.getString('sp_angle')!;
+      if (prefs.containsKey('sp_wind_speed')) _model.dataInputFieldModel2.textFieldModel.inputTextController?.text = prefs.getString('sp_wind_speed')!;
+      if (prefs.containsKey('sp_temp')) _model.dataInputFieldModel3.textFieldModel.inputTextController?.text = prefs.getString('sp_temp')!;
+      if (prefs.containsKey('sp_pressure')) _model.dataInputFieldModel4.textFieldModel.inputTextController?.text = prefs.getString('sp_pressure')!;
+      if (prefs.containsKey('sp_humidity')) _model.dataInputFieldModel5.textFieldModel.inputTextController?.text = prefs.getString('sp_humidity')!;
+      if (prefs.containsKey('sp_gust')) _model.dataInputFieldModelGust.textFieldModel.inputTextController?.text = prefs.getString('sp_gust')!;
+      
+      if (prefs.containsKey('sp_wind_dir')) _model.windDirectionHours = prefs.getInt('sp_wind_dir')!;
+      if (prefs.containsKey('sp_gust_active')) _model.isGustActive = prefs.getBool('sp_gust_active')!;
+    });
+  }
+
+  void _setupInputListeners() {
+    void saveString(String key, String value) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(key, value);
+    }
+
+    _model.dataInputFieldModelDistance.textFieldModel.inputTextController?.addListener(() {
+      saveString('sp_distance', _model.dataInputFieldModelDistance.textFieldModel.inputTextController?.text ?? '');
+    });
+    _model.dataInputFieldModel1.textFieldModel.inputTextController?.addListener(() {
+      saveString('sp_angle', _model.dataInputFieldModel1.textFieldModel.inputTextController?.text ?? '');
+    });
+    _model.dataInputFieldModel2.textFieldModel.inputTextController?.addListener(() {
+      saveString('sp_wind_speed', _model.dataInputFieldModel2.textFieldModel.inputTextController?.text ?? '');
+    });
+    _model.dataInputFieldModel3.textFieldModel.inputTextController?.addListener(() {
+      saveString('sp_temp', _model.dataInputFieldModel3.textFieldModel.inputTextController?.text ?? '');
+    });
+    _model.dataInputFieldModel4.textFieldModel.inputTextController?.addListener(() {
+      saveString('sp_pressure', _model.dataInputFieldModel4.textFieldModel.inputTextController?.text ?? '');
+    });
+    _model.dataInputFieldModel5.textFieldModel.inputTextController?.addListener(() {
+      saveString('sp_humidity', _model.dataInputFieldModel5.textFieldModel.inputTextController?.text ?? '');
+    });
+    _model.dataInputFieldModelGust.textFieldModel.inputTextController?.addListener(() {
+      saveString('sp_gust', _model.dataInputFieldModelGust.textFieldModel.inputTextController?.text ?? '');
+    });
   }
 
   @override
@@ -717,6 +767,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                     _model.windDirectionHours =
                                                         hour;
                                                   });
+                                                  SharedPreferences.getInstance().then((prefs) => prefs.setInt('sp_wind_dir', hour));
                                                 },
                                                 onTapDown: (details) {
                                                   final center =
@@ -740,6 +791,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                     _model.windDirectionHours =
                                                         hour;
                                                   });
+                                                  SharedPreferences.getInstance().then((prefs) => prefs.setInt('sp_wind_dir', hour));
                                                 },
                                                 child: AspectRatio(
                                                   aspectRatio: 1.0,
@@ -915,6 +967,8 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                       safeSetState(() =>
                                                           _model.isGustActive =
                                                               val);
+                                                      final prefs = await SharedPreferences.getInstance();
+                                                      await prefs.setBool('sp_gust_active', val);
                                                     },
                                                   ),
                                                 ),

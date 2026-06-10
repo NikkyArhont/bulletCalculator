@@ -1413,7 +1413,7 @@ class _EditWeaponWidgetState extends State<EditWeaponWidget> {
             ),
           SizedBox(height: 16.0),
           ButtonWidget(
-            content: '+ Добавить точку калибровки',
+            content: 'Добавить точку калибровки',
             icon: Icon(Icons.add_rounded, color: Colors.white, size: 16.0),
             icon_present: true,
             color: _model.calibrationPoints.length >= 3 
