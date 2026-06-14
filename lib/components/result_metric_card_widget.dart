@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'result_metric_card_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'result_metric_card_model.dart';
 
 class ResultMetricCardWidget extends StatefulWidget {
@@ -71,7 +72,7 @@ class _ResultMetricCardWidgetState extends State<ResultMetricCardWidget> {
               Text(
                 valueOrDefault<String>(
                   widget!.label,
-                  'Смещение (В)',
+                  'result.drop'.tr(),
                 ),
                 style: FlutterFlowTheme.of(context).labelSmall.override(
                       font: GoogleFonts.spaceGrotesk(
@@ -118,7 +119,7 @@ class _ResultMetricCardWidgetState extends State<ResultMetricCardWidget> {
                   Text(
                     valueOrDefault<String>(
                       widget!.unit,
-                      'см',
+                      'common.cm'.tr(),
                     ),
                     style: FlutterFlowTheme.of(context).bodySmall.override(
                           font: GoogleFonts.inter(

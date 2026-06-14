@@ -15,6 +15,7 @@ import 'login_model.dart';
 import '/main.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'login_model.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -85,7 +86,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Вход в Apex Ballistics',
+                                'login.title'.tr(),
                                 style: FlutterFlowTheme.of(context)
                                     .headlineMedium
                                     .override(
@@ -106,7 +107,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     ),
                               ),
                               Text(
-                                'Профессиональные расчеты для высокоточной стрельбы',
+                                'login.subtitle'.tr(),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -143,7 +144,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Номер телефона',
+                                    'login.phone_label'.tr(),
                                     style: FlutterFlowTheme.of(context)
                                         .labelLarge
                                         .override(
@@ -171,102 +172,28 @@ class _LoginWidgetState extends State<LoginWidget> {
                                           lineHeight: 1.1,
                                         ),
                                   ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 80.0,
-                                        height: 56.0,
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          borderRadius:
-                                              BorderRadius.circular(4.0),
-                                          shape: BoxShape.rectangle,
-                                          border: Border.all(
-                                            color: FlutterFlowTheme.of(context)
-                                                .alternate,
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        alignment:
-                                            AlignmentDirectional(0.0, 0.0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              '+7',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLarge
-                                                      .override(
-                                                        font: GoogleFonts.inter(
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontStyle: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyLarge
-                                                              .fontStyle,
-                                                        ),
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyLarge
-                                                                .fontStyle,
-                                                        lineHeight: 1.4,
-                                                      ),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_drop_down_rounded,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
-                                              size: 24.0,
-                                            ),
-                                          ].divide(SizedBox(width: 4.0)),
-                                        ),
+                                  wrapWithModel(
+                                    model: _model.textFieldModel,
+                                    updateCallback: () =>
+                                        safeSetState(() {}),
+                                    child: TextFieldWidget(
+                                      label: null,
+                                      helper: null,
+                                      hint: '+7 900 000 00 00',
+                                      value: '+',
+                                      leading_icon: Icon(
+                                        Icons.phone_android_rounded,
                                       ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: wrapWithModel(
-                                          model: _model.textFieldModel,
-                                          updateCallback: () =>
-                                              safeSetState(() {}),
-                                          child: TextFieldWidget(
-                                            label: null,
-                                            helper: null,
-                                            hint: '900 000-00-00',
-                                            value: '',
-                                            leading_icon: Icon(
-                                              Icons.phone_android_rounded,
-                                            ),
-                                            leading_icon_present: true,
-                                            trailing_icon_present: false,
-                                            border: Color(0x00000000),
-                                            hint_color: 'hint',
-                                            variant: 'outlined',
-                                            error: false,
-                                            height: 56.0,
-                                            keyboardType: TextInputType.phone,
-                                            inputFormatters: [PhoneMaskFormatter()],
-                                          ),
-                                        ),
-                                      ),
-                                    ].divide(SizedBox(width: 16.0)),
+                                      leading_icon_present: true,
+                                      trailing_icon_present: false,
+                                      border: Color(0x00000000),
+                                      hint_color: 'hint',
+                                      variant: 'outlined',
+                                      error: false,
+                                      height: 56.0,
+                                      keyboardType: TextInputType.phone,
+                                      inputFormatters: [PhonePlusFormatter()],
+                                    ),
                                   ),
                                 ].divide(SizedBox(height: 4.0)),
                               ),
@@ -274,7 +201,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 model: _model.buttonModel,
                                 updateCallback: () => safeSetState(() {}),
                                 child: ButtonWidget(
-                                  content: 'Получить SMS-код',
+                                  content: 'login.get_code'.tr(),
                                   icon_present: false,
                                   icon_end_present: false,
                                   color: (_model.textFieldModel.inputTextController?.text.length ?? 0) >= 14
@@ -285,16 +212,17 @@ class _LoginWidgetState extends State<LoginWidget> {
                                   full_width: true,
                                   loading: _model.isLoading,
                                   disabled: (_model.textFieldModel
-                                              .inputTextController?.text.length ??
+                                              .inputTextController?.text.replaceAll(RegExp(r'\D'), '').length ??
                                           0) <
-                                      14, // (###)###-##-## is 14 chars,
+                                      10, // Must have at least 10 digits
                                   onPressed: () async {
                                     if (_model.isLoading) return;
                                     safeSetState(() => _model.isLoading = true);
-                                    final phoneNumber = _model
+                                    final digits = _model
                                         .textFieldModel.inputTextController.text
                                         .replaceAll(RegExp(r'\D'), '');
-                                    final fullPhoneNumber = '+7$phoneNumber';
+                                    final fullPhoneNumber = '+$digits';
+                                    final phoneNumber = digits;
 
                                     try {
                                       final testNumbers = [
@@ -333,7 +261,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                              'Ошибка: ${e.toString()}'),
+                                              '${'login.error_prefix'.tr()}${e.toString()}'),
                                         ),
                                       );
                                     } finally {
@@ -362,7 +290,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 ),
                               ),
                               Text(
-                                'ИЛИ',
+                                'login.or'.tr(),
                                 style: FlutterFlowTheme.of(context)
                                     .labelSmall
                                     .override(
@@ -418,12 +346,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                                         context.goNamedAuth('initPage', context.mounted);
                                       } else {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Авторизация отменена или не удалась.')),
+                                          SnackBar(content: Text('login.auth_cancelled'.tr())),
                                         );
                                       }
                                     } catch (e) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Ошибка входа: $e')),
+                                        SnackBar(content: Text('${'login.auth_error'.tr()}$e')),
                                       );
                                     }
                                   },
@@ -451,8 +379,8 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 child: ButtonWidget(
                                   content: Theme.of(context).brightness ==
                                           Brightness.dark
-                                      ? 'Светлая тема'
-                                      : 'Темная тема',
+                                      ? 'login.light_theme'.tr()
+                                      : 'login.dark_theme'.tr(),
                                   icon: Icon(
                                     Theme.of(context).brightness ==
                                             Brightness.dark
@@ -480,6 +408,38 @@ class _LoginWidgetState extends State<LoginWidget> {
                                   },
                                 ),
                               ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                child: DropdownButtonFormField<Locale>(
+                                  value: context.locale,
+                                  decoration: InputDecoration(
+                                    labelText: 'language'.tr(),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(context).alternate,
+                                      ),
+                                    ),
+                                  ),
+                                  dropdownColor: FlutterFlowTheme.of(context).secondaryBackground,
+                                  style: FlutterFlowTheme.of(context).bodyMedium,
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: Locale('ru'),
+                                      child: Text('Русский'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: Locale('en'),
+                                      child: Text('English'),
+                                    ),
+                                  ],
+                                  onChanged: (Locale? newLocale) {
+                                    if (newLocale != null) {
+                                      context.setLocale(newLocale);
+                                    }
+                                  },
+                                ),
+                              ),
                             ].divide(SizedBox(height: 8.0)),
                           ),
                           Spacer(),
@@ -492,7 +452,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Нажимая «Продолжить», вы принимаете',
+                                  'login.terms_accept'.tr(),
                                   textAlign: TextAlign.center,
                                   style: FlutterFlowTheme.of(context)
                                       .bodySmall
@@ -526,7 +486,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                   runSpacing: 4.0,
                                   children: [
                                     Text(
-                                      'Условия использования',
+                                      'login.terms_of_use'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .bodySmall
                                           .override(
@@ -557,7 +517,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                           ),
                                     ),
                                     Text(
-                                      'и',
+                                      'login.and'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .bodySmall
                                           .override(
@@ -586,7 +546,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                           ),
                                     ),
                                     Text(
-                                      'Политику конфиденциальности',
+                                      'login.privacy_policy'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .bodySmall
                                           .override(
@@ -635,26 +595,12 @@ class _LoginWidgetState extends State<LoginWidget> {
   }
 }
 
-class PhoneMaskFormatter extends TextInputFormatter {
+class PhonePlusFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldSelection, TextEditingValue newSelection) {
-    var text = newSelection.text.replaceAll(RegExp(r'\D'), '');
-    if (text.length > 10) text = text.substring(0, 10);
-
-    var newText = '';
-    if (text.length > 0) {
-      newText = '(' + text.substring(0, text.length > 3 ? 3 : text.length);
-      if (text.length > 3) {
-        newText += ')' + text.substring(3, text.length > 6 ? 6 : text.length);
-      }
-      if (text.length > 6) {
-        newText += '-' + text.substring(6, text.length > 8 ? 8 : text.length);
-      }
-      if (text.length > 8) {
-        newText += '-' + text.substring(8, text.length > 10 ? 10 : text.length);
-      }
-    }
+    var digits = newSelection.text.replaceAll(RegExp(r'\D'), '');
+    var newText = '+' + digits;
 
     return TextEditingValue(
       text: newText,

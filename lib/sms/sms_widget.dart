@@ -15,6 +15,7 @@ import 'sms_model.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'sms_model.dart';
 
 class SmsWidget extends StatefulWidget {
@@ -111,7 +112,7 @@ class _SmsWidgetState extends State<SmsWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Подтверждение кода',
+                        'sms.title'.tr(),
                         style: FlutterFlowTheme.of(context)
                             .headlineMedium
                             .override(
@@ -135,7 +136,7 @@ class _SmsWidgetState extends State<SmsWidget> {
                             ),
                       ),
                       Text(
-                        'Мы отправили SMS с кодом на номер +7 ${widget.phoneNumber ?? '900 000-00-00'}',
+                        'sms.sent_to'.tr(args: [widget.phoneNumber ?? '900 000-00-00']),
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               font: GoogleFonts.inter(
                                 fontWeight: FlutterFlowTheme.of(context)
@@ -269,7 +270,7 @@ class _SmsWidgetState extends State<SmsWidget> {
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
                   child: Text(
-                    'Неверный код. Попробуйте ещё раз.',
+                    'sms.invalid_code'.tr(),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).bodySmall.override(
                       font: GoogleFonts.inter(
@@ -295,7 +296,7 @@ class _SmsWidgetState extends State<SmsWidget> {
                           size: 16.0,
                         ),
                         Text(
-                          'Отправить код повторно через 00:${_model.timerSeconds.toString().padLeft(2, '0')}',
+                          'sms.resend_timer'.tr(args: [_model.timerSeconds.toString().padLeft(2, '0')]),
                           style: FlutterFlowTheme.of(context)
                               .bodySmall
                               .override(
@@ -328,7 +329,7 @@ class _SmsWidgetState extends State<SmsWidget> {
                 model: _model.buttonModel,
                 updateCallback: () => safeSetState(() {}),
                 child: ButtonWidget(
-                  content: 'ПОДТВЕРДИТЬ',
+                  content: 'sms.confirm'.tr(),
                   icon_present: false,
                   icon_end_present: false,
                   color: FlutterFlowTheme.of(context).secondaryText,

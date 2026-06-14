@@ -11,9 +11,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '/components/logout_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'profile_model.dart';
 import '/services/bluetooth_service.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import '/flutter_flow/units_util.dart';
 export 'profile_model.dart';
 
 class ProfileWidget extends StatefulWidget {
@@ -224,9 +226,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                   final specialization = (snapshot.data?.data()
                                               as Map<String, dynamic>?)?[
                                           'specialization'] as String? ??
-                                      'Пользователь';
+                                      'profile.user'.tr();
                                   return Text(
-                                    specialization,
+                                    localizeSpecialization(specialization),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -257,7 +259,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 },
                               ),
                               Text(
-                                'v 1.9.0',
+                                'v 1.9.1',
                                 style: FlutterFlowTheme.of(context).labelSmall.override(
                                       font: GoogleFonts.inter(
                                         fontWeight: FlutterFlowTheme.of(context).labelSmall.fontWeight,
@@ -306,10 +308,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                             child: wrapWithModel(
                                               model: _model.profileStatModel1,
                                               updateCallback: () => safeSetState(() {}),
-                                              child: ProfileStatWidget(
-                                                label: 'Расчетов',
-                                                value: count.toString(),
-                                              ),
+                                                child: ProfileStatWidget(
+                                                  label: 'profile.calculations'.tr(),
+                                                  value: count.toString(),
+                                                ),
                                             ),
                                           );
                                         },
@@ -338,10 +340,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                             child: wrapWithModel(
                                               model: _model.profileStatModel2,
                                               updateCallback: () => safeSetState(() {}),
-                                              child: ProfileStatWidget(
-                                                label: 'Винтовок',
-                                                value: count.toString(),
-                                              ),
+                                                child: ProfileStatWidget(
+                                                  label: 'profile.rifles'.tr(),
+                                                  value: count.toString(),
+                                                ),
                                             ),
                                           );
                                         },
@@ -368,10 +370,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                           return wrapWithModel(
                                             model: _model.profileStatModel3,
                                             updateCallback: () => safeSetState(() {}),
-                                            child: ProfileStatWidget(
-                                              label: 'Точность',
-                                              value: '$accuracy%',
-                                            ),
+                                              child: ProfileStatWidget(
+                                                label: 'profile.accuracy'.tr(),
+                                                value: '$accuracy%',
+                                              ),
                                           );
                                         },
                                       ),
@@ -386,7 +388,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         model: _model.buttonModel1,
                         updateCallback: () => safeSetState(() {}),
                         child: ButtonWidget(
-                          content: 'Мои устройства',
+                          content: 'profile.my_devices'.tr(),
                           icon_present: false,
                           icon_end_present: false,
                           color: FlutterFlowTheme.of(context).secondaryText,
@@ -409,8 +411,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           final isKestrelConnected = manager.connectedKestrel != null;
                           final isVectorConnected = manager.connectedVector != null;
                           
-                          String deviceName = 'Устройства не подключены';
-                          String deviceStatus = 'Нажмите, чтобы настроить BLE';
+                          String deviceName = 'profile.no_devices'.tr();
+                          String deviceStatus = 'profile.click_to_configure'.tr();
                           bool isAnyConnected = isKestrelConnected || isVectorConnected;
                           Color statusColor = isAnyConnected 
                               ? FlutterFlowTheme.of(context).success 
@@ -421,17 +423,17 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
                           if (isKestrelConnected && isVectorConnected) {
                             deviceName = 'Kestrel & Vector Optics';
-                            final windStr = manager.cache.windSpeed != null ? ' • ${manager.cache.windSpeed} м/с' : '';
-                            final distStr = manager.cache.distance != null ? ' • ${manager.cache.distance?.toStringAsFixed(0)}м' : '';
-                            deviceStatus = 'Подключены$windStr$distStr';
+                            final windStr = manager.cache.windSpeed != null ? ' • ${manager.cache.windSpeed} ${'units.speed_m_s'.tr()}' : '';
+                            final distStr = manager.cache.distance != null ? ' • ${manager.cache.distance?.toStringAsFixed(0)}${'common.m'.tr()}' : '';
+                            deviceStatus = '${'profile.connected'.tr()}$windStr$distStr';
                           } else if (isKestrelConnected) {
                             deviceName = manager.connectedKestrel!.name;
-                            final windStr = manager.cache.windSpeed != null ? ' • ${manager.cache.windSpeed} м/с' : '';
-                            deviceStatus = 'Подключено$windStr';
+                            final windStr = manager.cache.windSpeed != null ? ' • ${manager.cache.windSpeed} ${'units.speed_m_s'.tr()}' : '';
+                            deviceStatus = '${'profile.connected_single'.tr()}$windStr';
                           } else if (isVectorConnected) {
                             deviceName = manager.connectedVector!.name;
-                            final distStr = manager.cache.distance != null ? ' • ${manager.cache.distance?.toStringAsFixed(0)}м' : '';
-                            deviceStatus = 'Подключено$distStr';
+                            final distStr = manager.cache.distance != null ? ' • ${manager.cache.distance?.toStringAsFixed(0)}${'common.m'.tr()}' : '';
+                            deviceStatus = '${'profile.connected_single'.tr()}$distStr';
                           }
 
                           return InkWell(
@@ -534,7 +536,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                'История расчетов',
+                                'profile.history'.tr(),
                                 style: FlutterFlowTheme.of(context)
                                     .titleMedium
                                     .override(
@@ -559,7 +561,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                   context.pushNamed('history');
                                 },
                                 child: Text(
-                                  'См. все',
+                                  'profile.see_all'.tr(),
                                   style: FlutterFlowTheme.of(context)
                                       .labelLarge
                                       .override(
@@ -597,7 +599,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               if (snapshot.hasError) {
                                 print('FIRESTORE ERROR: ${snapshot.error}');
                                 return Center(
-                                  child: Text('Ошибка загрузки истории: ${snapshot.error}'),
+                                    child: Text('${'profile.update_error'.tr(args: [snapshot.error.toString()])}'),
                                 );
                               }
                               if (!snapshot.hasData) {
@@ -613,7 +615,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               final docs = snapshot.data!.docs;
                               if (docs.isEmpty) {
                                 return Center(
-                                  child: Text('История пока пуста'),
+                                    child: Text('profile.history_empty'.tr()),
                                 );
                               }
                               return Column(
@@ -625,7 +627,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                   final timestamp = data['timestamp'] as Timestamp?;
                                   final dateStr = timestamp != null
                                       ? dateTimeFormat('d MMM, HH:mm', timestamp.toDate())
-                                      : 'Недавно';
+                                      : 'profile.recently'.tr();
 
                                   return InkWell(
                                     onTap: () async {
@@ -651,7 +653,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                       date: dateStr,
                                       distance: data['distance']?.toString() ?? '0',
                                       elevation: data['vertical_correction']?.toString() ?? '0.0',
-                                      weapon: data['weaponName'] ?? 'Оружие',
+                                      weapon: data['weaponName'] ?? 'profile.weapon_default'.tr(),
                                       wind: data['horizontal_correction']?.toString() ?? '0.0',
                                       resultId: doc.id,
                                       isHit: data['isHit'] == true,
@@ -672,7 +674,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             model: _model.buttonModel2,
                             updateCallback: () => safeSetState(() {}),
                             child: ButtonWidget(
-                              content: 'Выйти из аккаунта',
+                              content: 'profile.logout'.tr(),
                               icon: Icon(
                                 Icons.logout_rounded,
                                 color: FlutterFlowTheme.of(context).error,

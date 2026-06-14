@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'data_input_field_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'data_input_field_model.dart';
 
 class DataInputFieldWidget extends StatefulWidget {
@@ -70,7 +71,7 @@ class _DataInputFieldWidgetState extends State<DataInputFieldWidget> {
         Text(
           valueOrDefault<String>(
             widget!.label,
-            'Угол',
+            'shoot.angle'.tr(),
           ),
           style: FlutterFlowTheme.of(context).labelSmall.override(
                 font: GoogleFonts.spaceGrotesk(

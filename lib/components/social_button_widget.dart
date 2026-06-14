@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'social_button_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'social_button_model.dart';
 
 class SocialButtonWidget extends StatefulWidget {
@@ -88,7 +89,7 @@ class _SocialButtonWidgetState extends State<SocialButtonWidget> {
                     fit: BoxFit.contain,
                   ),
                   Text(
-                    'Продолжить через ${widget!.name}',
+                    'login.continue_with'.tr(args: [widget!.name]),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.inter(
                             fontWeight: FontWeight.w500,

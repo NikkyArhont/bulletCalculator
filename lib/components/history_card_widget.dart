@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'history_card_model.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '/flutter_flow/units_util.dart';
 export 'history_card_model.dart';
 
 class HistoryCardWidget extends StatefulWidget {
@@ -115,7 +117,7 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                                   ),
                                   SizedBox(width: 4.0),
                                   Text(
-                                    'Попадание',
+                                    'result.hit'.tr(),
                                     style: FlutterFlowTheme.of(context).labelSmall.override(
                                       font: GoogleFonts.inter(),
                                       color: widget.isHit
@@ -161,7 +163,7 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                       Text(
                         valueOrDefault<String>(
                           widget!.date,
-                          'Сегодня, 14:20',
+                          'profile.recently'.tr(),
                         ),
                         style: FlutterFlowTheme.of(context).labelSmall.override(
                               font: GoogleFonts.spaceGrotesk(
@@ -203,7 +205,7 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Дистанция',
+                            'profile.distance'.tr(),
                             style: FlutterFlowTheme.of(context)
                                 .labelSmall
                                 .override(
@@ -228,7 +230,7 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                                 ),
                           ),
                           Text(
-                            '${widget!.distance} м',
+                            '${widget!.distance} ${UnitsManager.instance.distanceLabel}',
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -256,7 +258,7 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            'Вертикаль',
+                            'result.vertical'.tr(),
                             style: FlutterFlowTheme.of(context)
                                 .labelSmall
                                 .override(
@@ -308,7 +310,7 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Ветер',
+                            'profile.wind'.tr(),
                             style: FlutterFlowTheme.of(context)
                                 .labelSmall
                                 .override(

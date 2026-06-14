@@ -2,6 +2,7 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -140,7 +141,7 @@ class _DeviceCardWidgetState extends State<DeviceCardWidget> {
                                       8.0, 4.0, 8.0, 4.0),
                                   child: Container(
                                     child: Text(
-                                      'ПОДКЛЮЧЕНО',
+                                      'devices.connected_label'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .labelSmall
                                           .override(
@@ -222,7 +223,7 @@ class _DeviceCardWidgetState extends State<DeviceCardWidget> {
                         },
                       ),
                       Text(
-                        widget!.connected ? 'Настроить' : 'Поиск',
+                        widget!.connected ? 'devices.configure'.tr() : 'devices.search'.tr(),
                         style: FlutterFlowTheme.of(context).labelSmall.override(
                               font: GoogleFonts.spaceGrotesk(
                                 fontWeight: FlutterFlowTheme.of(context)

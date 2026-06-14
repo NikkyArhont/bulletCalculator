@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'onboarding_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'onboarding_model.dart';
 
 class OnboardingWidget extends StatefulWidget {
@@ -123,10 +124,10 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                               updateCallback: () => safeSetState(() {}),
                               child: OnboardingStepWidget(
                                 description:
-                                    'Сохраняйте профили своего оружия и патронов для стабильных результатов в любых условиях.',
+                                    'onboarding.step1_desc'.tr(),
                                 lottie_desc:
                                     'https://dimg.dreamflow.cloud/v1/lottie/bullseye+target+hit+success+precision',
-                                title: 'Повышение точности',
+                                title: 'onboarding.step1_title'.tr(),
                                 step: 'option_1',
                               ),
                             ),
@@ -135,10 +136,10 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                               updateCallback: () => safeSetState(() {}),
                               child: OnboardingStepWidget(
                                 description:
-                                    'Автоматическое получение данных о ветре, температуре и давлении для максимальной точности.',
+                                    'onboarding.step2_desc'.tr(),
                                 lottie_desc:
                                     'https://dimg.dreamflow.cloud/v1/lottie/weather+station+wind+temperature+pressure+sensor',
-                                title: 'Учет погодных условий',
+                                title: 'onboarding.step2_title'.tr(),
                                 step: 'option_1',
                               ),
                             ),
@@ -147,10 +148,10 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                               updateCallback: () => safeSetState(() {}),
                               child: OnboardingStepWidget(
                                 description:
-                                    'Мгновенное вычисление вертикальных и горизонтальных поправок для идеального выстрела.',
+                                    'onboarding.step3_desc'.tr(),
                                 lottie_desc:
                                     'https://dimg.dreamflow.cloud/v1/lottie/high+precision+target+crosshair+radar+pulse',
-                                title: 'Высокоточный расчет',
+                                title: 'onboarding.step3_title'.tr(),
                                 step: 'option_1',
                               ),
                             ),
@@ -202,7 +203,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                     model: _model.buttonModel1,
                     updateCallback: () => safeSetState(() {}),
                     child: ButtonWidget(
-                      content: _model.pageViewCurrentIndex < 2 ? 'Далее' : 'Начать',
+                      content: _model.pageViewCurrentIndex < 2 ? 'onboarding.next'.tr() : 'onboarding.start'.tr(),
                       icon_present: false,
                       icon_end_present: false,
                       color: FlutterFlowTheme.of(context).secondaryText,
@@ -228,7 +229,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                     model: _model.buttonModel2,
                     updateCallback: () => safeSetState(() {}),
                     child: ButtonWidget(
-                      content: 'Пропустить',
+                      content: 'onboarding.skip'.tr(),
                       icon_present: false,
                       icon_end_present: false,
                       color: FlutterFlowTheme.of(context).secondaryText,

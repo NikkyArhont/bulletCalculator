@@ -22,6 +22,7 @@ import '/components/choose_spec_widget.dart';
 import '/components/delete_account_widget.dart';
 import '/components/logout_widget.dart';
 import '/main.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'profile_settings_model.dart';
 
 class ProfileSettingsWidget extends StatefulWidget {
@@ -100,7 +101,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                             },
                           ),
                           Text(
-                            'Редактирование профиля',
+                            'profile.edit_profile'.tr(),
                             style: FlutterFlowTheme.of(context)
                                 .titleMedium
                                 .override(
@@ -128,7 +129,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                             model: _model.buttonModel1,
                             updateCallback: () => safeSetState(() {}),
                             child: ButtonWidget(
-                              content: 'Сохранить',
+                              content: 'profile.save'.tr(),
                               icon_present: false,
                               icon_end_present: false,
                               color: FlutterFlowTheme.of(context).tertiary,
@@ -172,7 +173,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
 
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Профиль обновлен'),
+                                      content: Text('profile.updated'.tr()),
                                       backgroundColor:
                                           FlutterFlowTheme.of(context).success,
                                     ),
@@ -181,7 +182,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Ошибка обновления: $e'),
+                                      content: Text('profile.update_error'.tr(args: [e.toString()])),
                                       backgroundColor:
                                           FlutterFlowTheme.of(context).error,
                                     ),
@@ -219,7 +220,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                       .snapshots(),
                   builder: (context, snapshot) {
                     final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
-                    final specialization = userData['specialization'] as String? ?? 'Пользователь';
+                    final specialization = userData['specialization'] as String? ?? 'profile.user'.tr();
                     final distUnit = userData['distance_unit'] as String? ?? 'm';
                     final tUnit = userData['temp_unit'] as String? ?? 'c';
                     final pUnit = userData['pressure_unit'] as String? ?? 'mm';
@@ -331,7 +332,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                   model: _model.buttonModel2,
                                   updateCallback: () => safeSetState(() {}),
                                   child: ButtonWidget(
-                                    content: 'Изменить фото',
+                                    content: 'profile.change_photo'.tr(),
                                     icon_present: false,
                                     icon_end_present: false,
                                     color: FlutterFlowTheme.of(context)
@@ -372,13 +373,13 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                             safeSetState(() {});
                                             
                                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                              content: Text('Фото профиля обновлено'),
+                                              content: Text('profile.photo_updated'.tr()),
                                               backgroundColor: FlutterFlowTheme.of(context).success,
                                             ));
                                           }
                                         } catch (e) {
                                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                            content: Text('Ошибка загрузки: $e'),
+                                            content: Text('profile.upload_error'.tr(args: [e.toString()])),
                                             backgroundColor: FlutterFlowTheme.of(context).error,
                                           ));
                                         } finally {
@@ -403,7 +404,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                   child: TextFieldWidget(
                                     label: null,
                                     helper: null,
-                                    hint: 'Имя',
+                                    hint: 'profile.first_name_hint'.tr(),
                                     value: currentUserDisplayName.split(' ').first,
                                     leading_icon_present: false,
                                     trailing_icon_present: false,
@@ -419,7 +420,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                   child: TextFieldWidget(
                                     label: null,
                                     helper: null,
-                                    hint: 'Фамилия',
+                                    hint: 'profile.last_name_hint'.tr(),
                                     value: currentUserDisplayName.split(' ').length > 1
                                         ? currentUserDisplayName
                                             .split(' ')
@@ -441,7 +442,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
-                                      'Специализация',
+                                      'profile.specialization'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .labelMedium
                                           .override(
@@ -518,7 +519,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                   CrossAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  specialization,
+                                                  localizeSpecialization(specialization),
                                                   style:
                                                       FlutterFlowTheme.of(
                                                               context)
@@ -630,7 +631,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                   ),
                                 ),
                                 Text(
-                                  'Единицы измерения',
+                                  'profile.units'.tr(),
                                   style: FlutterFlowTheme.of(context)
                                       .titleSmall
                                       .override(
@@ -662,7 +663,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
-                                      'Дистанция',
+                                      'profile.distance'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .labelSmall
                                           .override(
@@ -731,7 +732,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'Метры (м)',
+                                                    'profile.meters'.tr(),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .labelMedium
@@ -805,7 +806,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'Ярды (yd)',
+                                                    'profile.yards'.tr(),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .labelMedium
@@ -856,7 +857,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
-                                      'Температура',
+                                      'profile.temperature'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .labelSmall
                                           .override(
@@ -925,7 +926,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'Цельсий (°C)',
+                                                    'profile.celsius'.tr(),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .labelMedium
@@ -999,7 +1000,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'Фаренгейт (°F)',
+                                                    'profile.fahrenheit'.tr(),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .labelMedium
@@ -1050,7 +1051,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
-                                      'Давление',
+                                      'profile.pressure'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .labelSmall
                                           .override(
@@ -1330,10 +1331,77 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                         FlutterFlowTheme.of(context).alternate,
                                   ),
                                   wrapWithModel(
+                                    model: _model.themeButtonModel,
+                                    updateCallback: () => safeSetState(() {}),
+                                    child: ButtonWidget(
+                                      content: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? 'profile.theme_light'.tr()
+                                          : 'profile.theme_dark'.tr(),
+                                      icon: Icon(
+                                        Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Icons.light_mode_rounded
+                                            : Icons.dark_mode_rounded,
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? FlutterFlowTheme.of(context).primary
+                                            : FlutterFlowTheme.of(context)
+                                                .primaryText,
+                                        size: 20.0,
+                                      ),
+                                      icon_present: true,
+                                      variant: 'ghost',
+                                      size: 'medium',
+                                      onPressed: () async {
+                                        if (Theme.of(context).brightness ==
+                                            Brightness.dark) {
+                                          MyApp.of(context)
+                                              .setThemeMode(ThemeMode.light);
+                                        } else {
+                                          MyApp.of(context)
+                                              .setThemeMode(ThemeMode.dark);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                    child: DropdownButtonFormField<Locale>(
+                                      value: context.locale,
+                                      decoration: InputDecoration(
+                                        labelText: 'language'.tr(),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                          borderSide: BorderSide(
+                                            color: FlutterFlowTheme.of(context).alternate,
+                                          ),
+                                        ),
+                                      ),
+                                      dropdownColor: FlutterFlowTheme.of(context).secondaryBackground,
+                                      style: FlutterFlowTheme.of(context).bodyMedium,
+                                      items: const [
+                                        DropdownMenuItem(
+                                          value: Locale('ru'),
+                                          child: Text('Русский'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: Locale('en'),
+                                          child: Text('English'),
+                                        ),
+                                      ],
+                                      onChanged: (Locale? newLocale) {
+                                        if (newLocale != null) {
+                                          context.setLocale(newLocale);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  wrapWithModel(
                                     model: _model.buttonModel3,
                                     updateCallback: () => safeSetState(() {}),
                                     child: ButtonWidget(
-                                      content: 'Удалить аккаунт',
+                                      content: 'profile.delete_account'.tr(),
                                       icon: Icon(
                                         Icons.delete_outline_rounded,
                                         color: FlutterFlowTheme.of(context)

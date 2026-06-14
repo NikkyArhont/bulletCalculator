@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'auth/firebase_auth/firebase_user_provider.dart';
 import 'auth/firebase_auth/auth_util.dart';
 
@@ -17,6 +18,7 @@ import 'services/bluetooth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
@@ -27,7 +29,14 @@ void main() async {
   // Reconnect saved Bluetooth devices (non-blocking)
   BluetoothDeviceManager.instance.reconnectSavedDevices();
 
-  runApp(MyApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('ru'), Locale('en')],
+      path: 'assets/langs',
+      fallbackLocale: const Locale('ru'),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -87,12 +96,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'bulletCalculator',
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en', '')],
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       theme: ThemeData(
         brightness: Brightness.light,
         useMaterial3: false,

@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'succsed_enter_model.dart';
 export 'succsed_enter_model.dart';
 
@@ -135,7 +136,7 @@ class _SuccsedEnterWidgetState extends State<SuccsedEnterWidget> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Вход выполнен',
+                          'success.title'.tr(),
                           textAlign: TextAlign.center,
                           style: FlutterFlowTheme.of(context)
                               .headlineMedium
@@ -164,7 +165,7 @@ class _SuccsedEnterWidgetState extends State<SuccsedEnterWidget> {
                             maxWidth: 320.0,
                           ),
                           child: Text(
-                            'Добро пожаловать в Apex Ballistics. Ваш аккаунт успешно подтвержден. Теперь вы можете приступить к высокоточным расчетам.',
+                            'success.welcome'.tr(),
                             textAlign: TextAlign.center,
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
@@ -203,7 +204,7 @@ class _SuccsedEnterWidgetState extends State<SuccsedEnterWidget> {
                             model: _model.buttonModel,
                             updateCallback: () => safeSetState(() {}),
                             child: ButtonWidget(
-                              content: 'ПЕРЕЙТИ К РАСЧЕТАМ',
+                              content: 'success.go_to_calcs'.tr(),
                               icon_present: false,
                               icon_end_present: false,
                               color: FlutterFlowTheme.of(context).secondaryText,

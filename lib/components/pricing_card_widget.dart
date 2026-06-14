@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'pricing_card_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'pricing_card_model.dart';
 
 class PricingCardWidget extends StatefulWidget {
@@ -97,7 +98,7 @@ class _PricingCardWidgetState extends State<PricingCardWidget> {
                             Text(
                               valueOrDefault<String>(
                                 widget!.title,
-                                'Месячный',
+                                'subscribe.title_monthly'.tr(),
                               ),
                               style: FlutterFlowTheme.of(context)
                                   .titleMedium
@@ -133,7 +134,7 @@ class _PricingCardWidgetState extends State<PricingCardWidget> {
                                       8.0, 4.0, 8.0, 4.0),
                                   child: Container(
                                     child: Text(
-                                      'ВЫГОДНО',
+                                      'subscribe.popular_badge'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .labelSmall
                                           .override(
@@ -163,7 +164,7 @@ class _PricingCardWidgetState extends State<PricingCardWidget> {
                         Text(
                           valueOrDefault<String>(
                             widget!.description,
-                            'Для разовых выездов',
+                            'subscribe.desc_monthly'.tr(),
                           ),
                           style: FlutterFlowTheme.of(context)
                               .bodySmall
@@ -202,28 +203,28 @@ class _PricingCardWidgetState extends State<PricingCardWidget> {
                           '490 ₽',
                         ),
                         style: FlutterFlowTheme.of(context)
-                            .titleMedium
-                            .override(
-                              font: GoogleFonts.spaceGrotesk(
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .titleMedium
-                                    .fontStyle,
-                              ),
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .titleMedium
-                                  .fontStyle,
-                              lineHeight: 1.2,
-                            ),
-                      ),
-                      Text(
-                        valueOrDefault<String>(
-                          widget!.period,
-                          '/мес',
-                        ),
+                             .titleMedium
+                             .override(
+                               font: GoogleFonts.spaceGrotesk(
+                                 fontWeight: FontWeight.bold,
+                                 fontStyle: FlutterFlowTheme.of(context)
+                                     .titleMedium
+                                     .fontStyle,
+                               ),
+                               color: FlutterFlowTheme.of(context).primaryText,
+                               letterSpacing: 0.0,
+                               fontWeight: FontWeight.bold,
+                               fontStyle: FlutterFlowTheme.of(context)
+                                   .titleMedium
+                                   .fontStyle,
+                               lineHeight: 1.2,
+                             ),
+                       ),
+                       Text(
+                         valueOrDefault<String>(
+                           widget!.period,
+                           'subscribe.period_monthly'.tr(),
+                         ),
                         style: FlutterFlowTheme.of(context).labelSmall.override(
                               font: GoogleFonts.spaceGrotesk(
                                 fontWeight: FlutterFlowTheme.of(context)

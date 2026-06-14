@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'delete_account_model.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'delete_account_model.dart';
 
 class DeleteAccountWidget extends StatefulWidget {
@@ -82,7 +83,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Удалить аккаунт?',
+                    'delete_acc.title'.tr(),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).titleLarge.override(
                           font: GoogleFonts.spaceGrotesk(
@@ -104,7 +105,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                         ),
                   ),
                   Text(
-                    'Вы уверены? Все ваши данные, профили оружия и история расчетов будут безвозвратно удалены.',
+                    'delete_acc.confirm_msg'.tr(),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.inter(
@@ -136,7 +137,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                     model: _model.buttonModel1,
                     updateCallback: () => safeSetState(() {}),
                     child: ButtonWidget(
-                      content: 'Удалить аккаунт',
+                      content: 'delete_acc.btn'.tr(),
                       icon_present: false,
                       icon_end_present: false,
                       color: FlutterFlowTheme.of(context).secondaryText,
@@ -158,7 +159,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                     model: _model.buttonModel2,
                     updateCallback: () => safeSetState(() {}),
                     child: ButtonWidget(
-                      content: 'Отмена',
+                      content: 'delete_acc.cancel'.tr(),
                       icon_present: false,
                       icon_end_present: false,
                       color: FlutterFlowTheme.of(context).secondaryText,

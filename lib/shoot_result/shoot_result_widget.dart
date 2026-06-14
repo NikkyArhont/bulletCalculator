@@ -13,8 +13,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'shoot_result_model.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '/flutter_flow/units_util.dart';
 export 'shoot_result_model.dart';
 import '/ballistic_engine.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ShootResultWidget extends StatefulWidget {
@@ -174,7 +177,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                             },
                           ),
                           Text(
-                            'Результат расчета',
+                            'result.title'.tr(),
                             style: FlutterFlowTheme.of(context)
                                 .titleMedium
                                 .override(
@@ -263,7 +266,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             CrossAxisAlignment.center,
                                         children: [
                                           Text(
-                                            'ВЕРТИКАЛЬНАЯ ПОПРАВКА',
+                                            'result.vertical_corr'.tr(),
                                             style: FlutterFlowTheme.of(context)
                                                 .labelSmall
                                                 .override(
@@ -360,7 +363,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ].divide(SizedBox(width: 16.0)),
                                           ),
                                           Text(
-                                            '${(_model.ballisticResult?.verticalClicks ?? 0).abs()} КЛИКОВ ${(_model.ballisticResult?.verticalClicks ?? 0) >= 0 ? "ВВЕРХ" : "ВНИЗ"}',
+                                            (_model.ballisticResult?.verticalClicks ?? 0) >= 0 ? 'result.clicks_up'.tr(args: [(_model.ballisticResult?.verticalClicks ?? 0).abs().toString()]) : 'result.clicks_down'.tr(args: [(_model.ballisticResult?.verticalClicks ?? 0).abs().toString()]),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -403,7 +406,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             CrossAxisAlignment.center,
                                         children: [
                                           Text(
-                                            'ГОРИЗОНТАЛЬ (ВЕТЕР)',
+                                            'result.horizontal_wind'.tr(),
                                             style: FlutterFlowTheme.of(context)
                                                 .labelSmall
                                                 .override(
@@ -500,7 +503,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ].divide(SizedBox(width: 16.0)),
                                           ),
                                           Text(
-                                            '${(_model.ballisticResult?.horizontalClicks ?? 0).abs()} КЛИКОВ ${(_model.ballisticResult?.horizontalClicks ?? 0) >= 0 ? "ВПРАВО" : "ВЛЕВО"}',
+                                            (_model.ballisticResult?.horizontalClicks ?? 0) >= 0 ? 'result.clicks_right'.tr(args: [(_model.ballisticResult?.horizontalClicks ?? 0).abs().toString()]) : 'result.clicks_left'.tr(args: [(_model.ballisticResult?.horizontalClicks ?? 0).abs().toString()]),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -554,8 +557,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         model: _model.resultMetricCardModel1,
                                         updateCallback: () => safeSetState(() {}),
                                         child: ResultMetricCardWidget(
-                                          label: 'Падение',
-                                          unit: 'см',
+                                          label: 'result.drop'.tr(),
+                                          unit: 'common.cm'.tr(),
                                           value: '${_model.ballisticResult?.dropCm.toStringAsFixed(1) ?? '0.0'}',
                                         ),
                                       ),
@@ -566,8 +569,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         model: _model.resultMetricCardModel2,
                                         updateCallback: () => safeSetState(() {}),
                                         child: ResultMetricCardWidget(
-                                          label: 'Снос ветром',
-                                          unit: 'см',
+                                           label: 'result.wind_drift'.tr(),
+                                           unit: 'common.cm'.tr(),
                                           value: '${_model.ballisticResult?.windDriftCm.toStringAsFixed(1) ?? '0.0'}',
                                         ),
                                       ),
@@ -585,8 +588,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         model: createModel(context, () => ResultMetricCardModel()),
                                         updateCallback: () => safeSetState(() {}),
                                         child: ResultMetricCardWidget(
-                                          label: 'Деривация',
-                                          unit: 'см',
+                                           label: 'result.derivation'.tr(),
+                                           unit: 'common.cm'.tr(),
                                           value: '${_model.ballisticResult?.spinDriftCm.toStringAsFixed(1) ?? '0.0'}',
                                         ),
                                       ),
@@ -597,7 +600,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         model: createModel(context, () => ResultMetricCardModel()),
                                         updateCallback: () => safeSetState(() {}),
                                         child: ResultMetricCardWidget(
-                                          label: 'Фактор стаб.',
+                                           label: 'result.stability_factor'.tr(),
                                           unit: 'SG',
                                           value: '${_model.ballisticResult?.sg.toStringAsFixed(2) ?? '0.00'}',
                                         ),
@@ -626,7 +629,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             CrossAxisAlignment.center,
                                         children: [
                                           Text(
-                                            'Визуализация траектории',
+                                            'result.trajectory_vis'.tr(),
                                             style: FlutterFlowTheme.of(context)
                                                 .titleSmall
                                                 .override(
@@ -704,7 +707,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                               maxX: (widget.distance ?? 600.0),
                                             ),
                                             xAxisLabelInfo: AxisLabelInfo(
-                                              title: 'Дистанция (м)',
+                                              title: 'result.distance_axis'.tr(),
                                               showLabels: true,
                                               labelInterval: (widget.distance ?? 600.0) / 5,
                                               labelTextStyle:
@@ -791,7 +794,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                                 ),
                                           ),
                                           Text(
-                                            '${_model.ballisticResult?.timeOfFlight.toStringAsFixed(3) ?? '0.000'} сек',
+                                            'result.seconds'.tr(args: [_model.ballisticResult?.timeOfFlight.toStringAsFixed(3) ?? '0.000']),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
@@ -829,7 +832,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
-                                  'Детали выстрела',
+                                  'result.shot_details'.tr(),
                                   style: FlutterFlowTheme.of(context)
                                       .labelLarge
                                       .override(
@@ -860,9 +863,9 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                   model: _model.correctionTileModel3,
                                   updateCallback: () => safeSetState(() {}),
                                   child: CorrectionTileWidget(
-                                    label: 'Скорость у цели',
-                                    sub_label: 'Дистанция ${widget.distance?.round() ?? 0} м',
-                                    unit: 'м/с',
+                                    label: 'result.speed_at_target'.tr(),
+                                    sub_label: 'result.distance_sub'.tr(args: ['${widget.distance?.round() ?? 0}', UnitsManager.instance.distanceLabel]),
+                                    unit: 'units.speed_m_s'.tr(),
                                     value: '${_model.ballisticResult?.velocityAtTarget.round() ?? 0}',
                                   ),
                                 ),
@@ -870,9 +873,9 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                   model: _model.correctionTileModel4,
                                   updateCallback: () => safeSetState(() {}),
                                   child: CorrectionTileWidget(
-                                    label: 'Энергия',
-                                    sub_label: 'В точке попадания',
-                                    unit: 'Дж',
+                                    label: 'result.energy'.tr(),
+                                    sub_label: 'result.at_hit_point'.tr(),
+                                    unit: 'result.joules'.tr(),
                                     value: '${_model.ballisticResult?.energyAtTarget.round() ?? 0}',
                                   ),
                                 ),
@@ -898,7 +901,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         model: _model.buttonModel,
                                         updateCallback: () => safeSetState(() {}),
                                         child: ButtonWidget(
-                                          content: 'ПОПАДАНИЕ',
+                                          content: 'result.hit'.tr(),
                                           icon: Icon(
                                             Icons.gps_fixed_rounded,
                                             color: FlutterFlowTheme.of(context).onPrimary,
@@ -935,7 +938,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         model: _model.buttonModel,
                                         updateCallback: () => safeSetState(() {}),
                                         child: ButtonWidget(
-                                          content: 'ПРОМАХ',
+                                          content: 'result.miss'.tr(),
                                           icon: Icon(
                                             Icons.close_rounded,
                                             color: FlutterFlowTheme.of(context).onError,
@@ -974,7 +977,7 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                               model: _model.buttonModel,
                               updateCallback: () => safeSetState(() {}),
                               child: ButtonWidget(
-                                content: 'Повторить расчет',
+                                content: 'result.recalculate'.tr(),
                                 icon: Icon(
                                   Icons.repeat,
                                   color: FlutterFlowTheme.of(context).onPrimary,

@@ -1,6 +1,7 @@
 import '/components/button_widget.dart';
 import '/components/device_card_widget.dart';
 import '/components/section_header_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -116,17 +117,17 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                         final cache = BluetoothDeviceManager.instance.cache;
                         if (device.type == BluetoothDeviceType.kestrel) {
                           final parts = <String>[];
-                          if (cache.windSpeed != null) parts.add('Ветер: ${cache.windSpeed}м/с');
-                          if (cache.windDirection != null) parts.add('Направление: ${cache.windDirection}ч');
-                          if (cache.temperature != null) parts.add('Т: ${cache.temperature}°C');
-                          if (cache.pressure != null) parts.add('Давл: ${cache.pressure}гПа');
-                          if (cache.humidity != null) parts.add('Влаж: ${cache.humidity}%');
+                           if (cache.windSpeed != null) parts.add('devices.kestrel_data'.tr(args: [cache.windSpeed.toString()]));
+                           if (cache.windDirection != null) parts.add('devices.kestrel_dir'.tr(args: [cache.windDirection.toString()]));
+                           if (cache.temperature != null) parts.add('devices.kestrel_temp'.tr(args: [cache.temperature.toString()]));
+                           if (cache.pressure != null) parts.add('devices.kestrel_press'.tr(args: [cache.pressure.toString()]));
+                           if (cache.humidity != null) parts.add('devices.kestrel_hum'.tr(args: [cache.humidity.toString()]));
                           
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                parts.isEmpty ? 'Данные еще не получены (ожидание сенсоров...)' : parts.join(', '),
+                                parts.isEmpty ? 'devices.kestrel_waiting'.tr() : parts.join(', '),
                                 style: FlutterFlowTheme.of(context).bodySmall.override(
                                       font: GoogleFonts.inter(),
                                       color: parts.isEmpty 
@@ -148,14 +149,14 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                           );
                         } else if (device.type == BluetoothDeviceType.vectorOptics) {
                           final parts = <String>[];
-                          if (cache.distance != null) parts.add('Дистанция: ${cache.distance}м');
-                          if (cache.angle != null) parts.add('Угол: ${cache.angle}°');
+                           if (cache.distance != null) parts.add('devices.vector_dist'.tr(args: [cache.distance.toString()]));
+                           if (cache.angle != null) parts.add('devices.vector_angle'.tr(args: [cache.angle.toString()]));
                           
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                parts.isEmpty ? 'Измерения не поступали (сделайте замер)' : parts.join(', '),
+                                parts.isEmpty ? 'devices.vector_waiting'.tr() : parts.join(', '),
                                 style: FlutterFlowTheme.of(context).bodySmall.override(
                                       font: GoogleFonts.inter(),
                                       color: parts.isEmpty 
@@ -214,7 +215,7 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                               ),
                               const SizedBox(width: 4.0),
                               Text(
-                                'Метеостанция',
+                                'devices.weather_station'.tr(),
                                 style: FlutterFlowTheme.of(context).bodySmall.override(
                                       font: GoogleFonts.inter(),
                                       color: device.type == BluetoothDeviceType.kestrel
@@ -256,7 +257,7 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                               ),
                               const SizedBox(width: 4.0),
                               Text(
-                                'Дальномер',
+                                'devices.rangefinder'.tr(),
                                 style: FlutterFlowTheme.of(context).bodySmall.override(
                                       font: GoogleFonts.inter(),
                                       color: device.type == BluetoothDeviceType.vectorOptics
@@ -279,7 +280,7 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
               model: isConnected ? _model.buttonModel1 : _model.buttonModel2,
               updateCallback: () => safeSetState(() {}),
               child: ButtonWidget(
-                content: isConnected ? 'Отключить' : 'Подключить',
+                content: isConnected ? 'devices.disconnect'.tr() : 'devices.connect'.tr(),
                 icon_present: false,
                 icon_end_present: false,
                 color: isConnected
@@ -352,7 +353,7 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                             },
                           ),
                           Text(
-                            'Добавление устройства',
+                            'devices.add_title'.tr(),
                             style: FlutterFlowTheme.of(context)
                                 .titleMedium
                                 .override(
@@ -464,7 +465,7 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                                   ),
                                   const SizedBox(height: 16.0),
                                   Text(
-                                    manager.isScanning ? 'Поиск устройств...' : 'Поиск завершен',
+                                    manager.isScanning ? 'devices.scanning'.tr() : 'devices.scan_complete'.tr(),
                                     style: FlutterFlowTheme.of(context).titleMedium.override(
                                           font: GoogleFonts.spaceGrotesk(
                                             fontWeight: FontWeight.bold,
@@ -476,8 +477,8 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                                   const SizedBox(height: 4.0),
                                   Text(
                                     manager.isScanning
-                                        ? 'Убедитесь, что Bluetooth включен'
-                                        : 'Подключите найденные устройства из списка',
+                                        ? 'devices.enable_bt'.tr()
+                                        : 'devices.connect_instruction'.tr(),
                                     style: FlutterFlowTheme.of(context).bodySmall.override(
                                           font: GoogleFonts.inter(),
                                           color: FlutterFlowTheme.of(context).secondaryText,
@@ -509,8 +510,8 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                             wrapWithModel(
                               model: _model.sectionHeaderModel,
                               updateCallback: () => safeSetState(() {}),
-                              child: const SectionHeaderWidget(
-                                title: 'ПОДКЛЮЧЕННЫЕ УСТРОЙСТВА',
+                              child: SectionHeaderWidget(
+                                title: 'devices.connected_title'.tr(),
                               ),
                             ),
                             const SizedBox(height: 8.0),
@@ -533,8 +534,8 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                           wrapWithModel(
                             model: _model.sectionHeaderModel,
                             updateCallback: () => safeSetState(() {}),
-                            child: const SectionHeaderWidget(
-                              title: 'ДОСТУПНЫЕ УСТРОЙСТВА',
+                            child: SectionHeaderWidget(
+                              title: 'devices.available_title'.tr(),
                             ),
                           ),
                           const SizedBox(height: 8.0),
@@ -549,8 +550,8 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                               padding: const EdgeInsets.symmetric(vertical: 24.0),
                               child: Text(
                                 manager.isScanning
-                                    ? 'Поиск подходящего оборудования...'
-                                    : 'Устройства не найдены. Убедитесь, что они включены и находятся в режиме сопряжения.',
+                                    ? 'devices.searching_devices'.tr()
+                                    : 'devices.not_found'.tr(),
                                 textAlign: TextAlign.center,
                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
                                       font: GoogleFonts.inter(),
@@ -603,7 +604,7 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                             model: _model.buttonModel4,
                             updateCallback: () => safeSetState(() {}),
                             child: ButtonWidget(
-                              content: 'Обновить поиск',
+                              content: 'devices.refresh_search'.tr(),
                               icon: Icon(
                                 Icons.refresh_rounded,
                                 color: FlutterFlowTheme.of(context).onPrimary,
@@ -625,7 +626,7 @@ class _MyDevicesWidgetState extends State<MyDevicesWidget> {
                           Container(
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'Не видите ваше устройство?',
+                              'devices.device_not_seen'.tr(),
                               style: FlutterFlowTheme.of(context)
                                   .bodySmall
                                   .override(

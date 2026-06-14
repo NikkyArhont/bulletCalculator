@@ -8,6 +8,7 @@ import 'package:lottie/lottie.dart';
 import 'package:material_palette/material_palette.dart';
 import 'package:provider/provider.dart';
 import 'onboarding_step_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'onboarding_step_model.dart';
 
 class OnboardingStepWidget extends StatefulWidget {
@@ -162,7 +163,7 @@ class _OnboardingStepWidgetState extends State<OnboardingStepWidget> {
               Text(
                 valueOrDefault<String>(
                   widget!.title,
-                  'Высокоточный расчет',
+                  'onboarding.step3_title'.tr(),
                 ),
                 textAlign: TextAlign.center,
                 style: FlutterFlowTheme.of(context).headlineMedium.override(
@@ -183,7 +184,7 @@ class _OnboardingStepWidgetState extends State<OnboardingStepWidget> {
               Text(
                 valueOrDefault<String>(
                   widget!.description,
-                  'Мгновенное вычисление вертикальных и горизонтальных поправок для идеального выстрела.',
+                  'onboarding.step3_desc'.tr(),
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 4,

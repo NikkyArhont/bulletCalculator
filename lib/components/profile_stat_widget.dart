@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'profile_stat_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'profile_stat_model.dart';
 
 class ProfileStatWidget extends StatefulWidget {
@@ -72,7 +73,7 @@ class _ProfileStatWidgetState extends State<ProfileStatWidget> {
         Text(
           valueOrDefault<String>(
             widget!.label,
-            'Расчетов',
+            'profile.calculations'.tr(),
           ),
           style: FlutterFlowTheme.of(context).labelSmall.override(
                 font: GoogleFonts.spaceGrotesk(

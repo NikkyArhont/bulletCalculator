@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 enum DistanceUnit { m, yd }
 enum TemperatureUnit { c, f }
@@ -59,7 +60,7 @@ class UnitsManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get distanceLabel => distanceUnit == DistanceUnit.m ? 'м' : 'yd';
+  String get distanceLabel => distanceUnit == DistanceUnit.m ? 'units.m'.tr() : 'units.yd'.tr();
   String get temperatureLabel => temperatureUnit == TemperatureUnit.c ? '°C' : '°F';
   String get pressureLabel {
     if (pressureUnit == PressureUnit.hpa) return 'hPa';
@@ -105,5 +106,22 @@ class UnitConverter {
           ? hPaTommHg(val)
           : inHgToMmHg(val);
     }
+  }
+}
+
+String localizeSpecialization(String spec) {
+  switch (spec) {
+    case 'Стрелок-спортсмен':
+      return 'spec.sport'.tr();
+    case 'Охотник':
+      return 'spec.hunter'.tr();
+    case 'Тактический стрелок':
+      return 'spec.tactical'.tr();
+    case 'Снайпер':
+      return 'spec.sniper'.tr();
+    case 'Любитель':
+      return 'spec.amateur'.tr();
+    default:
+      return spec;
   }
 }

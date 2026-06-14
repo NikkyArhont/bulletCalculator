@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'weapon_list_model.dart';
 export 'weapon_list_model.dart';
 
@@ -99,7 +100,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'МОЙ АРСЕНАЛ',
+                                    'weapon_list.title'.tr(),
                                 style: FlutterFlowTheme.of(context)
                                     .headlineMedium
                                     .override(
@@ -128,7 +129,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                 builder: (context, snapshot) {
                                   final count = snapshot.data?.docs.length ?? 0;
                                   return Text(
-                                    '$count АКТИВНЫХ СИСТЕМ',
+                                    '$count ${'weapon_list.active_systems'.tr()}',
                                     style: FlutterFlowTheme.of(context)
                                         .labelSmall
                                         .override(
@@ -233,7 +234,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                             child: TextFieldWidget(
                                               label: null,
                                               helper: null,
-                                              hint: 'ПОИСК ПО ИНВЕНТАРЮ...',
+                                              hint: 'weapon_list.search_hint'.tr(),
                                               value: '',
                                               leading_icon_present: false,
                                               trailing_icon_present: false,
@@ -271,7 +272,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                     return Center(
                                       child: Padding(
                                         padding: EdgeInsets.all(24.0),
-                                        child: Text(searchQuery.isEmpty ? 'Арсенал пуст' : 'Ничего не найдено'),
+                                        child: Text(searchQuery.isEmpty ? 'weapon_list.empty'.tr() : 'weapon_list.not_found'.tr()),
                                       ),
                                     );
                                   }
@@ -282,10 +283,10 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                       return TacticalWeaponCardWidget(
                                         bc_type: data['bc_model'] ?? 'G7',
                                         bc_value: data['bc_value'] ?? '0.315',
-                                        caliber: data['caliber'] ?? 'КАЛИБР',
-                                        name: data['name'] ?? 'ОРУЖИЕ',
+                                        caliber: data['caliber'] ?? 'weapon_list.caliber_default'.tr(),
+                                        name: data['name'] ?? 'weapon_list.weapon_default'.tr(),
                                         twist: data['twist'] ?? '203.2',
-                                        twist_dir: data['twist_direction'] == 'left' ? 'ЛЕВО' : 'ПРАВО',
+                                        twist_dir: data['twist_direction'] == 'left' ? 'weapon_list.left'.tr() : 'weapon_list.right'.tr(),
                                         bullet_length: data['bullet_length']?.toString() ?? '30.0',
                                         v0: data['muzzle_velocity'] ?? '820',
                                         weight: data['bullet_weight'] ?? '9.1',
@@ -299,7 +300,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                             queryParameters: {
                                               'selectedWeaponId': doc.id,
                                               'selectedWeaponName':
-                                                  data['name'] ?? 'Оружие',
+                                                  data['name'] ?? 'profile.weapon_default'.tr(),
                                               'selectedWeaponCaliber':
                                                   data['caliber'] ?? '',
                                               'muzzleVelocity':
@@ -344,7 +345,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                                             size: 16.0,
                                           ),
                                           Text(
-                                            'ПРОВЕРЯЙТЕ ДАННЫЕ ПЕРЕД СТРЕЛЬБОЙ',
+                                            'weapon_list.check_data'.tr(),
                                             textAlign: TextAlign.center,
                                             style: FlutterFlowTheme.of(context)
                                                 .labelSmall
@@ -417,7 +418,7 @@ class _WeaponListWidgetState extends State<WeaponListWidget> {
                         model: _model.buttonModel,
                         updateCallback: () => safeSetState(() {}),
                         child: ButtonWidget(
-                          content: 'ДОБАВИТЬ НОВОЕ ОРУЖИЕ',
+                          content: 'weapon_list.add_new'.tr(),
                           icon: Icon(
                             Icons.add_rounded,
                             color: FlutterFlowTheme.of(context).onPrimary,

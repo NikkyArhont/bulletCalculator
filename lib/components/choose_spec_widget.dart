@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'choose_spec_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'choose_spec_model.dart';
 
 class ChooseSpecWidget extends StatefulWidget {
@@ -103,7 +104,7 @@ class _ChooseSpecWidgetState extends State<ChooseSpecWidget> {
                     ),
                   ),
                   Text(
-                    'Выберите специализацию',
+                    'spec.title'.tr(),
                     style: FlutterFlowTheme.of(context).titleLarge.override(
                           font: GoogleFonts.spaceGrotesk(
                             fontWeight: FlutterFlowTheme.of(context)
@@ -140,7 +141,7 @@ class _ChooseSpecWidgetState extends State<ChooseSpecWidget> {
                           model: _model.specializationOptionModel1,
                           updateCallback: () => safeSetState(() {}),
                           child: SpecializationOptionWidget(
-                            label: 'Стрелок-спортсмен',
+                            label: 'spec.sport'.tr(),
                             selected: selectedSpec == 'Стрелок-спортсмен',
                           ),
                         ),
@@ -155,7 +156,7 @@ class _ChooseSpecWidgetState extends State<ChooseSpecWidget> {
                           model: _model.specializationOptionModel2,
                           updateCallback: () => safeSetState(() {}),
                           child: SpecializationOptionWidget(
-                            label: 'Охотник',
+                            label: 'spec.hunter'.tr(),
                             selected: selectedSpec == 'Охотник',
                           ),
                         ),
@@ -170,7 +171,7 @@ class _ChooseSpecWidgetState extends State<ChooseSpecWidget> {
                           model: _model.specializationOptionModel3,
                           updateCallback: () => safeSetState(() {}),
                           child: SpecializationOptionWidget(
-                            label: 'Тактический стрелок',
+                            label: 'spec.tactical'.tr(),
                             selected: selectedSpec == 'Тактический стрелок',
                           ),
                         ),
@@ -185,7 +186,7 @@ class _ChooseSpecWidgetState extends State<ChooseSpecWidget> {
                           model: _model.specializationOptionModel4,
                           updateCallback: () => safeSetState(() {}),
                           child: SpecializationOptionWidget(
-                            label: 'Снайпер',
+                            label: 'spec.sniper'.tr(),
                             selected: selectedSpec == 'Снайпер',
                           ),
                         ),
@@ -200,7 +201,7 @@ class _ChooseSpecWidgetState extends State<ChooseSpecWidget> {
                           model: _model.specializationOptionModel5,
                           updateCallback: () => safeSetState(() {}),
                           child: SpecializationOptionWidget(
-                            label: 'Любитель',
+                            label: 'spec.amateur'.tr(),
                             selected: selectedSpec == 'Любитель',
                           ),
                         ),
@@ -224,7 +225,7 @@ class _ChooseSpecWidgetState extends State<ChooseSpecWidget> {
                         }
                         Navigator.pop(context, selectedSpec);
                       },
-                    text: 'Готово',
+                    text: 'spec.done'.tr(),
                     options: FFButtonOptions(
                       width: double.infinity,
                       height: 56.0,

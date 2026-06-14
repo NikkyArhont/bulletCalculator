@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'delete_weapon_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'delete_weapon_model.dart';
 
 class DeleteWeaponWidget extends StatefulWidget {
@@ -85,7 +86,7 @@ class _DeleteWeaponWidgetState extends State<DeleteWeaponWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Удалить оружие?',
+                    'delete_weapon.title'.tr(),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).titleLarge.override(
                           font: GoogleFonts.spaceGrotesk(
@@ -107,7 +108,7 @@ class _DeleteWeaponWidgetState extends State<DeleteWeaponWidget> {
                         ),
                   ),
                   Text(
-                    'Вы уверены, что хотите удалить этот профиль оружия? Это действие нельзя будет отменить.',
+                    'delete_weapon.confirm_msg'.tr(),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.inter(
@@ -139,7 +140,7 @@ class _DeleteWeaponWidgetState extends State<DeleteWeaponWidget> {
                     model: _model.buttonModel1,
                     updateCallback: () => safeSetState(() {}),
                     child: ButtonWidget(
-                      content: 'Удалить',
+                      content: 'delete_weapon.btn'.tr(),
                       icon_present: false,
                       icon_end_present: false,
                       color: FlutterFlowTheme.of(context).secondaryText,
@@ -158,7 +159,7 @@ class _DeleteWeaponWidgetState extends State<DeleteWeaponWidget> {
                     model: _model.buttonModel2,
                     updateCallback: () => safeSetState(() {}),
                     child: ButtonWidget(
-                      content: 'Отмена',
+                      content: 'delete_weapon.cancel'.tr(),
                       icon_present: false,
                       icon_end_present: false,
                       color: FlutterFlowTheme.of(context).secondaryText,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'section_header_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'section_header_model.dart';
 
 class SectionHeaderWidget extends StatefulWidget {
@@ -54,7 +55,7 @@ class _SectionHeaderWidgetState extends State<SectionHeaderWidget> {
           Text(
             valueOrDefault<String>(
               widget!.title,
-              'ОСНОВНЫЕ ПАРАМЕТРЫ',
+              'weapon.section_main'.tr(),
             ),
             style: FlutterFlowTheme.of(context).labelLarge.override(
                   font: GoogleFonts.spaceGrotesk(

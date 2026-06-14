@@ -1,6 +1,7 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,10 +78,9 @@ class _CorrectionTileWidgetState extends State<CorrectionTileWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    valueOrDefault<String>(
-                      widget!.label,
-                      'Деривация',
-                    ),
+                    widget.label == 'Деривация'
+                        ? 'result.derivation'.tr()
+                        : widget.label,
                     style: FlutterFlowTheme.of(context).labelMedium.override(
                           font: GoogleFonts.spaceGrotesk(
                             fontWeight: FlutterFlowTheme.of(context)
@@ -102,10 +102,9 @@ class _CorrectionTileWidgetState extends State<CorrectionTileWidget> {
                         ),
                   ),
                   Text(
-                    valueOrDefault<String>(
-                      widget!.sub_label,
-                      'Вращение пули',
-                    ),
+                    widget.sub_label == 'Вращение пули'
+                        ? 'result.derivation_desc'.tr()
+                        : widget.sub_label,
                     style: FlutterFlowTheme.of(context).bodySmall.override(
                           font: GoogleFonts.inter(
                             fontWeight: FlutterFlowTheme.of(context)

@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'logout_model.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'logout_model.dart';
 
 class LogoutWidget extends StatefulWidget {
@@ -81,7 +82,7 @@ class _LogoutWidgetState extends State<LogoutWidget> {
                     ),
                   ),
                   Text(
-                    'Выход из аккаунта',
+                    'logout.title'.tr(),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).titleMedium.override(
                           font: GoogleFonts.spaceGrotesk(
@@ -104,7 +105,7 @@ class _LogoutWidgetState extends State<LogoutWidget> {
                         ),
                   ),
                   Text(
-                    'Вы уверены, что хотите выйти? Все несохраненные данные могут быть потеряны.',
+                    'logout.confirm_msg'.tr(),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.inter(
@@ -136,7 +137,7 @@ class _LogoutWidgetState extends State<LogoutWidget> {
                     model: _model.buttonModel1,
                     updateCallback: () => safeSetState(() {}),
                     child: ButtonWidget(
-                      content: 'Выйти',
+                      content: 'logout.btn'.tr(),
                       icon_present: false,
                       icon_end_present: false,
                       color: FlutterFlowTheme.of(context).error,
@@ -155,7 +156,7 @@ class _LogoutWidgetState extends State<LogoutWidget> {
                     model: _model.buttonModel2,
                     updateCallback: () => safeSetState(() {}),
                     child: ButtonWidget(
-                      content: 'Отмена',
+                      content: 'logout.cancel'.tr(),
                       icon_present: false,
                       icon_end_present: false,
                       color: FlutterFlowTheme.of(context).secondaryText,

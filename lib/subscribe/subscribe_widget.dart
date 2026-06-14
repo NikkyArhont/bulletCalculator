@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_palette/material_palette.dart';
 import 'package:provider/provider.dart';
 import 'subscribe_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'subscribe_model.dart';
 
 class SubscribeWidget extends StatefulWidget {
@@ -180,7 +181,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                               ),
                         ),
                         Text(
-                          'Разблокируйте полный потенциал вашей стрельбы',
+                          'subscribe.title'.tr(),
                           textAlign: TextAlign.center,
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
@@ -239,14 +240,14 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                                 model: _model.featureRowModel1,
                                 updateCallback: () => safeSetState(() {}),
                                 child: FeatureRowWidget(
-                                  text: 'Неограниченное кол-во профилей оружия',
+                                  text: 'subscribe.feature_weapons'.tr(),
                                 ),
                               ),
                               wrapWithModel(
                                 model: _model.featureRowModel2,
                                 updateCallback: () => safeSetState(() {}),
                                 child: FeatureRowWidget(
-                                  text: 'Интеграция с метеостанциями Kestrel',
+                                  text: 'subscribe.feature_kestrel'.tr(),
                                 ),
                               ),
                               wrapWithModel(
@@ -254,21 +255,21 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                                 updateCallback: () => safeSetState(() {}),
                                 child: FeatureRowWidget(
                                   text:
-                                      'Расширенные таблицы баллистики (G1/G7)',
+                                      'subscribe.feature_tables'.tr(),
                                 ),
                               ),
                               wrapWithModel(
                                 model: _model.featureRowModel4,
                                 updateCallback: () => safeSetState(() {}),
                                 child: FeatureRowWidget(
-                                  text: 'Облачная синхронизация данных',
+                                  text: 'subscribe.feature_cloud'.tr(),
                                 ),
                               ),
                               wrapWithModel(
                                 model: _model.featureRowModel5,
                                 updateCallback: () => safeSetState(() {}),
                                 child: FeatureRowWidget(
-                                  text: 'Приоритетная поддержка 24/7',
+                                  text: 'subscribe.feature_support'.tr(),
                                 ),
                               ),
                             ],
@@ -294,7 +295,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                           EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                       child: Container(
                         child: Text(
-                          'Выберите тарифный план',
+                          'subscribe.choose_plan'.tr(),
                           style: FlutterFlowTheme.of(context)
                               .labelLarge
                               .override(
@@ -324,11 +325,11 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                       model: _model.pricingCardModel1,
                       updateCallback: () => safeSetState(() {}),
                       child: PricingCardWidget(
-                        description: 'Для разовых выездов',
+                        description: 'subscribe.desc_monthly'.tr(),
                         is_popular: false,
-                        period: '/мес',
+                        period: 'subscribe.period_monthly'.tr(),
                         price: '490 ₽',
-                        title: 'Месячный',
+                        title: 'subscribe.title_monthly'.tr(),
                         selected: false,
                       ),
                     ),
@@ -336,11 +337,11 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                       model: _model.pricingCardModel2,
                       updateCallback: () => safeSetState(() {}),
                       child: PricingCardWidget(
-                        description: 'Лучший выбор для профи',
+                        description: 'subscribe.desc_yearly'.tr(),
                         is_popular: true,
-                        period: '/год',
+                        period: 'subscribe.period_yearly'.tr(),
                         price: '3 990 ₽',
-                        title: 'Годовой',
+                        title: 'subscribe.title_yearly'.tr(),
                         selected: true,
                       ),
                     ),
@@ -348,11 +349,11 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                       model: _model.pricingCardModel3,
                       updateCallback: () => safeSetState(() {}),
                       child: PricingCardWidget(
-                        description: 'Один раз и навсегда',
+                        description: 'subscribe.desc_lifetime'.tr(),
                         is_popular: false,
-                        period: 'разово',
+                        period: 'subscribe.period_lifetime'.tr(),
                         price: '9 990 ₽',
-                        title: 'Бессрочный',
+                        title: 'subscribe.title_lifetime'.tr(),
                         selected: false,
                       ),
                     ),
@@ -388,7 +389,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                             Expanded(
                               flex: 1,
                               child: Text(
-                                'Начните 7-дневный бесплатный пробный период. Отмена в любое время.',
+                                'subscribe.trial_info'.tr(),
                                 style: FlutterFlowTheme.of(context)
                                     .bodySmall
                                     .override(
@@ -430,7 +431,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                       model: _model.buttonModel1,
                       updateCallback: () => safeSetState(() {}),
                       child: ButtonWidget(
-                        content: 'Попробовать бесплатно',
+                        content: 'subscribe.try_free'.tr(),
                         icon_present: false,
                         icon_end_present: false,
                         color: FlutterFlowTheme.of(context).secondaryText,
@@ -448,7 +449,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                       model: _model.buttonModel2,
                       updateCallback: () => safeSetState(() {}),
                       child: ButtonWidget(
-                        content: 'Восстановить покупки',
+                        content: 'subscribe.restore'.tr(),
                         icon_present: false,
                         icon_end_present: false,
                         color: FlutterFlowTheme.of(context).secondaryText,
@@ -470,7 +471,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'Условия использования',
+                      'subscribe.terms'.tr(),
                       style: FlutterFlowTheme.of(context).labelSmall.override(
                             font: GoogleFonts.spaceGrotesk(
                               fontWeight: FlutterFlowTheme.of(context)
@@ -493,7 +494,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
                           ),
                     ),
                     Text(
-                      'Приватность',
+                      'subscribe.privacy'.tr(),
                       style: FlutterFlowTheme.of(context).labelSmall.override(
                             font: GoogleFonts.spaceGrotesk(
                               fontWeight: FlutterFlowTheme.of(context)

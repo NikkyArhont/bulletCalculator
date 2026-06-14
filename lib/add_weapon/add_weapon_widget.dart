@@ -10,6 +10,7 @@ import '/flutter_flow/form_field_controller.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/units_util.dart';
 import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -180,7 +181,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               },
                             ),
                             Text(
-                              'Новое оружие',
+                              'weapon.new_title'.tr(),
                               style: FlutterFlowTheme.of(context)
                                   .titleMedium
                                   .override(
@@ -232,7 +233,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                           model: _model.sectionHeaderModel1,
                           updateCallback: () => safeSetState(() {}),
                           child: SectionHeaderWidget(
-                            title: 'ОСНОВНЫЕ ПАРАМЕТРЫ',
+                            title: 'weapon.section_main'.tr(),
                           ),
                         ),
                         Container(
@@ -258,9 +259,9 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                     model: _model.textFieldModel1,
                                     updateCallback: () => safeSetState(() {}),
                                     child: TextFieldWidget(
-                                      label: 'Название профиля',
+                                      label: 'weapon.profile_name'.tr(),
                                       helper: null,
-                                      hint: 'Напр. TIKKA T3X .308',
+                                      hint: 'weapon.profile_name_hint'.tr(),
                                       value: '',
                                       leading_icon: Icon(
                                         Icons.precision_manufacturing_rounded,
@@ -286,8 +287,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: 'Высота прицела',
-                                            helper: sHErr ? '2–12 см' : 'см',
+                                            label: 'weapon.sight_height'.tr(),
+                                            helper: sHErr ? 'weapon.sight_height_err'.tr() : 'common.cm'.tr(),
                                             hint: '5.0',
                                             value: '',
                                             leading_icon_present: false,
@@ -311,8 +312,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: 'Дист. пристрелки',
-                                            helper: zDErr ? (isMetric ? '10–1000 м' : '10–1100 ярд') : UnitsManager.instance.distanceLabel,
+                                            label: 'weapon.zero_dist'.tr(),
+                                            helper: zDErr ? (isMetric ? 'weapon.zero_dist_err_metric'.tr() : 'weapon.zero_dist_err_imperial'.tr()) : UnitsManager.instance.distanceLabel,
                                             hint: '100',
                                             value: '',
                                             leading_icon_present: false,
@@ -347,7 +348,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                           model: _model.sectionHeaderModel2,
                           updateCallback: () => safeSetState(() {}),
                           child: SectionHeaderWidget(
-                            title: 'СТВОЛ И ОПТИКА',
+                            title: 'weapon.section_barrel_optics'.tr(),
                           ),
                         ),
                         Container(
@@ -382,8 +383,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: 'Твист (шаг)',
-                                            helper: twErr ? '4–24 дюйма' : 'дюймов',
+                                            label: 'weapon.twist'.tr(),
+                                            helper: twErr ? 'weapon.twist_err'.tr() : 'weapon.twist_units'.tr(),
                                             hint: '10',
                                             value: '',
                                             leading_icon: Icon(
@@ -407,7 +408,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: 'Цена клика',
+                                            label: 'weapon.click_val'.tr(),
                                             helper: cVErr ? '0.001–5.0' : 'MRAD / MOA',
                                             hint: '0.1',
                                             value: '',
@@ -440,7 +441,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Тип клика',
+                                              'weapon.click_type'.tr(),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .labelSmall
@@ -547,7 +548,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Направление нарезов',
+                                              'weapon.twist_dir'.tr(),
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .labelSmall
@@ -645,7 +646,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                                               ),
                                                             ),
                                                           Text(
-                                                            'Правое',
+                                                            'weapon.right'.tr(),
                                                             style: FlutterFlowTheme.of(
                                                                     context)
                                                                 .labelMedium
@@ -733,7 +734,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                                               ),
                                                             ),
                                                           Text(
-                                                            'Левое',
+                                                            'weapon.left'.tr(),
                                                             style: FlutterFlowTheme.of(
                                                                     context)
                                                                 .labelMedium
@@ -786,7 +787,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                           model: _model.sectionHeaderModel3,
                           updateCallback: () => safeSetState(() {}),
                           child: SectionHeaderWidget(
-                            title: 'БОЕПРИПАС И БАЛЛИСТИКА',
+                            title: 'weapon.section_ammo_ballistics'.tr(),
                           ),
                         ),
                         Container(
@@ -821,8 +822,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: 'Вес пули',
-                                            helper: bWErr ? '10–1000 grain' : 'grain',
+                                            label: 'weapon.bullet_weight'.tr(),
+                                            helper: bWErr ? 'weapon.err_bullet_weight_range'.tr() : 'grain',
                                             hint: '175',
                                             value: '',
                                             leading_icon: Icon(
@@ -846,8 +847,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: 'Длина пули',
-                                            helper: bLErr ? '3–80 мм' : 'мм',
+                                            label: 'weapon.bullet_length'.tr(),
+                                            helper: bLErr ? 'weapon.bullet_length_err'.tr() : 'units.mm'.tr(),
                                             hint: '32.5',
                                             value: '',
                                             leading_icon: Icon(
@@ -877,8 +878,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           model: _model.textFieldModel10,
                                           updateCallback: () => safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: 'Диаметр калибра',
-                                            helper: calErr ? (isMetric ? '4–20 мм' : '0.15–0.8 дюйма') : (isMetric ? 'мм' : 'дюймы'),
+                                            label: 'weapon.caliber'.tr(),
+                                            helper: calErr ? (isMetric ? 'weapon.caliber_err_metric'.tr() : 'weapon.caliber_err_imperial'.tr()) : (isMetric ? 'units.mm'.tr() : 'weapon.twist_units'.tr()),
                                             hint: '7.62',
                                             value: '',
                                             leading_icon: Icon(
@@ -901,8 +902,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                           model: _model.textFieldModel8,
                                           updateCallback: () => safeSetState(() {}),
                                           child: TextFieldWidget(
-                                            label: 'Нач. скорость',
-                                            helper: mVErr ? (isMetric ? '100–1500 м/с' : '330–4900 fps') : (isMetric ? 'м/с' : 'fps'),
+                                            label: 'weapon.mv'.tr(),
+                                            helper: mVErr ? (isMetric ? 'weapon.mv_err_metric'.tr() : 'weapon.mv_err_imperial'.tr()) : (isMetric ? 'units.speed_m_s'.tr() : 'fps'),
                                             hint: '820',
                                             value: '',
                                             leading_icon: Icon(
@@ -936,7 +937,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'БАЛЛИСТИЧЕСКИЙ КОЭФФИЦИЕНТ',
+                                        'weapon.bc_uppercase'.tr(),
                                         style: FlutterFlowTheme.of(context)
                                             .labelSmall
                                             .override(
@@ -1072,7 +1073,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                                     isOverButton: false,
                                                     isSearchable: false,
                                                     isMultiSelect: false,
-                                                    labelText: 'МОДЕЛЬ',
+                                                    labelText: 'weapon.bc_model'.tr(),
                                                     labelTextStyle:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -1105,8 +1106,8 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                               updateCallback: () =>
                                                   safeSetState(() {}),
                                               child: TextFieldWidget(
-                                            label: 'Значение BC',
-                                            helper: bcVErr ? '0.05–1.5' : null,
+                                            label: 'weapon.bc_value'.tr(),
+                                            helper: bcVErr ? 'weapon.err_bc_range'.tr() : null,
                                             hint: '0.243',
                                             value: '',
                                             leading_icon_present: false,
@@ -1140,7 +1141,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                           model: _model.sectionHeaderModel3,
                           updateCallback: () => safeSetState(() {}),
                           child: SectionHeaderWidget(
-                            title: 'КАЛИБРОВКА BC / MULTI BC',
+                            title: 'weapon.section_calibration'.tr(),
                           ),
                         ),
                         Container(
@@ -1186,7 +1187,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               Expanded(
                                 flex: 1,
                                 child: Text(
-                                  'ВНИМАНИЕ: Ошибка в высоте прицела на 5мм может дать критическое отклонение на дистанциях свыше 500м. Проверьте данные перед сохранением.',
+                                  'weapon.warning_sight_height'.tr(),
                                   maxLines: 3,
                                   style: FlutterFlowTheme.of(context)
                                       .bodySmall
@@ -1226,7 +1227,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                         model: _model.buttonModel,
                         updateCallback: () => safeSetState(() {}),
                         child: ButtonWidget(
-                          content: '+ Добавить оружие',
+                          content: 'weapon.add_btn'.tr(),
                           icon: Icon(
                             Icons.security_rounded,
                             color: FlutterFlowTheme.of(context).onPrimary,
@@ -1246,7 +1247,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               final uid = currentUserUid;
                               if (uid == null || uid.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Ошибка авторизации')));
+                                    SnackBar(content: Text('weapon.err_auth'.tr())));
                                 safeSetState(() => _model.isLoading = false);
                                 return;
                               }
@@ -1255,7 +1256,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                   '';
                               if (name.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Введите название профиля')));
+                                    SnackBar(content: Text('weapon.err_name'.tr())));
                                 safeSetState(() => _model.isLoading = false);
                                 return;
                               }
@@ -1280,54 +1281,54 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               double? sH = parseValue(_model.textFieldModel2
                                   .inputTextController?.text);
                               if (sH == null) {
-                                showError('Введите высоту прицела');
+                                showError('weapon.err_sight_height_empty'.tr());
                                 return;
                               }
                               if (sH < 2.0 || sH > 12.0) {
-                                showError('Высота прицела: 2–12 см');
+                                showError('weapon.err_sight_height_range'.tr());
                                 return;
                               }
 
                               double? zD = parseValue(_model.textFieldModel3
                                   .inputTextController?.text);
                               if (zD == null) {
-                                showError('Введите дистанцию пристрелки');
+                                showError('weapon.err_zero_dist_empty'.tr());
                                 return;
                               }
                               if (!isMetric) zD *= 0.9144;
                               if (zD < 10 || zD > 1000) {
                                 showError(isMetric 
-                                  ? 'Дистанция пристрелки: 10–1000 м'
-                                  : 'Дистанция пристрелки: 10–1100 ярд');
+                                  ? 'weapon.err_zero_dist_range_metric'.tr()
+                                  : 'weapon.err_zero_dist_range_imperial'.tr());
                                 return;
                               }
 
                               double? tw = parseValue(_model.textFieldModel4
                                   .inputTextController?.text);
                               if (tw == null) {
-                                showError('Введите твист');
+                                showError('weapon.err_twist_empty'.tr());
                                 return;
                               }
                               if (tw < 4.0 || tw > 24.0) {
-                                showError('Твист: 4–24 дюйма');
+                                showError('weapon.err_twist_range'.tr());
                                 return;
                               }
 
                               double? cV = parseValue(_model.textFieldModel5
                                   .inputTextController?.text);
                               if (cV == null || cV <= 0 || cV > 5.0) {
-                                showError('Цена клика: 0.001–5.0');
+                                showError('weapon.err_click_val_range'.tr());
                                 return;
                               }
                               if (_model.clickTypeValue == null) {
-                                showError('Выберите тип клика');
+                                showError('weapon.err_click_type_empty'.tr());
                                 return;
                               }
 
                               double? bW = parseValue(_model.textFieldModel6
                                   .inputTextController?.text);
                               if (bW == null || bW < 10 || bW > 1000) {
-                                showError('Вес пули: 10–1000 grain');
+                                showError('weapon.err_bullet_weight_range'.tr());
                                 return;
                               }
 
@@ -1335,41 +1336,41 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                                   .inputTextController?.text);
                               if (bL == null || bL < 3 || bL > 80) {
                                 showError(isMetric
-                                  ? 'Длина пули: 3–80 мм'
-                                  : 'Длина пули: 0.12–3.15 дюйма');
+                                  ? 'weapon.err_bullet_length_range_metric'.tr()
+                                  : 'weapon.err_bullet_length_range_imperial'.tr());
                                 return;
                               }
 
                               double? mV = parseValue(_model.textFieldModel8
                                   .inputTextController?.text);
                               if (mV == null) {
-                                showError('Введите скорость');
+                                showError('weapon.err_mv_empty'.tr());
                                 return;
                               }
                               if (!isMetric) mV *= 0.3048;
                               if (mV < 100 || mV > 1500) {
                                 showError(isMetric
-                                  ? 'Скорость: 100–1500 м/с'
-                                  : 'Скорость: 330–4900 fps');
+                                  ? 'weapon.err_mv_range_metric'.tr()
+                                  : 'weapon.err_mv_range_imperial'.tr());
                                 return;
                               }
 
                               double? bcV = parseValue(_model.textFieldModel9
                                   .inputTextController?.text);
                               if (bcV == null || bcV < 0.05 || bcV > 1.5) {
-                                showError('БК: 0.05–1.5');
+                                showError('weapon.err_bc_range'.tr());
                                 return;
                               }
 
                               double? cal = parseValue(_model.textFieldModel10
                                   .inputTextController?.text);
                               if (cal == null) {
-                                showError('Введите калибр');
+                                showError('weapon.err_caliber_empty'.tr());
                                 return;
                               }
                               if (!isMetric) cal *= 25.4;
                               if (cal < 4.0 || cal > 20.0) {
-                                showError(isMetric ? 'Калибр: 4–20 мм' : 'Калибр: 0.15–0.8 дюйма');
+                                showError(isMetric ? 'weapon.err_caliber_range_metric'.tr() : 'weapon.err_caliber_range_imperial'.tr());
                                 return;
                               }
 
@@ -1399,7 +1400,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                               if (context.mounted) context.safePop();
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Ошибка при сохранении: $e')));
+                                  SnackBar(content: Text('weapon.err_save_failed'.tr(args: [e.toString()]))));
                             } finally {
                               if (mounted) {
                                 safeSetState(
@@ -1437,13 +1438,13 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Использовать Multi BC',
+                    'weapon.use_multi_bc'.tr(),
                     style: FlutterFlowTheme.of(context).bodyLarge.override(
                       font: GoogleFonts.inter(fontWeight: FontWeight.w600),
                     ),
                   ),
                   Text(
-                    'Расчет по разным BC для ближней, средней и дальней дистанций',
+                    'weapon.multi_bc_desc'.tr(),
                     style: FlutterFlowTheme.of(context).labelMedium.override(
                       font: GoogleFonts.inter(color: FlutterFlowTheme.of(context).secondaryText),
                     ),
@@ -1465,14 +1466,14 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
         SizedBox(height: 16.0),
         if (!_model.useMultiBc) ...[
           Text(
-            'Калибровка позволяет автоматически рассчитать точный базовый BC по одному реальному выстрелу на дистанции.',
+            'weapon.calibration_desc'.tr(),
             style: FlutterFlowTheme.of(context).bodyMedium.override(
               font: GoogleFonts.inter(color: FlutterFlowTheme.of(context).secondaryText),
             ),
           ),
           SizedBox(height: 16.0),
           ButtonWidget(
-            content: 'Калибровать базовый BC',
+            content: 'weapon.calibrate_btn'.tr(),
             icon: Icon(Icons.calculate_rounded, color: Colors.white, size: 16.0),
             icon_present: true,
             color: FlutterFlowTheme.of(context).primary,
@@ -1480,7 +1481,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
           ),
         ] else ...[
           Text(
-            'Настройте до 3 калибровочных дистанций для зон: ближней (до 1-й точки), средней (до 2-й) и дальней (выше 2-й).',
+            'weapon.multi_bc_points_desc'.tr(),
             style: FlutterFlowTheme.of(context).bodyMedium.override(
               font: GoogleFonts.inter(color: FlutterFlowTheme.of(context).secondaryText),
             ),
@@ -1491,7 +1492,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Center(
                 child: Text(
-                  'Нет калибровочных точек',
+                  'weapon.no_points'.tr(),
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                     font: GoogleFonts.inter(fontStyle: FontStyle.italic),
                   ),
@@ -1518,13 +1519,13 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Дистанция: ${dist.toStringAsFixed(0)} ${isMetric ? 'м' : 'yd'}',
+                            'weapon.point_distance'.tr(args: [dist.toStringAsFixed(0), isMetric ? 'units.m'.tr() : 'units.yd'.tr()]),
                             style: FlutterFlowTheme.of(context).bodyMedium.override(
                               font: GoogleFonts.inter(fontWeight: FontWeight.w600),
                             ),
                           ),
                           Text(
-                            'Поправка: $corr $unit • Расчетный BC: ${bcVal.toStringAsFixed(4)}',
+                            'weapon.point_corr_bc'.tr(args: [corr.toString(), unit, bcVal.toStringAsFixed(4)]),
                             style: FlutterFlowTheme.of(context).bodySmall.override(
                               font: GoogleFonts.inter(color: FlutterFlowTheme.of(context).secondaryText),
                             ),
@@ -1547,7 +1548,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
             ),
           SizedBox(height: 16.0),
           ButtonWidget(
-            content: 'Добавить точку калибровки',
+            content: 'weapon.add_point_btn'.tr(),
             icon: Icon(Icons.add_rounded, color: Colors.white, size: 16.0),
             icon_present: true,
             color: _model.calibrationPoints.length >= 3 
@@ -1624,7 +1625,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
     if (mV == null || bW == null || bL == null || cal == null || sH == null || zD == null || tw == null || cV == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Пожалуйста, сначала заполните все основные параметры оружия (скорость, твист, калибр, высоту прицела и т.д.).'),
+          content: Text('weapon.fill_params_first'.tr()),
           backgroundColor: FlutterFlowTheme.of(context).error,
         ),
       );
@@ -1644,7 +1645,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
               backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
               title: Text(
-                isMultiBcPoint ? 'Добавление точки Multi BC' : 'Калибровка базового BC',
+                isMultiBcPoint ? 'weapon.add_multi_bc_title'.tr() : 'weapon.calibrate_btn'.tr(),
                 style: FlutterFlowTheme.of(context).titleMedium.override(
                   font: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.bold),
                 ),
@@ -1656,7 +1657,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                     controller: distController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Дистанция выстрела (${isMetric ? 'м' : 'yd'})',
+                      labelText: 'weapon.shot_distance'.tr(args: [isMetric ? 'units.m'.tr() : 'units.yd'.tr()]),
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -1668,7 +1669,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                           controller: corrController,
                           keyboardType: TextInputType.numberWithOptions(decimal: true),
                           decoration: InputDecoration(
-                            labelText: 'Вертикальная поправка',
+                            labelText: 'weapon.vertical_corr'.tr(),
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -1684,7 +1685,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                             });
                           }
                         },
-                        items: ['MRAD', 'MOA', 'клики', 'см'].map((u) {
+                        items: ['MRAD', 'MOA', 'units.clicks'.tr(), 'common.cm'.tr()].map((u) {
                           return DropdownMenuItem<String>(
                             value: u,
                             child: Text(u),
@@ -1698,7 +1699,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: Text('Отмена', style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText)),
+                  child: Text('common.cancel'.tr(), style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText)),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -1710,7 +1711,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                     final cValText = double.tryParse(corrController.text.trim().replaceAll(',', '.'));
                     if (dVal == null || dVal <= 0 || cValText == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Пожалуйста, введите корректные значения.')),
+                        SnackBar(content: Text('weapon.validation_err'.tr())),
                       );
                       return;
                     }
@@ -1725,7 +1726,7 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
                     if (isMultiBcPoint) {
                       if (_model.calibrationPoints.any((pt) => (pt['distance'] - targetDistMeters).abs() < 0.1)) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Точка для этой дистанции уже существует.')),
+                          SnackBar(content: Text('weapon.point_exists_err'.tr())),
                         );
                         return;
                       }
@@ -1773,13 +1774,13 @@ class _AddWeaponWidgetState extends State<AddWeaponWidget> {
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Базовый БК успешно откалиброван: $calBc'),
+                          content: Text('weapon.calib_success'.tr(args: [calBc.toString()])),
                           backgroundColor: FlutterFlowTheme.of(context).success,
                         ),
                       );
                     }
                   },
-                  child: Text('Рассчитать', style: TextStyle(color: Colors.white)),
+                  child: Text('weapon.calculate'.tr(), style: TextStyle(color: Colors.white)),
                 ),
               ],
             );

@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'tactical_weapon_card_model.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '/flutter_flow/units_util.dart';
 export 'tactical_weapon_card_model.dart';
 
 class TacticalWeaponCardWidget extends StatefulWidget {
@@ -71,14 +73,14 @@ class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
     final val = double.tryParse(raw.replaceAll(RegExp(r'[^\d.]'), ''));
     if (val == null) return raw;
     final inches = val / 25.4;
-    return '${inches.toStringAsFixed(1)} дюйм';
+    return '${inches.toStringAsFixed(1)} ${'common.inch'.tr()}';
   }
 
   String _formatSightHeight(String raw) {
     final val = double.tryParse(raw);
     if (val == null) return raw;
     final cm = val / 10.0;
-    return '${cm.toStringAsFixed(1)} см';
+    return '${cm.toStringAsFixed(1)} ${'common.cm'.tr()}';
   }
 
   Widget _buildGridItem(BuildContext context, String label, String value) {
@@ -254,29 +256,29 @@ class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
                             Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                _buildGridItem(context, 'ТВИСТ', _formatTwist(widget!.twist)),
-                                _buildGridItem(context, 'НАПР.', widget!.twist_dir),
-                                _buildGridItem(context, 'V0 (М/С)', widget!.v0),
-                                _buildGridItem(context, 'ВЕС (Г)', widget!.weight),
+                                _buildGridItem(context, 'common.twist'.tr(), _formatTwist(widget!.twist)),
+                                _buildGridItem(context, 'common.dir'.tr(), widget!.twist_dir == 'left' ? 'weapon.left'.tr() : 'weapon.right'.tr()),
+                                _buildGridItem(context, 'common.v0'.tr(), widget!.v0),
+                                _buildGridItem(context, 'common.weight'.tr(), widget!.weight),
                               ],
                             ),
                             // Row 2: Length, BC Model, BC Value, Sight Height
                             Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                _buildGridItem(context, 'ДЛИНА (ММ)', widget!.bullet_length),
-                                _buildGridItem(context, 'БК МОДЕЛЬ', widget!.bc_type),
-                                _buildGridItem(context, 'БК ЗНАЧ.', widget!.bc_value),
-                                _buildGridItem(context, 'ПРИЦЕЛ', _formatSightHeight(widget!.sight_height)),
+                                _buildGridItem(context, 'common.length'.tr(), widget!.bullet_length),
+                                _buildGridItem(context, 'common.bc_model'.tr(), widget!.bc_type),
+                                _buildGridItem(context, 'common.bc_val'.tr(), widget!.bc_value),
+                                _buildGridItem(context, 'common.sight'.tr(), _formatSightHeight(widget!.sight_height)),
                               ],
                             ),
                             // Row 3: Zero Dist, Click, Click Type, Empty
                             Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                _buildGridItem(context, 'ПРИСТР. (М)', widget!.zero_distance),
-                                _buildGridItem(context, 'КЛИК', widget!.click_value),
-                                _buildGridItem(context, 'ТИП КЛИКА', widget!.click_type),
+                                _buildGridItem(context, 'common.zero_distance'.tr(args: [UnitsManager.instance.distanceLabel.toUpperCase()]), widget!.zero_distance),
+                                _buildGridItem(context, 'common.click'.tr(), widget!.click_value),
+                                _buildGridItem(context, 'common.click_type'.tr(), widget!.click_type),
                                 _buildGridItem(context, '', ''),
                               ],
                             ),
@@ -296,7 +298,7 @@ class _TacticalWeaponCardWidgetState extends State<TacticalWeaponCardWidget> {
                           model: _model.buttonModel,
                           updateCallback: () => safeSetState(() {}),
                           child: ButtonWidget(
-                            content: 'ВЫБРАТЬ ОРУЖИЕ',
+                            content: 'common.select_weapon_btn'.tr(),
                             icon_present: false,
                             icon_end_present: false,
                             color: FlutterFlowTheme.of(context).secondaryText,

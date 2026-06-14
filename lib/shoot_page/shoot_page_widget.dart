@@ -18,6 +18,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '/ballistic_engine.dart';
 import '/services/bluetooth_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'shoot_page_model.dart';
 export 'shoot_page_model.dart';
 
@@ -122,7 +123,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
   void _handleParameters() {
     if (widget.selectedWeaponId != null) {
       _model.selectedWeaponId = widget.selectedWeaponId;
-      _model.selectedWeaponName = widget.selectedWeaponName ?? 'Оружие';
+      _model.selectedWeaponName = widget.selectedWeaponName ?? 'shoot.weapon_default'.tr();
       _model.selectedWeaponCaliber = widget.selectedWeaponCaliber ?? '';
 
       if (widget.muzzleVelocity != null) {
@@ -205,7 +206,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Баллистический расчет',
+                                      'shoot.title'.tr(),
                                       style: FlutterFlowTheme.of(context)
                                           .titleLarge
                                           .override(
@@ -301,7 +302,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Text(
-                                                          'Оружие',
+                                                          'shoot.weapon_default'.tr(),
                                                           style: FlutterFlowTheme.of(context)
                                                               .labelSmall
                                                               .override(
@@ -311,7 +312,11 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                               ),
                                                         ),
                                                         Text(
-                                                          _model.selectedWeaponName,
+                                                          _model.selectedWeaponName == 'Выберите оружие' || _model.selectedWeaponName == 'shoot.weapon_label'
+                                                              ? 'shoot.weapon_label'.tr()
+                                                              : (_model.selectedWeaponName == 'Оружие' || _model.selectedWeaponName == 'shoot.weapon_default'
+                                                                  ? 'shoot.weapon_default'.tr()
+                                                                  : _model.selectedWeaponName),
                                                           style: FlutterFlowTheme.of(context)
                                                               .bodyLarge
                                                               .override(
@@ -364,7 +369,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                   Padding(
                                                     padding: EdgeInsets.all(16.0),
                                                     child: Text(
-                                                      'Нет добавленного оружия',
+                                                      'shoot.no_weapon'.tr(),
                                                       textAlign: TextAlign.center,
                                                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                         font: GoogleFonts.inter(),
@@ -375,7 +380,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                   ),
                                                 ...weapons.map((doc) {
                                                   final data = doc.data() as Map<String, dynamic>;
-                                                  final name = data['name'] as String? ?? 'Без названия';
+                                                  final name = data['name'] as String? ?? 'shoot.no_name'.tr();
                                                   final caliber = data['caliber'] as String? ?? '';
                                                   final isSelected = _model.selectedWeaponId == doc.id;
                                                   return InkWell(
@@ -462,7 +467,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                         ),
                                                         SizedBox(width: 8.0),
                                                         Text(
-                                                          'Добавить оружие',
+                                                          'shoot.add_weapon'.tr(),
                                                           style: FlutterFlowTheme.of(context)
                                                               .labelMedium
                                                               .override(
@@ -513,7 +518,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Цель и Дистанция',
+                                  'shoot.target_distance'.tr(),
                                   style: FlutterFlowTheme.of(context)
                                       .titleMedium
                                       .override(
@@ -558,7 +563,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         if (!isConnected) {
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(
-                                              content: Text('Дальномер Vector Optics не подключен. Подключите его в разделе "Мои устройства".', style: TextStyle(color: Colors.white)),
+                                              content: Text('shoot.rangefinder_err_not_connected'.tr(), style: TextStyle(color: Colors.white)),
                                               backgroundColor: Colors.red,
                                             ),
                                           );
@@ -569,7 +574,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         if (cache.lastDistanceTime == null) {
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(
-                                              content: Text('Замеры еще не получены с дальномера. Сделайте замер на приборе.', style: TextStyle(color: Colors.white)),
+                                              content: Text('shoot.rangefinder_err_no_measurements'.tr(), style: TextStyle(color: Colors.white)),
                                               backgroundColor: Colors.orange,
                                             ),
                                           );
@@ -587,7 +592,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
 
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text('Данные дистанции и угла обновлены с дальномера!', style: TextStyle(color: Colors.white)),
+                                            content: Text('shoot.rangefinder_success'.tr(), style: TextStyle(color: Colors.white)),
                                             backgroundColor: Colors.green,
                                           ),
                                         );
@@ -615,8 +620,8 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                             .primary,
                                         size: 18.0,
                                       ),
-                                      label: 'Дистанция',
-                                      unit: 'м',
+                                      label: 'shoot.distance'.tr(),
+                                      unit: 'units.m'.tr(),
                                       value: '850',
                                     ),
                                   ),
@@ -634,7 +639,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                             .primary,
                                         size: 18.0,
                                       ),
-                                      label: 'Угол',
+                                      label: 'shoot.angle'.tr(),
                                       unit: '°',
                                       value: '3',
                                     ),
@@ -671,7 +676,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        'Параметры ветра',
+                                        'shoot.wind_params'.tr(),
                                         style: FlutterFlowTheme.of(context)
                                             .titleMedium
                                             .override(
@@ -724,13 +729,13 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                               CrossAxisAlignment.center,
                                           children: [
                                             Text(
-                                              'Направление',
+                                              'shoot.direction'.tr(),
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .labelSmall,
                                             ),
                                             Text(
-                                              '${_model.windDirectionHours} ч',
+                                              '{} {}'.tr(args: [_model.windDirectionHours.toString(), 'shoot.hours'.tr()]),
                                               style: FlutterFlowTheme.of(context)
                                                   .bodyMedium
                                                   .override(
@@ -905,8 +910,8 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                       .primary,
                                                   size: 18.0,
                                                 ),
-                                                label: 'Скорость',
-                                                unit: 'м/с',
+                                                 label: 'shoot.speed'.tr(),
+                                                 unit: 'units.speed_m_s'.tr(),
                                                 value: '4.5',
                                               ),
                                             ),
@@ -918,7 +923,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                   CrossAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  'Порыв',
+                                                   'shoot.gust'.tr(),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .labelSmall
@@ -989,8 +994,8 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                         .primary,
                                                     size: 18.0,
                                                   ),
-                                                  label: 'Порыв',
-                                                  unit: 'м/с',
+                                                   label: 'shoot.gust'.tr(),
+                                                   unit: 'units.speed_m_s'.tr(),
                                                   value: '6.0',
                                                 ),
                                               ),
@@ -1015,7 +1020,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Атмосфера',
+                                   'shoot.atmosphere'.tr(),
                                   style: FlutterFlowTheme.of(context)
                                       .titleMedium
                                       .override(
@@ -1109,7 +1114,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                 .primary,
                                             size: 18.0,
                                           ),
-                                          label: 'Температура',
+                                          label: 'shoot.temperature'.tr(),
                                           unit: '°C',
                                           value: '18',
                                         ),
@@ -1129,7 +1134,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                 .primary,
                                             size: 18.0,
                                           ),
-                                          label: 'Давление',
+                                          label: 'shoot.pressure'.tr(),
                                           unit: 'hPa',
                                           value: '1005',
                                         ),
@@ -1148,7 +1153,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                           FlutterFlowTheme.of(context).primary,
                                       size: 18.0,
                                     ),
-                                    label: 'Влажность',
+                                    label: 'shoot.humidity'.tr(),
                                     unit: '%',
                                     value: '45',
                                   ),
@@ -1163,7 +1168,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         model: createModel(context, () => ButtonModel()),
                                         updateCallback: () => safeSetState(() {}),
                                         child: ButtonWidget(
-                                          content: 'Погода (GPS)',
+                                          content: 'shoot.weather_gps'.tr(),
                                           icon: Icon(
                                             Icons.cloud_download_rounded,
                                             color: Colors.white,
@@ -1181,7 +1186,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                             serviceEnabled = await Geolocator.isLocationServiceEnabled();
                                             if (!serviceEnabled) {
                                               ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Службы геолокации отключены.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                                SnackBar(content: Text('shoot.gps_err_disabled'.tr(), style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
                                               );
                                               return;
                                             }
@@ -1191,7 +1196,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                               permission = await Geolocator.requestPermission();
                                               if (permission == LocationPermission.denied) {
                                                 ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(content: Text('Доступ к геолокации запрещен.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                                  SnackBar(content: Text('shoot.gps_err_denied'.tr(), style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
                                                 );
                                                 return;
                                               }
@@ -1199,13 +1204,13 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
 
                                             if (permission == LocationPermission.deniedForever) {
                                               ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Геолокация запрещена навсегда. Разрешите в настройках.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                                SnackBar(content: Text('shoot.gps_err_forever'.tr(), style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
                                               );
                                               return;
                                             }
 
                                             ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text('Получение погоды...')),
+                                              SnackBar(content: Text('shoot.weather_loading'.tr())),
                                             );
 
                                             try {
@@ -1227,15 +1232,15 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                 
                                                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                                 ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(content: Text('Погода успешно обновлена!', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
+                                                  SnackBar(content: Text('shoot.weather_success'.tr(), style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
                                                 );
                                               } else {
-                                                throw Exception('Ошибка сервера API');
+                                                throw Exception('shoot.api_error'.tr());
                                               }
                                             } catch (e) {
                                               ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                               ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Ошибка получения погоды', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                                SnackBar(content: Text('shoot.weather_err_failed'.tr(), style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
                                               );
                                             }
                                           },
@@ -1248,7 +1253,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         model: createModel(context, () => ButtonModel()),
                                         updateCallback: () => safeSetState(() {}),
                                         child: ButtonWidget(
-                                          content: 'С устройств',
+                                          content: 'shoot.from_devices'.tr(),
                                           icon: Icon(
                                             Icons.bluetooth_connected_rounded,
                                             color: FlutterFlowTheme.of(context).success,
@@ -1259,12 +1264,12 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                           color: FlutterFlowTheme.of(context).success,
                                           size: 'large',
                                           full_width: true,
-                                                                                     onPressed: () {
+                                          onPressed: () {
                                              final manager = BluetoothDeviceManager.instance;
                                              if (manager.connectedKestrel == null) {
                                                ScaffoldMessenger.of(context).showSnackBar(
                                                  SnackBar(
-                                                   content: Text('Метеостанция Kestrel не подключена. Подключите её в разделе "Мои устройства".', style: TextStyle(color: Colors.white)),
+                                                   content: Text('shoot.kestrel_err_not_connected'.tr(), style: TextStyle(color: Colors.white)),
                                                    backgroundColor: Colors.red,
                                                  ),
                                                );
@@ -1280,12 +1285,16 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                              if (!hasAnyData) {
                                                ScaffoldMessenger.of(context).showSnackBar(
                                                  SnackBar(
-                                                   content: Text('Данные с метеостанции еще не получены. Убедитесь, что датчики активны.', style: TextStyle(color: Colors.white)),
+                                                   content: Text('shoot.kestrel_err_no_measurements'.tr(), style: TextStyle(color: Colors.white)),
                                                    backgroundColor: Colors.orange,
                                                  ),
                                                );
                                                return;
                                              }
+                                             
+                                             ScaffoldMessenger.of(context).showSnackBar(
+                                               SnackBar(content: Text('shoot.weather_loading'.tr())),
+                                             );
 
                                              safeSetState(() {
                                                if (cache.windSpeed != null) {
@@ -1308,9 +1317,10 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                }
                                              });
 
+                                             ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                              ScaffoldMessenger.of(context).showSnackBar(
                                                SnackBar(
-                                                 content: Text('Метеоданные успешно обновлены с Kestrel!', style: TextStyle(color: Colors.white)),
+                                                 content: Text('shoot.kestrel_success'.tr(), style: TextStyle(color: Colors.white)),
                                                  backgroundColor: Colors.green,
                                                ),
                                              );
@@ -1351,7 +1361,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          'Ожидаемый разброс',
+                                          'shoot.expected_spread'.tr(),
                                           style: FlutterFlowTheme.of(context)
                                               .labelLarge
                                               .override(
@@ -1381,7 +1391,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                               ),
                                         ),
                                         Text(
-                                          '${((double.tryParse(distanceText) ?? 0.0) / 100 * 2.91 * (1.0 + (_model.isGustActive ? 0.2 : 0.0))).toStringAsFixed(1)} см',
+                                          '{} {}'.tr(args: [((double.tryParse(distanceText) ?? 0.0) / 100 * 2.91 * (1.0 + (_model.isGustActive ? 0.2 : 0.0))).toStringAsFixed(1), 'common.cm'.tr()]),
                                           style: FlutterFlowTheme.of(context)
                                               .titleMedium
                                               .override(
@@ -1462,7 +1472,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                     ),
                                   ),
                                   Text(
-                                    'Ожидаемый диаметр группы на дистанции ${distanceText}м',
+                                    'shoot.expected_group_diameter'.tr(args: [distanceText]),
                                     style: FlutterFlowTheme.of(context)
                                         .bodySmall
                                         .override(
@@ -1524,7 +1534,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                               model: _model.buttonModel,
                               updateCallback: () => safeSetState(() {}),
                               child: ButtonWidget(
-                                content: 'РАССЧИТАТЬ',
+                                content: 'shoot.calculate_btn'.tr(),
                                 icon: Icon(
                                   Icons.analytics_rounded,
                                   color: FlutterFlowTheme.of(context).onPrimary,
@@ -1544,7 +1554,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content:
-                                              Text('Пожалуйста, выберите оружие')),
+                                              Text('shoot.select_weapon_validation'.tr())),
                                     );
                                     return;
                                   }
@@ -1557,7 +1567,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content: Text(
-                                              'Пожалуйста, заполните все основные поля')),
+                                              'shoot.fill_fields_validation'.tr())),
                                     );
                                     return;
                                   }
@@ -1565,7 +1575,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content: Text(
-                                              'Пожалуйста, укажите скорость порыва')),
+                                              'shoot.gust_speed_validation'.tr())),
                                     );
                                     return;
                                   }
@@ -1583,7 +1593,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
 
                                       if (!weaponDoc.exists) {
                                         throw Exception(
-                                            'Данные об оружии не найдены');
+                                            'shoot.weapon_not_found'.tr());
                                       }
 
                                       final weaponData = weaponDoc.data()!;
@@ -1749,7 +1759,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                           .showSnackBar(
                                         SnackBar(
                                             content: Text(
-                                                'Ошибка при сохранении: $e')),
+                                                'shoot.save_error'.tr(args: [e.toString()]))),
                                       );
                                     }
                                     if (mounted) {

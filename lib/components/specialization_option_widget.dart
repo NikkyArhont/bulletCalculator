@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'specialization_option_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 export 'specialization_option_model.dart';
 
 class SpecializationOptionWidget extends StatefulWidget {
@@ -77,7 +78,7 @@ class _SpecializationOptionWidgetState
                   Text(
                     valueOrDefault<String>(
                       widget!.label,
-                      'Стрелок-спортсмен',
+                      'spec.sport'.tr(),
                     ),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.inter(
