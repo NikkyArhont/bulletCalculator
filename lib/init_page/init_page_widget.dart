@@ -278,7 +278,7 @@ class _InitPageWidgetState extends State<InitPageWidget> {
                           ),
                         ),
                         Text(
-                          'v 1.9.1',
+                          'v 1.9.2',
                           style:
                               FlutterFlowTheme.of(context).labelSmall.override(
                                     font: GoogleFonts.spaceGrotesk(

@@ -240,7 +240,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                             context.goNamed(
                                               'SMS',
                                               queryParameters: {
-                                                'phoneNumber': phoneNumber,
+                                                'phoneNumber': fullPhoneNumber,
                                               }.withoutNulls,
                                             );
                                           },
@@ -253,7 +253,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                         context.goNamed(
                                           'SMS',
                                           queryParameters: {
-                                            'phoneNumber': phoneNumber,
+                                            'phoneNumber': fullPhoneNumber,
                                           }.withoutNulls,
                                         );
                                       }
@@ -431,6 +431,22 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     DropdownMenuItem(
                                       value: Locale('en'),
                                       child: Text('English'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: Locale('fr'),
+                                      child: Text('Français'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: Locale('es'),
+                                      child: Text('Español'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: Locale('pt'),
+                                      child: Text('Português'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: Locale('de'),
+                                      child: Text('Deutsch'),
                                     ),
                                   ],
                                   onChanged: (Locale? newLocale) {

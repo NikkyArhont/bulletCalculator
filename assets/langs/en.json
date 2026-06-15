@@ -32,7 +32,7 @@
   },
   "sms": {
     "title": "Verification Code",
-    "sent_to": "We sent an SMS with a code to +7 {}",
+    "sent_to": "We sent an SMS with a code to {}",
     "invalid_code": "Invalid code. Please try again.",
     "resend_timer": "Resend code in 00:{}",
     "resend_btn": "Resend Code",

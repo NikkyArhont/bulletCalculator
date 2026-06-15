@@ -355,7 +355,10 @@ class _SmsWidgetState extends State<SmsWidget> {
                         '+79182222222',
                         '+79183333333'
                       ];
-                      final fullPhoneNumber = '+7${widget.phoneNumber}';
+                      var fullPhoneNumber = widget.phoneNumber ?? '';
+                      if (fullPhoneNumber.isNotEmpty && !fullPhoneNumber.startsWith('+')) {
+                        fullPhoneNumber = '+$fullPhoneNumber';
+                      }
 
                       if (testNumbers.contains(fullPhoneNumber)) {
                         final baseUser = await authManager.verifySmsCode(
