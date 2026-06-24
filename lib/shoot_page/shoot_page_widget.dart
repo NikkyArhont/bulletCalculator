@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '/ballistic_engine.dart';
 import '/services/bluetooth_service.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '/flutter_flow/units_util.dart';
 import 'shoot_page_model.dart';
 export 'shoot_page_model.dart';
 
@@ -53,6 +54,9 @@ class ShootPageWidget extends StatefulWidget {
 
 class _ShootPageWidgetState extends State<ShootPageWidget> {
   late ShootPageModel _model;
+  DistanceUnit _lastDistanceUnit = UnitsManager.instance.distanceUnit;
+  TemperatureUnit _lastTemperatureUnit = UnitsManager.instance.temperatureUnit;
+  PressureUnit _lastPressureUnit = UnitsManager.instance.pressureUnit;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -63,6 +67,79 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
     _handleParameters();
     _loadSavedInputs();
     _setupInputListeners();
+    UnitsManager.instance.addListener(_onUnitsChanged);
+  }
+
+  void _onUnitsChanged() {
+    if (!mounted) return;
+    
+    // Check distance unit change
+    if (_lastDistanceUnit != UnitsManager.instance.distanceUnit) {
+      final isNowMetric = UnitsManager.instance.distanceUnit == DistanceUnit.m;
+      
+      final distStr = _model.dataInputFieldModelDistance.textFieldModel.inputTextController?.text;
+      if (distStr != null && distStr.isNotEmpty) {
+        final dist = double.tryParse(distStr);
+        if (dist != null) {
+          final newVal = isNowMetric ? UnitConverter.yardsToMeters(dist) : UnitConverter.metersToYards(dist);
+          _model.dataInputFieldModelDistance.textFieldModel.inputTextController?.text = newVal.toStringAsFixed(1);
+        }
+      }
+      
+      final speedStr = _model.dataInputFieldModel2.textFieldModel.inputTextController?.text;
+      if (speedStr != null && speedStr.isNotEmpty) {
+        final speed = double.tryParse(speedStr);
+        if (speed != null) {
+          final newVal = isNowMetric ? UnitConverter.mphToMs(speed) : UnitConverter.msToMph(speed);
+          _model.dataInputFieldModel2.textFieldModel.inputTextController?.text = newVal.toStringAsFixed(1);
+        }
+      }
+      
+      final gustStr = _model.dataInputFieldModelGust.textFieldModel.inputTextController?.text;
+      if (gustStr != null && gustStr.isNotEmpty) {
+        final gust = double.tryParse(gustStr);
+        if (gust != null) {
+          final newVal = isNowMetric ? UnitConverter.mphToMs(gust) : UnitConverter.msToMph(gust);
+          _model.dataInputFieldModelGust.textFieldModel.inputTextController?.text = newVal.toStringAsFixed(1);
+        }
+      }
+      _lastDistanceUnit = UnitsManager.instance.distanceUnit;
+    }
+
+    // Check temp unit change
+    if (_lastTemperatureUnit != UnitsManager.instance.temperatureUnit) {
+      final isNowC = UnitsManager.instance.temperatureUnit == TemperatureUnit.c;
+      final tempStr = _model.dataInputFieldModel3.textFieldModel.inputTextController?.text;
+      if (tempStr != null && tempStr.isNotEmpty) {
+        final temp = double.tryParse(tempStr);
+        if (temp != null) {
+          final newVal = isNowC ? UnitConverter.fahrenheitToCelsius(temp) : UnitConverter.celsiusToFahrenheit(temp);
+          _model.dataInputFieldModel3.textFieldModel.inputTextController?.text = newVal.toStringAsFixed(1);
+        }
+      }
+      _lastTemperatureUnit = UnitsManager.instance.temperatureUnit;
+    }
+
+    // Check pressure unit change
+    if (_lastPressureUnit != UnitsManager.instance.pressureUnit) {
+      final presStr = _model.dataInputFieldModel4.textFieldModel.inputTextController?.text;
+      if (presStr != null && presStr.isNotEmpty) {
+        final pres = double.tryParse(presStr);
+        if (pres != null) {
+          double hpa = 0;
+          if (_lastPressureUnit == PressureUnit.hpa) hpa = pres;
+          else if (_lastPressureUnit == PressureUnit.mm) hpa = UnitConverter.mmHgTohPa(pres);
+          else if (_lastPressureUnit == PressureUnit.inhg) hpa = UnitConverter.mmHgTohPa(UnitConverter.inHgToMmHg(pres));
+
+          double newVal = hpa;
+          if (UnitsManager.instance.pressureUnit == PressureUnit.mm) newVal = UnitConverter.hPaTommHg(hpa);
+          else if (UnitsManager.instance.pressureUnit == PressureUnit.inhg) newVal = UnitConverter.mmHgToInHg(UnitConverter.hPaTommHg(hpa));
+          
+          _model.dataInputFieldModel4.textFieldModel.inputTextController?.text = newVal.toStringAsFixed(1);
+        }
+      }
+      _lastPressureUnit = UnitsManager.instance.pressureUnit;
+    }
   }
 
   Future<void> _loadSavedInputs() async {
@@ -139,6 +216,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
 
   @override
   void dispose() {
+    UnitsManager.instance.removeListener(_onUnitsChanged);
     _model.dispose();
 
     super.dispose();
@@ -146,7 +224,10 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final distanceText =
+    return AnimatedBuilder(
+      animation: UnitsManager.instance,
+      builder: (context, _) {
+        final distanceText =
         _model.dataInputFieldModelDistance.textFieldModel.inputTextController?.text ??
             '';
     final angleText =
@@ -621,7 +702,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         size: 18.0,
                                       ),
                                       label: 'shoot.distance'.tr(),
-                                      unit: 'units.m'.tr(),
+                                      unit: UnitsManager.instance.distanceLabel,
                                       value: '850',
                                     ),
                                   ),
@@ -911,7 +992,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                   size: 18.0,
                                                 ),
                                                  label: 'shoot.speed'.tr(),
-                                                 unit: 'units.speed_m_s'.tr(),
+                                                 unit: UnitsManager.instance.speedLabel,
                                                 value: '4.5',
                                               ),
                                             ),
@@ -995,7 +1076,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                     size: 18.0,
                                                   ),
                                                    label: 'shoot.gust'.tr(),
-                                                   unit: 'units.speed_m_s'.tr(),
+                                                   unit: UnitsManager.instance.speedLabel,
                                                   value: '6.0',
                                                 ),
                                               ),
@@ -1115,7 +1196,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                             size: 18.0,
                                           ),
                                           label: 'shoot.temperature'.tr(),
-                                          unit: '°C',
+                                          unit: UnitsManager.instance.temperatureLabel,
                                           value: '18',
                                         ),
                                       ),
@@ -1135,7 +1216,7 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                             size: 18.0,
                                           ),
                                           label: 'shoot.pressure'.tr(),
-                                          unit: 'hPa',
+                                          unit: UnitsManager.instance.pressureLabel,
                                           value: '1005',
                                         ),
                                       ),
@@ -1225,8 +1306,8 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                                 final press = current['surface_pressure'];
                                                 
                                                 safeSetState(() {
-                                                  _model.dataInputFieldModel3.textFieldModel.inputTextController?.text = temp.toString();
-                                                  _model.dataInputFieldModel4.textFieldModel.inputTextController?.text = press.toString();
+                                                  _model.dataInputFieldModel3.textFieldModel.inputTextController?.text = UnitConverter.convertTemperature((temp as num).toDouble()).toStringAsFixed(1);
+                                                  _model.dataInputFieldModel4.textFieldModel.inputTextController?.text = UnitConverter.convertPressure((press as num).toDouble()).toStringAsFixed(1);
                                                   _model.dataInputFieldModel5.textFieldModel.inputTextController?.text = hum.toString();
                                                 });
                                                 
@@ -1297,24 +1378,24 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                              );
 
                                              safeSetState(() {
-                                               if (cache.windSpeed != null) {
-                                                 _model.dataInputFieldModel2.textFieldModel.inputTextController?.text = cache.windSpeed.toString();
-                                               }
-                                               if (cache.windGust != null) {
-                                                 _model.dataInputFieldModelGust.textFieldModel.inputTextController?.text = cache.windGust.toString();
-                                               }
-                                               if (cache.windDirection != null) {
-                                                 _model.windDirectionHours = cache.windDirection!;
-                                               }
-                                               if (cache.temperature != null) {
-                                                 _model.dataInputFieldModel3.textFieldModel.inputTextController?.text = cache.temperature.toString();
-                                               }
-                                               if (cache.pressure != null) {
-                                                 _model.dataInputFieldModel4.textFieldModel.inputTextController?.text = cache.pressure.toString();
-                                               }
-                                               if (cache.humidity != null) {
-                                                 _model.dataInputFieldModel5.textFieldModel.inputTextController?.text = cache.humidity.toString();
-                                               }
+                                                if (cache.windSpeed != null) {
+                                                  _model.dataInputFieldModel2.textFieldModel.inputTextController?.text = UnitConverter.convertSpeed(cache.windSpeed!).toStringAsFixed(1);
+                                                }
+                                                if (cache.windGust != null) {
+                                                  _model.dataInputFieldModelGust.textFieldModel.inputTextController?.text = UnitConverter.convertSpeed(cache.windGust!).toStringAsFixed(1);
+                                                }
+                                                if (cache.windDirection != null) {
+                                                  _model.windDirectionHours = cache.windDirection!;
+                                                }
+                                                if (cache.temperature != null) {
+                                                  _model.dataInputFieldModel3.textFieldModel.inputTextController?.text = UnitConverter.convertTemperature(cache.temperature!).toStringAsFixed(1);
+                                                }
+                                                if (cache.pressure != null) {
+                                                  _model.dataInputFieldModel4.textFieldModel.inputTextController?.text = UnitConverter.convertPressure(cache.pressure!).toStringAsFixed(1);
+                                                }
+                                                if (cache.humidity != null) {
+                                                  _model.dataInputFieldModel5.textFieldModel.inputTextController?.text = cache.humidity.toString();
+                                                }
                                              });
 
                                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -1650,12 +1731,12 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         bc: bcValue,
                                         bcModel: weaponData['bc_model']?.toString() ?? 'G1',
                                         weightGrains: bulletWeight,
-                                        distance: double.tryParse(distanceText) ?? 0.0,
+                                        distance: UnitConverter.convertDistance(double.tryParse(distanceText) ?? 0.0, toSelected: false),
                                         zeroDistance: zeroDistance,
-                                        windSpeed: double.tryParse(speedText) ?? 0.0,
+                                        windSpeed: UnitConverter.convertSpeed(double.tryParse(speedText) ?? 0.0, toSelected: false),
                                         windDirectionHours: _model.windDirectionHours.toDouble(),
-                                        temperatureC: double.tryParse(tempText) ?? 0.0,
-                                        pressureHpa: double.tryParse(pressureText) ?? 0.0,
+                                        temperatureC: UnitConverter.convertTemperature(double.tryParse(tempText) ?? 0.0, toSelected: false),
+                                        pressureHpa: UnitConverter.convertPressure(double.tryParse(pressureText) ?? 0.0, toSelected: false),
                                         humidity: double.tryParse(humidityText) ?? 50.0,
                                         angleDegrees: double.tryParse(angleText) ?? 0.0,
                                         sightHeightMm: sightHeight,
@@ -1672,21 +1753,21 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
                                         'weaponId': _model.selectedWeaponId,
                                         'weaponName': _model.selectedWeaponName,
                                         'distance':
-                                            double.tryParse(distanceText) ?? 0.0,
+                                            UnitConverter.convertDistance(double.tryParse(distanceText) ?? 0.0, toSelected: false),
                                         'angle':
                                             double.tryParse(angleText) ?? 0.0,
                                         'windSpeed':
-                                            double.tryParse(speedText) ?? 0.0,
+                                            UnitConverter.convertSpeed(double.tryParse(speedText) ?? 0.0, toSelected: false),
                                         'windDirection':
                                             _model.windDirectionHours,
                                         'isGustActive': _model.isGustActive,
                                         'gustSpeed': _model.isGustActive
-                                            ? (double.tryParse(gustText) ?? 0.0)
+                                            ? UnitConverter.convertSpeed(double.tryParse(gustText) ?? 0.0, toSelected: false)
                                             : 0.0,
                                         'temperature':
-                                            double.tryParse(tempText) ?? 0.0,
+                                            UnitConverter.convertTemperature(double.tryParse(tempText) ?? 0.0, toSelected: false),
                                         'pressure':
-                                            double.tryParse(pressureText) ?? 0.0,
+                                            UnitConverter.convertPressure(double.tryParse(pressureText) ?? 0.0, toSelected: false),
                                         'humidity':
                                             double.tryParse(humidityText) ?? 0.0,
                                         'windDirection': _model.windDirectionHours,
@@ -1782,6 +1863,8 @@ class _ShootPageWidgetState extends State<ShootPageWidget> {
         ),
         ),
       ),
+    );
+      },
     );
   }
 }

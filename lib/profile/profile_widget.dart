@@ -259,7 +259,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 },
                               ),
                               Text(
-                                'v 1.9.2',
+                                'v 1.9.3',
                                 style: FlutterFlowTheme.of(context).labelSmall.override(
                                       font: GoogleFonts.inter(
                                         fontWeight: FlutterFlowTheme.of(context).labelSmall.fontWeight,

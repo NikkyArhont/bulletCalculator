@@ -63,7 +63,17 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return AnimatedBuilder(
+      animation: UnitsManager.instance,
+      builder: (context, _) {
+        final distVal = double.tryParse(widget.distance) ?? 0.0;
+        final convertedDist = UnitConverter.convertDistance(distVal, toSelected: true);
+        String distStr = convertedDist.toStringAsFixed(2);
+        if (distStr.contains('.')) {
+          distStr = distStr.replaceAll(RegExp(r'0*$'), '').replaceAll(RegExp(r'\.$'), '');
+        }
+
+        return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
       child: Container(
         child: Container(
@@ -230,7 +240,7 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
                                 ),
                           ),
                           Text(
-                            '${widget!.distance} ${UnitsManager.instance.distanceLabel}',
+                            '$distStr ${UnitsManager.instance.distanceLabel}',
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -364,6 +374,8 @@ class _HistoryCardWidgetState extends State<HistoryCardWidget> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 }

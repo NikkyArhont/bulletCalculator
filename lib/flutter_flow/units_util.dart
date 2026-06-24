@@ -67,6 +67,10 @@ class UnitsManager extends ChangeNotifier {
     if (pressureUnit == PressureUnit.inhg) return 'inHg';
     return 'mmHg';
   }
+
+  String get speedLabel => distanceUnit == DistanceUnit.m ? 'units.speed_m_s'.tr() : 'mph';
+  String get smallDistanceLabel => distanceUnit == DistanceUnit.m ? 'common.cm'.tr() : 'in';
+  String get energyLabel => distanceUnit == DistanceUnit.m ? 'result.joules'.tr() : 'ft-lbs';
 }
 
 class UnitConverter {
@@ -84,6 +88,18 @@ class UnitConverter {
   static double mmHgToInHg(double mmHg) => mmHg * 0.0393701;
   static double inHgToMmHg(double inHg) => inHg / 0.0393701;
 
+  // Speed: m/s <-> mph (1 m/s = 2.23694 mph)
+  static double msToMph(double ms) => ms * 2.23694;
+  static double mphToMs(double mph) => mph / 2.23694;
+
+  // Small Distance: cm <-> in
+  static double cmToInches(double cm) => cm / 2.54;
+  static double inchesToCm(double inches) => inches * 2.54;
+
+  // Energy: Joules <-> ft-lbs
+  static double joulesToFtLbs(double j) => j * 0.737562;
+  static double ftLbsToJoules(double ftLbs) => ftLbs / 0.737562;
+
   // Generic conversion based on Current Settings
   static double convertDistance(double val, {bool toSelected = true}) {
     if (UnitsManager.instance.distanceUnit == DistanceUnit.m) return val;
@@ -96,16 +112,31 @@ class UnitConverter {
   }
 
   static double convertPressure(double val, {bool toSelected = true}) {
-    if (UnitsManager.instance.pressureUnit == PressureUnit.mm) return val;
+    if (UnitsManager.instance.pressureUnit == PressureUnit.hpa) return val;
     if (toSelected) {
-      return UnitsManager.instance.pressureUnit == PressureUnit.hpa
-          ? mmHgTohPa(val)
-          : mmHgToInHg(val);
-    } else {
-      return UnitsManager.instance.pressureUnit == PressureUnit.hpa
+      return UnitsManager.instance.pressureUnit == PressureUnit.mm
           ? hPaTommHg(val)
-          : inHgToMmHg(val);
+          : mmHgToInHg(hPaTommHg(val));
+    } else {
+      return UnitsManager.instance.pressureUnit == PressureUnit.mm
+          ? mmHgTohPa(val)
+          : mmHgTohPa(inHgToMmHg(val));
     }
+  }
+
+  static double convertSpeed(double val, {bool toSelected = true}) {
+    if (UnitsManager.instance.distanceUnit == DistanceUnit.m) return val;
+    return toSelected ? msToMph(val) : mphToMs(val);
+  }
+
+  static double convertSmallDistance(double val, {bool toSelected = true}) {
+    if (UnitsManager.instance.distanceUnit == DistanceUnit.m) return val;
+    return toSelected ? cmToInches(val) : inchesToCm(val);
+  }
+
+  static double convertEnergy(double val, {bool toSelected = true}) {
+    if (UnitsManager.instance.distanceUnit == DistanceUnit.m) return val;
+    return toSelected ? joulesToFtLbs(val) : ftLbsToJoules(val);
   }
 }
 

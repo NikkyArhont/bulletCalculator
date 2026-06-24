@@ -103,12 +103,12 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
       v0: widget.muzzleVelocity ?? 800.0,
       bc: widget.bcValue ?? 0.3,
       weightGrains: widget.bulletWeight ?? 9.0,
-      distance: widget.distance ?? 100.0,
+      distance: UnitConverter.convertDistance(widget.distance ?? 100.0, toSelected: false),
       zeroDistance: widget.zeroDistance ?? 100.0,
-      windSpeed: widget.windSpeed ?? 0.0,
+      windSpeed: UnitConverter.convertSpeed(widget.windSpeed ?? 0.0, toSelected: false),
       windDirectionHours: widget.windDirection ?? 3.0,
-      temperatureC: widget.temperature ?? 15.0,
-      pressureHpa: widget.pressure ?? 1013.0,
+      temperatureC: UnitConverter.convertTemperature(widget.temperature ?? 15.0, toSelected: false),
+      pressureHpa: UnitConverter.convertPressure(widget.pressure ?? 1013.0, toSelected: false),
       humidity: widget.humidity ?? 50.0,
       angleDegrees: widget.angle ?? 0.0,
       sightHeightMm: widget.sightHeight ?? 50.0,
@@ -132,11 +132,14 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
+    return AnimatedBuilder(
+      animation: UnitsManager.instance,
+      builder: (context, _) {
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -558,8 +561,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         updateCallback: () => safeSetState(() {}),
                                         child: ResultMetricCardWidget(
                                           label: 'result.drop'.tr(),
-                                          unit: 'common.cm'.tr(),
-                                          value: '${_model.ballisticResult?.dropCm.toStringAsFixed(1) ?? '0.0'}',
+                                          unit: UnitsManager.instance.smallDistanceLabel,
+                                          value: '${UnitConverter.convertSmallDistance(_model.ballisticResult?.dropCm ?? 0.0).toStringAsFixed(1)}',
                                         ),
                                       ),
                                     ),
@@ -570,8 +573,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         updateCallback: () => safeSetState(() {}),
                                         child: ResultMetricCardWidget(
                                            label: 'result.wind_drift'.tr(),
-                                           unit: 'common.cm'.tr(),
-                                          value: '${_model.ballisticResult?.windDriftCm.toStringAsFixed(1) ?? '0.0'}',
+                                           unit: UnitsManager.instance.smallDistanceLabel,
+                                          value: '${UnitConverter.convertSmallDistance(_model.ballisticResult?.windDriftCm ?? 0.0).toStringAsFixed(1)}',
                                         ),
                                       ),
                                     ),
@@ -589,8 +592,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                         updateCallback: () => safeSetState(() {}),
                                         child: ResultMetricCardWidget(
                                            label: 'result.derivation'.tr(),
-                                           unit: 'common.cm'.tr(),
-                                          value: '${_model.ballisticResult?.spinDriftCm.toStringAsFixed(1) ?? '0.0'}',
+                                           unit: UnitsManager.instance.smallDistanceLabel,
+                                          value: '${UnitConverter.convertSmallDistance(_model.ballisticResult?.spinDriftCm ?? 0.0).toStringAsFixed(1)}',
                                         ),
                                       ),
                                     ),
@@ -678,8 +681,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                           child: FlutterFlowLineChart(
                                             data: [
                                               FFLineChartData(
-                                                xData: _model.ballisticResult?.trajectoryPoints.map((p) => p.x).toList() ?? [0.0, (widget.distance ?? 600.0)],
-                                                yData: _model.ballisticResult?.trajectoryPoints.map((p) => p.y).toList() ?? [0.0, 0.0],
+                                                xData: _model.ballisticResult?.trajectoryPoints.map((p) => UnitConverter.convertDistance(p.x)).toList() ?? [0.0, UnitConverter.convertDistance(widget.distance ?? 600.0)],
+                                                yData: _model.ballisticResult?.trajectoryPoints.map((p) => UnitConverter.convertSmallDistance(p.y)).toList() ?? [0.0, 0.0],
                                                 settings: LineChartBarData(
                                                   color: FlutterFlowTheme.of(
                                                           context)
@@ -704,12 +707,12 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                             ),
                                             axisBounds: AxisBounds(
                                               minX: 0.0,
-                                              maxX: (widget.distance ?? 600.0),
+                                              maxX: UnitConverter.convertDistance(widget.distance ?? 600.0),
                                             ),
                                             xAxisLabelInfo: AxisLabelInfo(
-                                              title: 'result.distance_axis'.tr(),
+                                              title: 'result.distance_axis'.tr() + ' (${UnitsManager.instance.distanceLabel})',
                                               showLabels: true,
-                                              labelInterval: (widget.distance ?? 600.0) / 5,
+                                              labelInterval: UnitConverter.convertDistance(widget.distance ?? 600.0) / 5,
                                               labelTextStyle:
                                                   FlutterFlowTheme.of(context)
                                                       .bodySmall
@@ -865,8 +868,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                   child: CorrectionTileWidget(
                                     label: 'result.speed_at_target'.tr(),
                                     sub_label: 'result.distance_sub'.tr(args: ['${widget.distance?.round() ?? 0}', UnitsManager.instance.distanceLabel]),
-                                    unit: 'units.speed_m_s'.tr(),
-                                    value: '${_model.ballisticResult?.velocityAtTarget.round() ?? 0}',
+                                    unit: UnitsManager.instance.speedLabel,
+                                    value: '${UnitConverter.convertSpeed(_model.ballisticResult?.velocityAtTarget ?? 0.0).round()}',
                                   ),
                                 ),
                                 wrapWithModel(
@@ -875,8 +878,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
                                   child: CorrectionTileWidget(
                                     label: 'result.energy'.tr(),
                                     sub_label: 'result.at_hit_point'.tr(),
-                                    unit: 'result.joules'.tr(),
-                                    value: '${_model.ballisticResult?.energyAtTarget.round() ?? 0}',
+                                    unit: UnitsManager.instance.energyLabel,
+                                    value: '${UnitConverter.convertEnergy(_model.ballisticResult?.energyAtTarget ?? 0.0).round()}',
                                   ),
                                 ),
                               ].divide(SizedBox(height: 16.0)),
@@ -1013,6 +1016,8 @@ class _ShootResultWidgetState extends State<ShootResultWidget> {
         ),
         ),
       ),
+    );
+      },
     );
   }
 }
