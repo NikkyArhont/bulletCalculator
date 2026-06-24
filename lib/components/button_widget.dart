@@ -208,67 +208,70 @@ class _ButtonWidgetState extends State<ButtonWidget> {
                       }(),
                       0.0,
                     )),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (valueOrDefault<bool>(
-                      widget!.icon_present,
-                      false,
-                    ))
-                      widget!.icon!,
-                    Text(
-                      valueOrDefault<String>(
-                        widget!.content,
-                        'Далее',
-                      ),
-                      maxLines: 1,
-                      style: FlutterFlowTheme.of(context).labelMedium.override(
-                            font: GoogleFonts.spaceGrotesk(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (valueOrDefault<bool>(
+                        widget!.icon_present,
+                        false,
+                      ))
+                        widget!.icon!,
+                      Text(
+                        valueOrDefault<String>(
+                          widget!.content,
+                          'Далее',
+                        ),
+                        maxLines: 1,
+                        style: FlutterFlowTheme.of(context).labelMedium.override(
+                              font: GoogleFonts.spaceGrotesk(
+                                fontWeight: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .fontWeight,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .fontStyle,
+                              ),
+                              color: () {
+                                if (widget!.color != null) {
+                                  if (widget!.variant == 'outline' || widget!.variant == 'ghost') {
+                                    return widget!.color!;
+                                  }
+                                  return Colors.white;
+                                }
+                                if (widget!.variant == 'secondary') {
+                                  return FlutterFlowTheme.of(context).onSecondary;
+                                } else if (widget!.variant == 'outline') {
+                                  return FlutterFlowTheme.of(context).primaryText;
+                                } else if (widget!.variant == 'ghost') {
+                                  return FlutterFlowTheme.of(context).primary;
+                                } else if (widget!.variant == 'destructive') {
+                                  return FlutterFlowTheme.of(context).onError;
+                                } else {
+                                  return FlutterFlowTheme.of(context).onPrimary;
+                                }
+                              }(),
+                              letterSpacing: 0.0,
                               fontWeight: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .fontWeight,
                               fontStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .fontStyle,
+                              lineHeight: 1.1,
                             ),
-                            color: () {
-                              if (widget!.color != null) {
-                                if (widget!.variant == 'outline' || widget!.variant == 'ghost') {
-                                  return widget!.color!;
-                                }
-                                return Colors.white;
-                              }
-                              if (widget!.variant == 'secondary') {
-                                return FlutterFlowTheme.of(context).onSecondary;
-                              } else if (widget!.variant == 'outline') {
-                                return FlutterFlowTheme.of(context).primaryText;
-                              } else if (widget!.variant == 'ghost') {
-                                return FlutterFlowTheme.of(context).primary;
-                              } else if (widget!.variant == 'destructive') {
-                                return FlutterFlowTheme.of(context).onError;
-                              } else {
-                                return FlutterFlowTheme.of(context).onPrimary;
-                              }
-                            }(),
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .fontStyle,
-                            lineHeight: 1.1,
-                          ),
-                      overflow: TextOverflow.clip,
-                    ),
-                    if (valueOrDefault<bool>(
-                      widget!.icon_end_present,
-                      false,
-                    ))
-                      widget!.icon_end!,
-                  ].divide(SizedBox(width: 8.0)),
+                        overflow: TextOverflow.clip,
+                      ),
+                      if (valueOrDefault<bool>(
+                        widget!.icon_end_present,
+                        false,
+                      ))
+                        widget!.icon_end!,
+                    ].divide(SizedBox(width: 8.0)),
+                  ),
                 ),
               ),
             ),
